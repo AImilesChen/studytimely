@@ -6,9 +6,11 @@
   "indexable": true,
   "gscVerification": "",
   "bingVerification": "5B3F27784F92AB167C79A47A4BC185D0",
-  "ga4Id": "",
-  "analyticsPolicyReviewed": false,
+  "ga4Id": "G-H523HGH13V",
+  "analyticsPolicyReviewed": true,
   "accountsEnabled": true,
   "accountsReviewed": true,
-  "localAccountsTest": false
+  "localAccountsTest": false,
+  "analyticsSourceContainer": "GTM-W5CTHLWP",
+  "ahrefsKey": "I/HxiJvFlguUUynvxpr9rg"
 }

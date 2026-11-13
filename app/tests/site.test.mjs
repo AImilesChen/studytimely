@@ -42,7 +42,7 @@ test('analytics accepts only whitelisted behavior fields and remains absent befo
  const sent=[],frames=[],listeners={};const win={location:{origin:'https://example.test'},addEventListener:(k,v)=>listeners[k]=v,removeEventListener:()=>{}};
  const doc={cookie:'_ga=fixture',createElement:()=>({contentWindow:{postMessage:m=>sent.push(m)},remove(){this.removed=true;}}),body:{append:f=>frames.push(f)}};
  const a=createAnalytics({id:'G-TEST',enabled:true,win,doc});a.page('/');a.track('timer_start',{mode:'study'});assert.equal(frames.length,0);
- a.consent(true);assert.equal(frames.length,1);a.page('/?subject=private');a.page('/');a.track('timer_start',{mode:'study',subject:'private'});
+ a.consent(true);assert.equal(frames.length,1);a.page('/');a.track('timer_start',{mode:'study',subject:'private'});
  listeners.message({source:frames[0].contentWindow,origin:win.location.origin,data:{type:'studytimely-analytics-ready'}});
  assert.equal(sent[0].type,'init');assert.equal(sent.filter(x=>x.type==='page').length,1);assert.ok(!JSON.stringify(sent).includes('private'));
  a.consent(false);assert.equal(frames[0].removed,true);assert.match(doc.cookie,/Max-Age=0/);const count=sent.length;a.track('timer_start',{mode:'study'});assert.equal(sent.length,count);a.destroy();

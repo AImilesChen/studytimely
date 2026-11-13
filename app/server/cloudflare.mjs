@@ -26,7 +26,7 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  const out=new Headers(response.headers);for(const [key,value] of Object.entries(headers))out.set(key,value);
  if(path==='/analytics-frame.html'||path==='/analytics-frame.js'||missing)out.set('X-Robots-Tag','noindex, nofollow');
  if(path.startsWith('/assets/'))out.set('Cache-Control','public, max-age=31536000, immutable');else out.set('Cache-Control','no-cache');
- const analytics=config.analyticsEnabled?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com":'';
+ const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com https://analytics.ahrefs.com":'';
  out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});
 }};}

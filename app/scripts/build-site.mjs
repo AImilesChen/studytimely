@@ -17,6 +17,7 @@ if(release){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(config.effectiveDate))missing.push('effectiveDate');
  if(config.policiesReviewed!==true)missing.push('policiesReviewed');if(config.indexable!==true)missing.push('indexable');
  if(config.ga4Id&&(!/^G-[A-Z0-9]+$/.test(config.ga4Id)||!config.analyticsPolicyReviewed))missing.push('reviewed analytics configuration');
+ if(config.ahrefsKey&&(!/^[A-Za-z0-9/+_-]{16,80}$/.test(config.ahrefsKey)||!config.analyticsPolicyReviewed))missing.push('reviewed Ahrefs configuration');
  for(const file of policyFiles){const text=await fs.readFile(path.join(root,'../docs/compliance/v1.1',file),'utf8');if(text.includes('[待确认')||text.includes('INTERNAL DRAFT'))missing.push('final policy: '+file);}
  if(config.accountsEnabled&&(!config.accountsReviewed||config.localAccountsTest))missing.push('production account setup and policy review');
  if(missing.length)throw Error('Release configuration is incomplete: '+missing.join(', ')+'. Local preview remains available.');
@@ -42,7 +43,7 @@ await fs.writeFile('dist/client/sitemap.xml',`<?xml version="1.0" encoding="UTF-
 // Explicit individual paths, all inside dist/client; never remove a source or archive.
 for(const name of ['design-review.html','design-review.css','design-review.js']){const file=path.join(root,'dist/client',name);if(existsSync(file))await fs.unlink(file);}
 const pwa=await buildPwa(root,ROUTES);console.log('PWA cache:',pwa);
-await fs.writeFile('dist/cloudflare-entry.mjs',`import {createWorker} from '../server/cloudflare.mjs';\nexport default createWorker(${JSON.stringify({origin:config.origin,indexable:release,accountsEnabled:config.accountsEnabled===true,analyticsEnabled:!!config.ga4Id&&config.analyticsPolicyReviewed})});\n`);
+await fs.writeFile('dist/cloudflare-entry.mjs',`import {createWorker} from '../server/cloudflare.mjs';\nexport default createWorker(${JSON.stringify({origin:config.origin,indexable:release,accountsEnabled:config.accountsEnabled===true,analyticsEnabled:!!(config.ga4Id||config.ahrefsKey)&&config.analyticsPolicyReviewed})});\n`);
 await bundleWorker({entryPoints:['dist/cloudflare-entry.mjs'],bundle:true,format:'esm',platform:'browser',target:'es2022',outfile:'dist/cloudflare/worker.mjs'});
 await import('./prepare-sites-build.mjs');
 console.log(`Pre-rendered ${ROUTES.length} pages + 404. Environment: ${release?'release':'local preview (noindex)'}.`);

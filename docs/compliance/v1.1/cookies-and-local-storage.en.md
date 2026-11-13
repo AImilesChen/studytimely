@@ -25,9 +25,15 @@ Saving timer or history information is separate from sending analytics events. W
 
 ## 3. Analytics and advertising
 
-This release does not load advertising trackers or optional analytics tools, and anonymous use sets no application cookie. Optional sign-in uses the necessary session cookie described above. The IndexedDB storage above supports the timer and the preferences and records you choose to save. Hosting and network-security processing by Cloudflare is described in our Privacy Policy; browser storage and network processing are separate.
+Optional Google Analytics 4 and Ahrefs usage statistics are off by default. Enable them together in Settings → Data → Allow Google Analytics and Ahrefs. No analytics script or measurement is sent by this integration before you enable it; declining leaves the free tools available. Account/private and legal pages are excluded. Hosting and network-security requests remain separate from analytics.
 
-If optional tracking is introduced, we will update this notice and provide the required choice before activation. Declining optional tracking will not prevent use of the basic timer.
+| Item | Purpose | Duration and controls |
+|---|---|---|
+| IndexedDB setting `analytics` | Remember this browser's optional statistics choice | Until changed or local site data is cleared; excluded from cloud sync. |
+| Google Analytics `_ga` / `_ga_*` cookies, only after opt-in | Basic usage and visitor/session measurement | Our tag sets up to 30 days without refreshing that expiry on each visit. Turn the setting off to stop collection and expire this site's analytics cookies. |
+| Ahrefs analytics script and requests, only after opt-in | Public tool page visits and basic timer actions | No analytics cookies set by Ahrefs; it uses daily pseudonymous counting. Provider-side retention is separate from browser storage. |
+
+Only approved tool paths without query strings, fragments or referrers and allowlisted timer-mode events are sent. Email, account details, labels, study records and durations are excluded from our payloads. Reopen Settings → Data to withdraw at any time. Withdrawal does not erase prior provider-held data; see our Privacy Policy and the linked provider notices. Advertising storage and personalisation remain disabled.
 
 ## 4. Browser controls and deletion
 
