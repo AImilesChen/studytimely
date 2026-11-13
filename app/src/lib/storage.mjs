@@ -5,7 +5,7 @@ export const DATABASE='studytimely';
 export const STORE='local-state';
 export const ROOT_KEY='v1';
 export const CHANNEL='studytimely-state-v1';
-export const SESSION_PREFERENCE_KEYS=['theme','spaceTheme','ambient','lastTool','reducedMotion','sound','volume','clock24','showSeconds','showDate'];
+export const SESSION_PREFERENCE_KEYS=['theme','spaceTheme','ambient','lastTool','lastPage','reducedMotion','sound','volume','clock24','showSeconds','showDate'];
 const uuid=()=>crypto.randomUUID();
 export function persistedState(state){
  // Choosing not to remember preferences retains study data and active timing only.

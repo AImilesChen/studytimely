@@ -10,7 +10,7 @@ import terms from '../../docs/compliance/v1.1/terms-of-use.en.md?raw';
 import cookies from '../../docs/compliance/v1.1/cookies-and-local-storage.en.md?raw';
 import {useStudyStore} from './lib/useStudyStore.jsx';
 import {elapsedMs,formatTime,human,hasProgress,isStudy,makeTimer,statistics} from './lib/model.mjs';
-import {TOOLS,LEGAL_LINKS,GUIDES,FAQ,toolFor,routeFor} from './lib/routes.mjs';
+import {TOOLS,LEGAL_LINKS,GUIDES,FAQ,toolFor,routeFor,startupPath} from './lib/routes.mjs';
 import {Dialog} from './components/Dialog.jsx';
 import {Settings} from './components/Settings.jsx';
 import {Tracker} from './components/Tracker.jsx';
@@ -40,7 +40,7 @@ export function App({initialPath='/',initialNow=0}){
  useEffect(()=>{document.documentElement.dataset.theme=s.theme;document.documentElement.dataset.space=s.spaceTheme;document.documentElement.dataset.motion=s.reducedMotion?'reduced':'full';},[s.theme,s.spaceTheme,s.reducedMotion]);
  useEffect(()=>{const changed=()=>setFull(!!document.fullscreenElement);document.addEventListener('fullscreenchange',changed);return()=>document.removeEventListener('fullscreenchange',changed);},[]);
  useEffect(()=>{const changed=()=>{setPath(location.pathname);setFocus(false);setSettings(false);};window.addEventListener('popstate',changed);return()=>window.removeEventListener('popstate',changed);},[]);
- useEffect(()=>{if(ready&&path==='/alarm-clock'&&s.lastTool!=='alarm')command('settings',{patch:{lastTool:'alarm'}});if(ready&&path==='/app')go(toolFor(s.lastTool).path);else if(ready&&tool&&s.lastTool!==tool.id)command('settings',{patch:{lastTool:tool.id}});},[ready,path]);
+ useEffect(()=>{if(!ready)return;if(path==='/app'){go(hasProgress(active)?toolFor(active.mode).path:startupPath(s));return;}const current=routeFor(path);if((tool||tracker||management)&&!['account','app'].includes(current?.id)&&s.lastPage!==current?.path)command('settings',{patch:{lastPage:current.path,...(tool?{lastTool:tool.id}:{})}});},[ready,path]);
  useEffect(()=>{applyMetadata(path);analytics.current?.page(path);},[path]);
  useEffect(()=>{analytics.current=createAnalytics({id:site.ga4Id,enabled:site.analyticsPolicyReviewed});return()=>analytics.current?.destroy();},[]);
  useEffect(()=>{analytics.current?.consent(ready&&s.analytics&&!memory);analytics.current?.page(path);},[ready,s.analytics,memory,path]);

@@ -21,7 +21,7 @@ export const MANAGEMENT_ROUTES=[
 ];
 ROUTES.push(...MANAGEMENT_ROUTES);
 export const routeFor=path=>ROUTES.find(r=>r.path===path);
-export const toolFor=mode=>TOOLS.find(t=>t.id===mode)||MANAGEMENT_ROUTES.find(t=>t.id===mode)||TOOLS[1];
+export const toolFor=mode=>ROUTES.find(t=>t.id===mode)||TOOLS[1];
 export const LEGAL_LINKS=[['Privacy Policy','/privacy'],['Terms of Use','/terms'],['Cookies & Local Storage','/cookies']];
 export const GUIDES={
  study:[['Choose your session.','Count upwards with Study Timer, or alternate study and rest with Pomodoro.'],['Start studying.','Add a subject in Settings if it helps. Pause whenever you need to.'],['Review your time.','Finish your session and see your activity in the study workspace.']],
@@ -40,3 +40,5 @@ export const FAQ={
  countdown:[['Is this the same as an alarm clock?','No. A countdown measures a duration. It does not schedule an alert for a particular time of day.'],['Does a countdown add to my study total?','Use Study Timer, Focus Timer or Pomodoro when you want to record a study session. A general countdown can also be used for breaks and other activities.'],...SHARED_FAQ.filter((_,i)=>i!==1)],
  stopwatch:[['What does Lap do?','It records the time for a round while the stopwatch keeps running. The list shows each lap and the total elapsed time.'],['Does Reset remove my lap list?','Yes. Reset clears the current run and its laps. Review them before resetting.'],['Should I use Stopwatch or Study Timer?','Use Stopwatch when lap times matter. Use Study Timer when you want study history, subjects and progress towards a daily study goal.'],...SHARED_FAQ.slice(0,1)]
 };
+
+export function startupPath(settings){const page=routeFor(settings.lastPage);return page&&page.indexable!==false&&!['privacy','terms','cookies'].includes(page.id)?page.path:toolFor(settings.lastTool).path;}

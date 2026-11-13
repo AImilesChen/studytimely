@@ -4,7 +4,8 @@ export const SCHEMA=1;
 export const MAX_GAP=30*60*1000;
 export const MAX_RUN=24*60*60*1000;
 export const MODES=['study','pomodoro','focus','countdown','stopwatch','clock','alarm'];
-export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},lastTool:'study',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
+const EXTRA_LAST_PAGES={alarm:'/alarm-clock',tracker:'/study-tracker',planner:'/study-planner',schedule:'/study-schedule-maker',habits:'/study-habit-tracker',syllabus:'/syllabus-tracker',exam:'/exam-countdown',aesthetic:'/aesthetic-timer',calculator:'/study-time-calculator'};
+export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},lastTool:'study',lastPage:'',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
 export function emptyState(epoch='initial'){return{schema:SCHEMA,epoch,revision:0,settings:structuredClone(DEFAULT_SETTINGS),subjects:[],dailyGoal:0,sessions:[],timer:null,workspace:emptyWorkspace()};}
 export class DomainError extends Error{constructor(code,message){super(message);this.code=code;}}
 const fail=(code,message)=>{throw new DomainError(code,message);};
@@ -50,7 +51,10 @@ function ownerGuard(state,owner){if(hasProgress(state.timer)&&state.timer.owner!
 function integer(n,min,max,label){if(!Number.isInteger(n)||n<min||n>max)fail('INVALID',`${label} must be a whole number from ${min} to ${max}.`);return n;}
 export function validateSettings(input){
  const s={...DEFAULT_SETTINGS,...input};
- if(!MODES.includes(s.lastTool))fail('INVALID','Choose a supported last tool.');
+ // Preserve the legacy six-mode setting so older open tabs can still validate state.
+ if(EXTRA_LAST_PAGES[s.lastTool]){s.lastPage=s.lastPage||EXTRA_LAST_PAGES[s.lastTool];s.lastTool='study';}
+ if(!MODES.includes(s.lastTool)||s.lastTool==='alarm')fail('INVALID','Choose a supported last tool.');
+ if(typeof s.lastPage!=='string'||s.lastPage.length>100)fail('INVALID','Invalid last page.');
  if(!['dark','light'].includes(s.theme))fail('INVALID','Choose a supported theme.');
  if(!['default','midnight','sand','rain','forest','coffee','desk'].includes(s.spaceTheme))fail('INVALID','Choose a supported study space.');
  if(!s.ambient||typeof s.ambient!=='object'||Array.isArray(s.ambient))fail('INVALID','Invalid ambient sound settings.');
