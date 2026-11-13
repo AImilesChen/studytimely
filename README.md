@@ -31,6 +31,6 @@ Public policies are in `docs/compliance/v1.1`; generated third-party notices are
 
 Public source availability does not imply an additional open-source licence. Third-party dependencies and assets retain their respective licences.
 
-Latest production release notes: [V1.1.1, 2026-11-13](docs/releases/V1.1.1-2026-11-13.md). The [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) records its earlier verification state. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
+Latest production release notes: [V1.1.2, optional analytics](docs/releases/V1.1.2-2026-11-13.md). GA4 Realtime and the verified Ahrefs project both received the controlled page visit. [V1.1.1 closure](docs/releases/V1.1.1-2026-11-13.md) and the [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) record earlier verification states. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
 
 V1.1 closure adds a wall-time alarm with snooze, study-time calculator, explicit opt-in presentation-settings sync and self-hosted web-vitals 5.1.0 readings that stay in tab memory. These are not site-wide CrUX percentiles.
