@@ -10,7 +10,7 @@ Seven timing tools including a local-time alarm, local study history, task-linke
 
 Use Node 24. From `app`, run `npm ci`, `npm run dev`. Vite preview supports local tools; account integration needs a Worker/D1 environment.
 
-Run `npm run build` then `npm test` for the local candidate and regression suite. `npm run build:release` creates the production-indexable build after configuration/policy checks. When testing a production build, set STUDY_TEST_RELEASE=1 before npm test. Current suite: 54 tests. `npm run test:sites` checks the protected Sites adapter.
+Run `npm run build` then `npm test` for the local candidate and regression suite. `npm run build:release` creates the production-indexable build after configuration/policy checks. When testing a production build, set STUDY_TEST_RELEASE=1 before npm test. Current suite: 55 tests. `npm run test:sites` checks the protected Sites adapter.
 
 For full local Worker integration, build and use official Wrangler:
 
@@ -27,10 +27,10 @@ The local fixture only delivers codes to synthetic @studytimely.invalid addresse
 
 Sign-in uses Cloudflare Email Service, with per-IP/email rate limits, hashed one-time codes, HttpOnly sessions, CSRF and per-account data scope. Cloud sync is manual, uses optimistic versions and never uploads an active timer. Cloud snapshots are limited to 1 MiB. Clearing local data, deleting cloud data and deleting an account are separate actions. Back up local records before clearing browser storage.
 
-Public policies are in `docs/compliance/v1.1`; third-party asset notices are in `app/public/THIRD-PARTY-NOTICES.txt`. Analytics is disabled. GSC/Bing verification and submission are separate operational steps and are not claimed complete.
+Public policies are in `docs/compliance/v1.1`; generated third-party notices are in `app/dist/client/THIRD-PARTY-NOTICES.txt`, including the self-hosted web-vitals licence. Analytics is disabled. GSC and Bing ownership were verified and the production Sitemap submitted on 2026-11-13; submission does not establish indexing or search traffic.
 
 Public source availability does not imply an additional open-source licence. Third-party dependencies and assets retain their respective licences.
 
-Production release notes: [V1.1, 2026-11-13](docs/releases/V1.1-2026-11-13.md). The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
+Latest production release notes: [V1.1.1, 2026-11-13](docs/releases/V1.1.1-2026-11-13.md). The [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) records its earlier verification state. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
 
 V1.1 closure adds a wall-time alarm with snooze, study-time calculator, explicit opt-in presentation-settings sync and self-hosted web-vitals 5.1.0 readings that stay in tab memory. These are not site-wide CrUX percentiles.
