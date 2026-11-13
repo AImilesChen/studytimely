@@ -1,29 +1,10 @@
 import {validateBackup} from '../src/lib/model.mjs';
-
+import {ApiError,fail,digest,hmac,equal,randomToken,result,cookie,readCookie,body} from './auth-shared.mjs';
 export const MAX_SYNC_BYTES=1024*1024;
-const AGE=30*86400000,CODE_AGE=10*60000;
-class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code;}}
-const fail=(status,code,message)=>{throw new ApiError(status,code,message);};
-const encoder=new TextEncoder();
-export async function digest(text){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(text)))).map(v=>v.toString(16).padStart(2,'0')).join('');}
-async function hmac(secret,value){const k=await crypto.subtle.importKey('raw',encoder.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',k,encoder.encode(value)))).map(v=>v.toString(16).padStart(2,'0')).join('');}
-function equal(a,b){if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let different=0;for(let i=0;i<a.length;i++)different|=a.charCodeAt(i)^b.charCodeAt(i);return different===0;}
+const AGE=30*86400000,CODE_AGE=10*60000,encoder=new TextEncoder();
 const email=value=>{if(typeof value!=='string'||value.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(value.trim()))fail(400,'INVALID','Enter a valid email address.');return value.trim().toLowerCase();};
-function randomToken(){return Array.from(crypto.getRandomValues(new Uint8Array(32))).map(v=>v.toString(16).padStart(2,'0')).join('');}
 function randomCode(){let n;do{n=crypto.getRandomValues(new Uint32Array(1))[0];}while(n>=4294000000);return String(n%1000000).padStart(6,'0');}
-function result(data,status=200,extra={}){return Response.json(data,{status,headers:{'Cache-Control':'no-store, private','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Referrer-Policy':'no-referrer',...extra}});}
-function cookieName(request){return new URL(request.url).protocol==='https:'?'__Host-studytimely-session':'studytimely-local-session';}
-function cookie(request,token,seconds){const secure=new URL(request.url).protocol==='https:';return `${cookieName(request)}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${seconds}${secure?'; Secure':''}`;}
-function readCookie(request){return (request.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName(request)+'='))?.slice(cookieName(request).length+1)||'';}
-async function body(request,limit=2048){
- if(!request.headers.get('content-type')?.toLowerCase().startsWith('application/json'))fail(415,'CONTENT_TYPE','Use JSON for this request.');
- if(Number(request.headers.get('content-length')||0)>limit)fail(413,'TOO_LARGE','The request is too large.');
- const reader=request.body?.getReader();if(!reader)fail(400,'INVALID','A JSON request body is required.');
- const chunks=[];let count=0;while(true){const {done,value}=await reader.read();if(done)break;count+=value.byteLength;if(count>limit){await reader.cancel();fail(413,'TOO_LARGE','The request is too large.');}chunks.push(value);}
- const bytes=new Uint8Array(count);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}
- try{const value=JSON.parse(new TextDecoder().decode(bytes));if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'INVALID','Provide a valid JSON object.');}
-}
-export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=randomToken,makeId=()=>crypto.randomUUID()}={}){
+export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=randomToken,makeId=()=>crypto.randomUUID(),emailRecoveryOnly=false}={}){
  return async function handle(request,env,enabled=true){
   const url=new URL(request.url),path=url.pathname,method=request.method,at=now();
   try{
@@ -42,16 +23,17 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
    let identity=null,sessionToken=readCookie(request),sessionHash='';
    if(sessionToken&&/^[a-f0-9]{64}$/.test(sessionToken)){
     sessionHash=await digest(sessionToken);
-    identity=await query('SELECT a.id,a.email,a.created_at,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?',sessionHash,at).first();
+    identity=await query('SELECT a.id,a.email,a.google_sub,a.created_at,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?',sessionHash,at).first();
    }
    const csrf=identity?await hmac(env.AUTH_HMAC,'csrf:'+sessionToken):'';
-   if(path==='/api/auth/me'&&method==='GET')return result({user:identity?{email:identity.email,createdAt:identity.created_at}:null,csrf:identity?csrf:null});
+   if(path==='/api/auth/me'&&method==='GET')return result({user:identity?{email:identity.email,createdAt:identity.created_at,googleLinked:!!identity.google_sub}:null,csrf:identity?csrf:null,providers:{google:!!(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)}});
    if(!publicPaths.includes(path)&&!identity)fail(401,'NO_AUTH','Sign in to use cloud data. Anonymous tools remain available.');
    if(identity&&!publicPaths.includes(path)&&!['GET','HEAD'].includes(method)&&!equal(request.headers.get('x-csrf-token'),csrf))fail(403,'CSRF','Refresh your account page and try again.');
    if(path==='/api/auth/request-code'&&method==='POST'){
     const input=await body(request),address=email(input.email);
     if(input.accepted!==true)fail(400,'AGE_POLICY','Confirm the account age and privacy requirements before continuing.');
     await limit('request-ip',ip,20,3600000);await limit('request-email',address,3,900000);
+    if(emailRecoveryOnly){const legacy=await query('SELECT google_sub FROM accounts WHERE email=?',address).first();if(!legacy||legacy.google_sub)return result({sent:true,expiresIn:600},202);}
     if(!env.EMAIL?.send)fail(503,'MAIL_UNAVAILABLE','Sign-in email is unavailable. Please try again later.');
     const key=await hmac(env.AUTH_HMAC,'email:'+address);
     const code=makeCode(),nonce=makeToken(),hash=await hmac(env.AUTH_HMAC,key+':'+nonce+':'+code);
@@ -69,6 +51,7 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
     const saved=await query('UPDATE login_codes SET attempts=attempts+1 WHERE email_key=? AND expires_at>? AND attempts<5 RETURNING code_hash,nonce',key,at).first();
     if(!saved||!equal(saved.code_hash,await hmac(env.AUTH_HMAC,key+':'+saved.nonce+':'+input.code)))fail(400,'INVALID_CODE','The code is incorrect or expired. Request a new code if needed.');
     const consumed=await query('DELETE FROM login_codes WHERE email_key=? AND nonce=? RETURNING email_key',key,saved.nonce).first();if(!consumed)fail(400,'INVALID_CODE','This code has already been used.');
+    const linkedGoogle=await query('SELECT google_sub FROM accounts WHERE email=?',address).first();if(emailRecoveryOnly&&!linkedGoogle)fail(400,'INVALID_CODE','The code is incorrect or expired.');if(linkedGoogle?.google_sub)fail(400,'GOOGLE_REQUIRED','Use Google to sign in to this linked account.');
     await query('INSERT INTO accounts(id,email,created_at) VALUES(?,?,?) ON CONFLICT(email) DO NOTHING',makeId(),address,at).run();
     const account=await query('SELECT id,email,created_at FROM accounts WHERE email=?',address).first(),token=makeToken();
     await query('INSERT INTO sessions(token_hash,account_id,expires_at) VALUES(?,?,?)',await digest(token),account.id,at+AGE).run();
@@ -93,7 +76,9 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
    }
    if(path==='/api/account/export'&&method==='GET'){
     const row=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();
-    return result({account:{email:identity.email,createdAt:identity.created_at},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
+    const profile=await query('SELECT id,nickname,public_ranking,accepted_at FROM community_profiles WHERE account_id=?',identity.id).first();
+    const community=profile?{profile,ownedRooms:(await query('SELECT id,name,visibility,goal_minutes,capacity,invitations_open,created_at,closed_at FROM community_rooms WHERE owner_id=?',profile.id).all()).results,roomTime:(await query('SELECT room_id,day,seconds FROM community_room_daily WHERE profile_id=?',profile.id).all()).results,rankHistory:(await query('SELECT day,rank,seconds FROM community_rank_history WHERE profile_id=?',profile.id).all()).results,blocks:(await query('SELECT blocked_id FROM community_blocks WHERE blocker_id=?',profile.id).all()).results,memberships:(await query('SELECT room_id,joined_at,left_at,banned FROM community_members WHERE profile_id=?',profile.id).all()).results,daily:(await query('SELECT day,seconds FROM community_daily WHERE profile_id=?',profile.id).all()).results,messages:(await query('SELECT room_id,text,created_at FROM community_messages WHERE author_id=?',profile.id).all()).results,reports:(await query('SELECT room_id,reason,detail,status,created_at FROM community_reports WHERE reporter_id=?',profile.id).all()).results}:null;
+    return result({community,account:{email:identity.email,createdAt:identity.created_at,googleSubject:identity.google_sub||null},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
    }
    if(path==='/api/account'&&method==='DELETE'){
     const input=await body(request);if(input.confirm!=='DELETE')fail(400,'CONFIRM','Confirm account deletion explicitly.');

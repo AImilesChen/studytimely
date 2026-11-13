@@ -1,12 +1,16 @@
 import {ROUTES} from '../src/lib/routes.mjs';
 import {createAccountsApi} from './accounts.mjs';
-const accountApi=createAccountsApi();
+import {createGoogleAuth} from './google-auth.mjs';
+import {createCommunityApi,communityMaintenance} from './community.mjs';
+const accountApi=createAccountsApi({emailRecoveryOnly:true}),googleApi=createGoogleAuth(),communityApi=createCommunityApi();
 const accountPaths=new Set(['/api/auth/me','/api/auth/request-code','/api/auth/verify-code','/api/auth/logout','/api/workspace','/api/account/export','/api/account']);
 const paths=new Set(ROUTES.map(r=>r.path));
-export function createWorker(config={indexable:false}){return{async fetch(request,env){
+export function createWorker(config={indexable:false}){return{async fetch(request,env,ctx){
  const url=new URL(request.url),path=url.pathname;
+ if(path.startsWith('/api/auth/google/'))return googleApi(request,env);
+ if(path.startsWith('/api/community/'))return communityApi(request,env,config.communityEnabled===true,ctx);
  if(accountPaths.has(path))return accountApi(request,env,config.accountsEnabled===true);
- const headers={'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'};
+ const headers={'X-Content-Type-Options':'nosniff','Referrer-Policy':['/study-groups','/leaderboard','/account'].includes(path)?'no-referrer':'strict-origin-when-cross-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'};
  if(!config.indexable)headers['X-Robots-Tag']='noindex, nofollow';
  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{...headers,Allow:'GET, HEAD'}});
  if(config.origin){
@@ -27,6 +31,6 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  if(path==='/analytics-frame.html'||path==='/analytics-frame.js'||missing)out.set('X-Robots-Tag','noindex, nofollow');
  if(path.startsWith('/assets/'))out.set('Cache-Control','public, max-age=31536000, immutable');else out.set('Cache-Control','no-cache');
  const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com":'';
- out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
+ out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${config.communityEnabled&&path==='/study-groups'?' '+(url.protocol==='https:'?'wss://':'ws://')+url.host:''}${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});
-}};}
+},async scheduled(event,env,ctx){if(config.communityEnabled)ctx.waitUntil(communityMaintenance(env,event.scheduledTime));}};}

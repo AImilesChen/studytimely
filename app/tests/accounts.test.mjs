@@ -5,11 +5,11 @@ import fs from 'node:fs';
 import {createAccountsApi,MAX_SYNC_BYTES} from '../server/accounts.mjs';
 import {emptyState} from '../src/lib/model.mjs';
 import {backupOf} from '../src/lib/storage.mjs';
-function setup(){
- const db=new DatabaseSync(':memory:');db.exec(fs.readFileSync(new URL('../migrations/0001_accounts.sql',import.meta.url),'utf8'));
- const DB={prepare(sql){return{bind(...values){return{async first(){return db.prepare(sql).get(...values)||null;},async run(){return {meta:db.prepare(sql).run(...values)};}};}};},async batch(statements){db.exec('BEGIN');try{const out=[];for(const s of statements)out.push(await s.run());db.exec('COMMIT');return out;}catch(e){db.exec('ROLLBACK');throw e;}}};
+function setup(options={}){
+ const db=new DatabaseSync(':memory:');for(const name of fs.readdirSync(new URL('../migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(fs.readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
+ const DB={prepare(sql){return{bind(...values){return{async first(){return db.prepare(sql).get(...values)||null;},async all(){return {results:db.prepare(sql).all(...values)};},async run(){return {meta:db.prepare(sql).run(...values)};}};}};},async batch(statements){db.exec('BEGIN');try{const out=[];for(const s of statements)out.push(await s.run());db.exec('COMMIT');return out;}catch(e){db.exec('ROLLBACK');throw e;}}};
  let at=Date.UTC(2026,10,13,12),sent=[];const env={DB,AUTH_HMAC:'synthetic-local-test-secret-not-a-production-key',EMAIL:{async send(message){sent.push(message);}}};
- const api=createAccountsApi({now:()=>at,makeCode:()=>'123456'});
+ const api=createAccountsApi({now:()=>at,makeCode:()=>'123456',...options});
  const call=(path,method='GET',body,cookie='',csrf='',extra={})=>api(new Request('https://study.test'+path,{method,headers:{origin:'https://study.test','content-type':'application/json',cookie,'x-csrf-token':csrf,...extra},body:body===undefined?undefined:JSON.stringify(body)}),env);
  const login=async(address='qa@example.invalid')=>{assert.equal((await call('/api/auth/request-code','POST',{email:address,accepted:true})).status,202);const r=await call('/api/auth/verify-code','POST',{email:address,code:'123456'});assert.equal(r.status,200);return{cookie:r.headers.get('set-cookie').split(';')[0],csrf:(await r.json()).csrf};};
  return{db,env,sent,call,login,advance:n=>at+=n,close:()=>db.close()};
@@ -35,3 +35,10 @@ test('logout revokes the token, account deletion cascades cloud data and all ses
 test('oversized bodies, cross-site auth and missing acceptance do not create usable credentials',async()=>{
  const s=setup();try{assert.equal((await s.call('/api/auth/request-code','POST',{email:'qa@example.invalid',accepted:false})).status,400);assert.equal((await s.call('/api/auth/request-code','POST',{email:'qa@example.invalid',accepted:true},'','',{origin:'https://evil.test'})).status,403);assert.equal(s.sent.length,0);const a=await s.login();assert.equal((await s.call('/api/workspace','PUT',{version:0,document:'x'.repeat(MAX_SYNC_BYTES+5000)},a.cookie,a.csrf)).status,413);assert.equal((await s.call('/api/account/export','GET',undefined,a.cookie)).headers.get('cache-control'),'no-store, private');}finally{s.close();}
 });
+
+ test('Google release permits email recovery only for existing unlinked accounts without account enumeration',async()=>{
+ const s=setup({emailRecoveryOnly:true});try{
+ for(const address of ['new@example.invalid','google@example.invalid']){if(address.startsWith('google'))s.db.prepare('INSERT INTO accounts(id,email,google_sub,created_at) VALUES(?,?,?,?)').run(crypto.randomUUID(),address,'fixture-google',Date.now());assert.equal((await s.call('/api/auth/request-code','POST',{email:address,accepted:true})).status,202);assert.equal((await s.call('/api/auth/verify-code','POST',{email:address,code:'123456'})).status,400);}
+ assert.equal(s.sent.length,0);assert.equal(s.db.prepare('SELECT count(*) n FROM login_codes').get().n,0);
+ s.db.prepare('INSERT INTO accounts(id,email,created_at) VALUES(?,?,?)').run(crypto.randomUUID(),'legacy@example.invalid',Date.now());const a=await s.login('legacy@example.invalid');assert.ok(a.cookie);assert.equal(s.sent.length,1);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,2);
+ }finally{s.close();}});

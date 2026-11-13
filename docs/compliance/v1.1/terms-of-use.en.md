@@ -18,7 +18,7 @@ You do not need an account for the free tools. The absence of registration is no
 
 The free release provides the timer, clock, stopwatch and local study-record functions available on the site. Basic study-timing functions are provided free of charge, consistent with our commitment to keep those core functions free. No payment card or subscription is required for them.
 
-Optional email sign-in and manual cloud sync are available. Anonymous tools remain available. Cloud snapshots support up to 1 MiB; use JSON backup for larger histories. Study rooms, public leaderboards, paid subscriptions and AI study tools are not included. A roadmap is not a promise that a feature will be released on a particular date. Any later paid feature must be clearly described and separately chosen; it will not silently enrol you in a subscription or turn the promised free core timing tools into paid features.
+Optional Google sign-in and manual cloud sync are available; email codes recover existing unlinked accounts. Anonymous tools remain available. Cloud snapshots support up to 1 MiB; use JSON backup for larger histories. Optional study rooms, member chat and opted-in public leaderboards are available under the community section below. Paid subscriptions and AI study tools are not included. A roadmap is not a promise that a feature will be released on a particular date. Any later paid feature must be clearly described and separately chosen; it will not silently enrol you in a subscription or turn the promised free core timing tools into paid features.
 
 ## 4. Your records and device
 
@@ -61,3 +61,13 @@ Our [Privacy Policy](/privacy) and [Cookies and Local Storage Notice](/cookies) 
 We will post an updated effective date when these Terms change and give appropriate notice of material changes. New paid services require separate clear terms and agreement where required.
 
 Please contact [support@studytimely.com](mailto:support@studytimely.com) about a concern. Applicable law determines your rights and the courts that may hear a dispute. These Terms do not remove mandatory protections available where you live, require mandatory arbitration, waive collective rights, or prevent complaints to a competent regulator.
+
+## Community participation
+
+Study groups and global rankings are optional and require a Google-linked account, a separate nickname and confirmation that you are at least 16, with parental permission where required. Anonymous visitors may view public rooms and opted-in rankings. Do not impersonate someone, publish another person's information, harass others, send spam, post unlawful or sexual exploitation content, or manipulate verified scores. Do not put your school, contact details or sensitive personal information in room names, nicknames or chat.
+
+You retain rights in your own content. By submitting it, you allow us to store and display it to the intended room members/visitors, provide the requested ranking and review reports for operation and moderation. This does not grant permission to use private messages as advertising or testimonials. Public-room names, membership nicknames and room-time totals are public; private rooms and member chat have the access controls described in our Privacy Policy. Keep invitations confidential. A member may still copy information they can see, so privacy settings cannot guarantee secrecy from other members.
+
+Room owners can manage invitations, capacity and goals, mute or remove members, hide messages and close rooms. Platform moderators may review reports and restrict content or access. Use Report message or contact support@studytimely.com; include only the information necessary for a review. Reports concerning an owner are reserved for platform moderators. We do not promise immediate or continuous moderation. Authors may delete messages; reported excerpts may be retained temporarily for review.
+
+Rankings use server-checked room timers, one active timer per account, connection-gap checks, 25-minute check-ins and an eight-hour UTC daily cap. Local/imported records are excluded. Global participation is off until you opt in; room members can still see room contributions. Scores are an informal study aid, not proof of attention, attendance, exam readiness or an entitlement to a prize. We may correct or remove invalid scores and restrict abusive activity. Shared focus rounds are optional; members control their own participation. Network/device interruptions can prevent verified time from being credited.

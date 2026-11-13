@@ -19,7 +19,11 @@ Cookies are small pieces of information a browser may send with website requests
 | Cache Storage `studytimely-shell-*` and service worker | Public app shell for offline use; no API responses or user records | Replaced on app update or removed through browser website-data controls. |
 | `__Host-studytimely-session` (optional HTTPS sign-in) | Necessary random session token; Secure, HttpOnly, SameSite=Lax, Path=/ | Up to 30 days. Sign out revokes it; account deletion revokes all account sessions. |
 
-No session token is placed in localStorage or study backups.
+| `__Host-studytimely-oauth` (Google sign-in) | Necessary browser binding for an OAuth transaction; Secure, HttpOnly, SameSite=Lax, Path=/ | Up to 10 minutes; cleared after callback. Server state includes nonce and PKCE verifier with matching expiry. |
+| sessionStorage `studytimely-room-lease` | Remember which tab controls a server-checked room timer; not an account/session credential | For the tab session. It does not permit access without the authenticated session and CSRF validation. |
+| sessionStorage `studytimely-room-invite` | Carry an invitation through sign-in | Used for up to 10 minutes, removed after joining; the invite is stripped from the current page URL. |
+
+No account session token is placed in localStorage, sessionStorage or study backups. Temporary room-control/invitation values serve different purposes and do not sign you in. Study groups and rankings require a network connection and are not included in offline caching.
 
 Saving timer or history information is separate from sending analytics events. We do not treat all browser storage as advertising tracking, or all local storage as automatically exempt from privacy requirements.
 

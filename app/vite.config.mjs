@@ -5,7 +5,7 @@ import {licensesPlugin} from './scripts/licenses-plugin.mjs';
 const settings=JSON.parse(fs.readFileSync(new URL('./site.config.json',import.meta.url),'utf8'));
 
 export default defineConfig({
-  define:{__STUDY_SITE__:JSON.stringify({...settings,indexable:process.env.STUDY_RELEASE==='1'&&settings.indexable})},
+  define:{__STUDY_SITE__:JSON.stringify({...settings,localAccountsTest:process.env.STUDY_RELEASE!=='1'&&settings.accountsEnabled,indexable:process.env.STUDY_RELEASE==='1'&&settings.indexable})},
   build: {
     outDir: "dist/client",
   },
