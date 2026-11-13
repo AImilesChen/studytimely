@@ -1,0 +1,2 @@
+export const WORKSPACE_LINKS=[['History','/study-tracker'],['Planner','/study-planner'],['Schedule','/study-schedule-maker'],['Habits','/study-habit-tracker'],['Syllabus','/syllabus-tracker'],['Exam dates','/exam-countdown'],['Study space','/aesthetic-timer'],['Account','/account']];
+export function WorkspaceNav({path,navigate}){return <nav className="workspace-nav" aria-label="Study workspace">{WORKSPACE_LINKS.map(([label,url])=><a key={url} href={url} onClick={navigate} aria-current={path===url?'page':undefined}>{label}</a>)}</nav>;}

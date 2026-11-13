@@ -1,0 +1,107 @@
+import {validateBackup} from '../src/lib/model.mjs';
+
+export const MAX_SYNC_BYTES=1024*1024;
+const AGE=30*86400000,CODE_AGE=10*60000;
+class ApiError extends Error{constructor(status,code,message){super(message);this.status=status;this.code=code;}}
+const fail=(status,code,message)=>{throw new ApiError(status,code,message);};
+const encoder=new TextEncoder();
+export async function digest(text){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(text)))).map(v=>v.toString(16).padStart(2,'0')).join('');}
+async function hmac(secret,value){const k=await crypto.subtle.importKey('raw',encoder.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);return Array.from(new Uint8Array(await crypto.subtle.sign('HMAC',k,encoder.encode(value)))).map(v=>v.toString(16).padStart(2,'0')).join('');}
+function equal(a,b){if(typeof a!=='string'||typeof b!=='string'||a.length!==b.length)return false;let different=0;for(let i=0;i<a.length;i++)different|=a.charCodeAt(i)^b.charCodeAt(i);return different===0;}
+const email=value=>{if(typeof value!=='string'||value.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(value.trim()))fail(400,'INVALID','Enter a valid email address.');return value.trim().toLowerCase();};
+function randomToken(){return Array.from(crypto.getRandomValues(new Uint8Array(32))).map(v=>v.toString(16).padStart(2,'0')).join('');}
+function randomCode(){let n;do{n=crypto.getRandomValues(new Uint32Array(1))[0];}while(n>=4294000000);return String(n%1000000).padStart(6,'0');}
+function result(data,status=200,extra={}){return Response.json(data,{status,headers:{'Cache-Control':'no-store, private','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow','Referrer-Policy':'no-referrer',...extra}});}
+function cookieName(request){return new URL(request.url).protocol==='https:'?'__Host-studytimely-session':'studytimely-local-session';}
+function cookie(request,token,seconds){const secure=new URL(request.url).protocol==='https:';return `${cookieName(request)}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${seconds}${secure?'; Secure':''}`;}
+function readCookie(request){return (request.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName(request)+'='))?.slice(cookieName(request).length+1)||'';}
+async function body(request,limit=2048){
+ if(!request.headers.get('content-type')?.toLowerCase().startsWith('application/json'))fail(415,'CONTENT_TYPE','Use JSON for this request.');
+ if(Number(request.headers.get('content-length')||0)>limit)fail(413,'TOO_LARGE','The request is too large.');
+ const reader=request.body?.getReader();if(!reader)fail(400,'INVALID','A JSON request body is required.');
+ const chunks=[];let count=0;while(true){const {done,value}=await reader.read();if(done)break;count+=value.byteLength;if(count>limit){await reader.cancel();fail(413,'TOO_LARGE','The request is too large.');}chunks.push(value);}
+ const bytes=new Uint8Array(count);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length;}
+ try{const value=JSON.parse(new TextDecoder().decode(bytes));if(!value||typeof value!=='object'||Array.isArray(value))throw Error();return value;}catch{fail(400,'INVALID','Provide a valid JSON object.');}
+}
+export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=randomToken,makeId=()=>crypto.randomUUID()}={}){
+ return async function handle(request,env,enabled=true){
+  const url=new URL(request.url),path=url.pathname,method=request.method,at=now();
+  try{
+   if(!enabled||!env.DB||!env.AUTH_HMAC||env.AUTH_HMAC.length<32)fail(503,'NOT_CONFIGURED','Optional accounts are not enabled here. Your local tools still work.');
+   if(url.protocol!=='https:'&&!['127.0.0.1','localhost','[::1]'].includes(url.hostname))fail(400,'HTTPS_REQUIRED','Use HTTPS to sign in.');
+   if(request.headers.get('sec-fetch-site')==='cross-site')fail(403,'ORIGIN','Use this action from StudyTimely.');
+   if(!['GET','HEAD'].includes(method)&&request.headers.get('origin')!==url.origin)fail(403,'ORIGIN','Use this action from StudyTimely.');
+   const query=(sql,...args)=>env.DB.prepare(sql).bind(...args);
+   async function limit(kind,key,max,period){
+    const bucket=kind+':'+Math.floor(at/period)+':'+await hmac(env.AUTH_HMAC,key);
+    const row=await query('INSERT INTO rate_limits(bucket,count,expires_at) VALUES(?,1,?) ON CONFLICT(bucket) DO UPDATE SET count=count+1 RETURNING count',bucket,at+period*2).first();
+    if(row.count>max)fail(429,'RATE_LIMIT','Too many attempts. Please wait before trying again.');
+   }
+   const ip=request.headers.get('cf-connecting-ip')||'local';
+   const publicPaths=['/api/auth/request-code','/api/auth/verify-code'];
+   let identity=null,sessionToken=readCookie(request),sessionHash='';
+   if(sessionToken&&/^[a-f0-9]{64}$/.test(sessionToken)){
+    sessionHash=await digest(sessionToken);
+    identity=await query('SELECT a.id,a.email,a.created_at,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?',sessionHash,at).first();
+   }
+   const csrf=identity?await hmac(env.AUTH_HMAC,'csrf:'+sessionToken):'';
+   if(path==='/api/auth/me'&&method==='GET')return result({user:identity?{email:identity.email,createdAt:identity.created_at}:null,csrf:identity?csrf:null});
+   if(!publicPaths.includes(path)&&!identity)fail(401,'NO_AUTH','Sign in to use cloud data. Anonymous tools remain available.');
+   if(identity&&!publicPaths.includes(path)&&!['GET','HEAD'].includes(method)&&!equal(request.headers.get('x-csrf-token'),csrf))fail(403,'CSRF','Refresh your account page and try again.');
+   if(path==='/api/auth/request-code'&&method==='POST'){
+    const input=await body(request),address=email(input.email);
+    if(input.accepted!==true)fail(400,'AGE_POLICY','Confirm the account age and privacy requirements before continuing.');
+    await limit('request-ip',ip,20,3600000);await limit('request-email',address,3,900000);
+    if(!env.EMAIL?.send)fail(503,'MAIL_UNAVAILABLE','Sign-in email is unavailable. Please try again later.');
+    const key=await hmac(env.AUTH_HMAC,'email:'+address);
+    const code=makeCode(),nonce=makeToken(),hash=await hmac(env.AUTH_HMAC,key+':'+nonce+':'+code);
+    const reserved=await query('INSERT INTO login_codes(email_key,code_hash,nonce,created_at,expires_at,attempts) VALUES(?,?,?,?,?,0) ON CONFLICT(email_key) DO UPDATE SET code_hash=excluded.code_hash,nonce=excluded.nonce,created_at=excluded.created_at,expires_at=excluded.expires_at,attempts=0 WHERE login_codes.created_at<=? RETURNING nonce',key,hash,nonce,at,at+CODE_AGE,at-60000).first();
+    if(!reserved)fail(429,'RATE_LIMIT','Wait at least one minute before requesting another code.');
+    try{await env.EMAIL.send({from:env.SUPPORT_EMAIL||'support@studytimely.com',to:address,subject:'Your StudyTimely sign-in code',text:`Your StudyTimely sign-in code is ${code}. It expires in 10 minutes and can be used once. If you did not request it, ignore this email. Do not share this code.`});}
+    catch{await query('DELETE FROM login_codes WHERE email_key=? AND nonce=?',key,nonce).run();fail(503,'MAIL_UNAVAILABLE','The sign-in email could not be sent. Please try again later.');}
+    await env.DB.batch([query('DELETE FROM login_codes WHERE expires_at<?',at),query('DELETE FROM sessions WHERE expires_at<?',at),query('DELETE FROM rate_limits WHERE expires_at<?',at)]);
+    return result({sent:true,expiresIn:600},202);
+   }
+   if(path==='/api/auth/verify-code'&&method==='POST'){
+    const input=await body(request),address=email(input.email);if(!/^\d{6}$/.test(input.code||''))fail(400,'INVALID_CODE','Enter the six-digit code from your email.');
+    await limit('verify-ip',ip,40,900000);
+    const key=await hmac(env.AUTH_HMAC,'email:'+address);
+    const saved=await query('UPDATE login_codes SET attempts=attempts+1 WHERE email_key=? AND expires_at>? AND attempts<5 RETURNING code_hash,nonce',key,at).first();
+    if(!saved||!equal(saved.code_hash,await hmac(env.AUTH_HMAC,key+':'+saved.nonce+':'+input.code)))fail(400,'INVALID_CODE','The code is incorrect or expired. Request a new code if needed.');
+    const consumed=await query('DELETE FROM login_codes WHERE email_key=? AND nonce=? RETURNING email_key',key,saved.nonce).first();if(!consumed)fail(400,'INVALID_CODE','This code has already been used.');
+    await query('INSERT INTO accounts(id,email,created_at) VALUES(?,?,?) ON CONFLICT(email) DO NOTHING',makeId(),address,at).run();
+    const account=await query('SELECT id,email,created_at FROM accounts WHERE email=?',address).first(),token=makeToken();
+    await query('INSERT INTO sessions(token_hash,account_id,expires_at) VALUES(?,?,?)',await digest(token),account.id,at+AGE).run();
+    return result({user:{email:account.email,createdAt:account.created_at},csrf:await hmac(env.AUTH_HMAC,'csrf:'+token)},200,{'Set-Cookie':cookie(request,token,AGE/1000)});
+   }
+   if(path==='/api/auth/logout'&&method==='POST'){await query('DELETE FROM sessions WHERE token_hash=?',sessionHash).run();return result({signedOut:true},200,{'Set-Cookie':cookie(request,'',0)});}
+   if(path==='/api/workspace'&&method==='GET'){
+    const row=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();
+    return result({version:row?.version||0,document:row?.document?JSON.parse(row.document):null,updatedAt:row?.updated_at||null});
+   }
+   if(path==='/api/workspace'&&['PUT','DELETE'].includes(method)){
+    await limit('sync-account',identity.id,120,3600000);
+    const input=await body(request,MAX_SYNC_BYTES+4096);if(!Number.isInteger(input.version)||input.version<0)fail(400,'INVALID','Provide the cloud version you last reviewed.');
+    let document=null;
+    if(method==='PUT'){
+     let valid;try{valid=validateBackup(input.document);}catch(e){fail(400,'INVALID',e.message);}
+     document=JSON.stringify({app:'StudyTimely',schema:1,...valid});if(encoder.encode(document).length>MAX_SYNC_BYTES)fail(413,'SYNC_LIMIT','Cloud sync supports up to 1 MiB per workspace. Export a local JSON backup for larger histories.');
+    }
+    const row=input.version===0?await query('INSERT INTO workspaces(account_id,version,document,updated_at) VALUES(?,1,?,?) ON CONFLICT(account_id) DO NOTHING RETURNING version',identity.id,document,at).first():await query('UPDATE workspaces SET version=version+1,document=?,updated_at=? WHERE account_id=? AND version=? RETURNING version',document,at,identity.id,input.version).first();
+    if(!row)fail(409,'CONFLICT','Cloud data changed on another device. Review and merge before saving again.');
+    return result({version:row.version,updatedAt:at,cleared:method==='DELETE'});
+   }
+   if(path==='/api/account/export'&&method==='GET'){
+    const row=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();
+    return result({account:{email:identity.email,createdAt:identity.created_at},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
+   }
+   if(path==='/api/account'&&method==='DELETE'){
+    const input=await body(request);if(input.confirm!=='DELETE')fail(400,'CONFIRM','Confirm account deletion explicitly.');
+    const key=await hmac(env.AUTH_HMAC,'email:'+identity.email);
+    await env.DB.batch([query('DELETE FROM login_codes WHERE email_key=?',key),query('DELETE FROM accounts WHERE id=?',identity.id)]);
+    return result({deleted:true},200,{'Set-Cookie':cookie(request,'',0)});
+   }
+   fail(405,'METHOD','This endpoint does not support that action.');
+  }catch(error){if(error instanceof ApiError)return result({error:{code:error.code,message:error.message}},error.status);return result({error:{code:'UNAVAILABLE',message:'The service is temporarily unavailable. Your local data has not been changed.'}},503);}
+ };
+}

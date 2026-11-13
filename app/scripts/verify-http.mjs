@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {ROUTES} from '../src/lib/routes.mjs';
+const config=JSON.parse(await fs.readFile(new URL('../site.config.json',import.meta.url),'utf8'));
+const release=process.argv.includes('--release'),base=process.env.PREVIEW_ORIGIN||(release?config.origin:'http://127.0.0.1:4181'),checks=[];
+for(const r of ROUTES){
+ const response=await fetch(base+r.path),html=await response.text();assert.equal(response.status,200);assert.equal((html.match(/<h1(?:\s|>)/g)||[]).length,1);assert.ok(html.includes(`name="robots" content="${release&&r.indexable!==false?'index,follow':'noindex,nofollow'}"`));assert.match(html,/<title>/);if(config.origin)assert.ok(html.includes(`rel="canonical" href="${config.origin}${r.path}"`));else assert.ok(!html.includes('rel="canonical"'));assert.ok(!html.includes('href="/study-groups"'));assert.ok(html.includes('href="/privacy"'));
+ checks.push({route:r.path,status:response.status,h1:1,preRendered:true,indexing:release?'index':'noindex',canonical:config.origin?config.origin+r.path:'omitted: domain not configured'});
+}
+for(const [path,status,location] of [['/study-timer',301,'/'],['/pomodoro-timer/',308,'/pomodoro-timer'],['/not-a-page',404,null],['/study-groups',404,null],['/design-review.html',404,null]]){const r=await fetch(base+path,{redirect:'manual',headers:{accept:'text/html'}});assert.equal(r.status,status);if(location)assert.equal(r.headers.get('location'),location);checks.push({route:path,status:r.status});}
+const robots=await(await fetch(base+'/robots.txt')).text(),sitemap=await(await fetch(base+'/sitemap.xml')).text();if(release){assert.ok(robots.includes('Sitemap: '+config.origin+'/sitemap.xml'));assert.equal((sitemap.match(/<loc>/g)||[]).length,13);}else{assert.equal(robots,'User-agent: *\nDisallow: /\n');assert.ok(!sitemap.includes('<loc>'));}
+const home=await(await fetch(base+'/')).text();for(const asset of [...home.matchAll(/(?:src|href)="(\/assets\/[^"<>]+)"/g)].map(m=>m[1])){const r=await fetch(base+asset);assert.equal(r.status,200);checks.push({asset,status:r.status});}
+const notices=await(await fetch(base+'/THIRD-PARTY-NOTICES.txt')).text();assert.ok(notices.includes('SIL OPEN FONT LICENSE'));assert.ok(notices.includes('@phosphor-icons/react'));
+const out=new URL(release?'../../docs/development/evidence/v1.1/release-http-checks.json':'../../docs/development/evidence/v1.1/http-checks.json',import.meta.url);await fs.writeFile(out,JSON.stringify({environment:release?'production':'local',base,checkedAt:new Date().toISOString(),robots:release?'allow':'disallow-all',sitemap:release?'thirteen public tool routes':'empty in preview',checks},null,2));console.log(`HTTP verification passed: ${checks.length} route/asset checks, robots, Sitemap and licenses.`);

@@ -1,0 +1,3 @@
+# StudyTimely release repository
+
+The user authorised publishing this repository publicly and deploying V1.1 at studytimely.com on 2026-11-13. Application is in app/, public policies in docs/compliance/v1.1/. Keep credentials and local state excluded. Preserve the existing sparse Graphite timer homepage, English UI, anonymous local tools and four protected Sites adapter files. Never deploy tests/fixtures/local-worker.mjs. Optional accounts use real D1 and EMAIL with runtime AUTH_HMAC Secret. No changes to unrelated Workers, mailboxes, Access, DNS or paid plans. Use the in-app browser for UI checks. Record actual commit, deployment and verification rather than assuming command success means release success.

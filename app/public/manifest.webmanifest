@@ -1,0 +1,16 @@
+{
+ "name":"StudyTimely — Study & Focus",
+ "short_name":"StudyTimely",
+ "id":"/app",
+ "start_url":"/app",
+ "scope":"/",
+ "display":"standalone",
+ "background_color":"#101110",
+ "theme_color":"#101110",
+ "description":"Free study timers and a local study workspace.",
+ "icons":[
+  {"src":"/design-assets/brand/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+  {"src":"/design-assets/brand/app-icon.png","sizes":"512x512","type":"image/png","purpose":"any"}
+ ],
+ "shortcuts":[{"name":"Start studying","url":"/"},{"name":"Study planner","url":"/study-planner"},{"name":"Pomodoro","url":"/pomodoro-timer"}]
+}

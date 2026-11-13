@@ -1,0 +1,43 @@
+{
+  "name": "studytimely",
+  "main": "dist/cloudflare/worker.mjs",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "studytimely.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.studytimely.com",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "html_handling": "none",
+    "not_found_handling": "none"
+  },
+  "observability": {
+    "enabled": false
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "studytimely-accounts",
+      "database_id": "baf98218-ef15-49d1-b997-51f325bd23bc",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "vars": {
+    "SUPPORT_EMAIL": "support@studytimely.com"
+  }
+}
