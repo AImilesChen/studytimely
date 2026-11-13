@@ -72,3 +72,12 @@ test('exchange failures expose only safe stages, never provider details, codes o
  }
  const s=await setup(()=>{throw Error('private transport detail');});try{const r=await s.callback(await s.start());assert.equal(r.headers.get('location'),'https://study.test/account?signin=exchange_unavailable');}finally{s.close();}
 });
+
+test('runtime fetch uses supported manual redirects without following token or signing-key redirects',async()=>{
+ const s=await setup(),native=globalThis.fetch;let exchanges=0,certificates=0;
+ globalThis.fetch=async function(url,options){assert.equal(this,globalThis);assert.equal(options.redirect,'manual','workerd supports follow/manual; redirects must not receive OAuth credentials');if(url==='https://oauth2.googleapis.com/token'){exchanges++;return new Response(null,{status:302,headers:{location:'https://unrelated.invalid'}});}assert.equal(url,'https://www.googleapis.com/oauth2/v3/certs');certificates++;return new Response(null,{status:302,headers:{location:'https://unrelated.invalid'}});};
+ try{
+  const flow=await s.start(),api=createGoogleAuth({now:()=>at});const r=await api(new Request('https://study.test/api/auth/google/callback?state='+flow.url.searchParams.get('state')+'&code=synthetic-code',{headers:{cookie:flow.binder}}),s.env);assert.equal(r.headers.get('location'),'https://study.test/account?signin=exchange_failed');assert.equal(exchanges,1);
+  await assert.rejects(verifyGoogleIdToken(await jwt({}),{clientId:s.env.GOOGLE_CLIENT_ID,nonce:'fixture-nonce',now:at}));assert.equal(certificates,1);
+ }finally{globalThis.fetch=native;s.close();}
+});

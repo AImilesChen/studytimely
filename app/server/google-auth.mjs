@@ -5,11 +5,13 @@ const b64=bytes=>btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replace
 const decode=value=>Uint8Array.from(atob(value.replaceAll('-','+').replaceAll('_','/')),c=>c.charCodeAt(0));
 const json=value=>JSON.parse(new TextDecoder().decode(decode(value)));
 const binderName=req=>new URL(req.url).protocol==='https:'?'__Host-studytimely-oauth':'studytimely-local-oauth';
-export async function verifyGoogleIdToken(token,{clientId,nonce,now=Date.now(),fetcher=fetch,keys}={}){
+// Keep native fetch attached to its global receiver when passed between helpers.
+const runtimeFetch=(...args)=>globalThis.fetch(...args);
+export async function verifyGoogleIdToken(token,{clientId,nonce,now=Date.now(),fetcher=runtimeFetch,keys}={}){
  try{
   if(typeof token!=='string'||token.length>16000)throw Error();const parts=token.split('.');if(parts.length!==3)throw Error();const header=json(parts[0]),claims=json(parts[1]);
   if(header.alg!=='RS256'||typeof header.kid!=='string')throw Error();
-  if(!keys){const r=await fetcher(CERTS,{redirect:'error',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error();keys=(await r.json()).keys;}
+  if(!keys){const r=await fetcher(CERTS,{redirect:'manual',signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error();keys=(await r.json()).keys;}
   const jwk=keys?.find(k=>k.kid===header.kid&&k.kty==='RSA'&&(!k.use||k.use==='sig'));if(!jwk)throw Error();
   const key=await crypto.subtle.importKey('jwk',jwk,{name:'RSASSA-PKCS1-v1_5',hash:'SHA-256'},false,['verify']);
   if(!await crypto.subtle.verify('RSASSA-PKCS1-v1_5',key,decode(parts[2]),new TextEncoder().encode(parts[0]+'.'+parts[1])))throw Error();
@@ -18,7 +20,7 @@ export async function verifyGoogleIdToken(token,{clientId,nonce,now=Date.now(),f
   return{sub:claims.sub,email:claims.email.toLowerCase()};
  }catch{fail(400,'GOOGLE_TOKEN','Google sign-in could not be verified. Please start again.');}
 }
-export function createGoogleAuth({now=Date.now,fetcher=fetch,keys}={}){
+export function createGoogleAuth({now=Date.now,fetcher=runtimeFetch,keys}={}){
  return async(request,env)=>{
   const url=new URL(request.url),at=now(),callback=url.origin+'/api/auth/google/callback';
   let returnPath='/account',failure='failed';
@@ -41,7 +43,7 @@ export function createGoogleAuth({now=Date.now,fetcher=fetch,keys}={}){
    const saved=await env.DB.prepare('DELETE FROM oauth_states WHERE state_hash=? AND binder_hash=? AND expires_at>? RETURNING verifier,nonce,link_account,link_session_hash,return_path').bind(await digest(state),await digest(binder),at).first();if(!saved)return redirect('expired');returnPath=saved.return_path;
    if(url.searchParams.has('error'))return redirect('cancelled');const code=url.searchParams.get('code');if(!code||code.length>4096)return redirect('expired');
    failure='exchange_unavailable';
-   const exchanged=await fetcher(TOKEN,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,redirect_uri:callback,grant_type:'authorization_code',code_verifier:saved.verifier}),redirect:'error',signal:AbortSignal.timeout(10000)});
+   const exchanged=await fetcher(TOKEN,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,redirect_uri:callback,grant_type:'authorization_code',code_verifier:saved.verifier}),redirect:'manual',signal:AbortSignal.timeout(10000)});
    failure='exchange_failed';
    if(!exchanged.ok){const reason=(await exchanged.json().catch(()=>({}))).error;const stages={invalid_client:'provider_config',unauthorized_client:'provider_config',invalid_grant:'exchange_rejected',invalid_request:'exchange_request'};return redirect(Object.hasOwn(stages,reason)?stages[reason]:'exchange_failed');}failure='verification_failed';const claims=await verifyGoogleIdToken((await exchanged.json()).id_token,{clientId:env.GOOGLE_CLIENT_ID,nonce:saved.nonce,now:at,fetcher,keys});
    failure='storage_failed';
