@@ -46,6 +46,7 @@
 }
 .local-clock-screen .hinge { border-top-width: 1px; }
 .local-clock-screen .hinge::before, .local-clock-screen .hinge::after { display: none; }
+.local-clock-screen .clock-date { position: relative; top: 40px; }
 .local-clock-screen .timer-controls {
   position: static;
   flex: none;
@@ -91,7 +92,7 @@
   .local-clock-screen .timer-heading p { display: none; }
   .local-clock-screen .flip-clock { grid-column: 1 / -1; margin: 0; }
   .local-clock-screen .timer-controls { grid-column: 1 / -1; grid-row: 3; justify-self: center; margin: 0; min-height: 0; }
-  .local-clock-screen .clock-date { font-size: 12px; }
+  .local-clock-screen .clock-date { font-size: 12px; top: 0; }
   .local-clock-screen .tool-dock { grid-column: 1 / -1; margin: 0; width: min(76%, 680px); height: 58px; }
 }
 .focus-view .timer-screen.local-clock-screen {
