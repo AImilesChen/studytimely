@@ -1,12 +1,12 @@
 # StudyTimely
 
-**V2 candidate: 2.0.0-rc.1 is locally implemented; production remains V1.1.2. Real Google OAuth configuration, production moderator setup, migration and deployment are pending.** See [V2 scope, evidence and release gates](docs/releases/V2-CANDIDATE-2026-11-13.md) and [V2 API contract](docs/releases/V2-API.md).
+**V2.0.0 is deployed. Google credentials, the authorised moderator, D1 migrations, room Durable Objects and Cron are configured. Real Google login and authenticated production-community acceptance are still pending.** See [current production evidence](docs/releases/V2-2026-11-13.md). See [V2 scope, evidence and release gates](docs/releases/V2-CANDIDATE-2026-11-13.md) and [V2 API contract](docs/releases/V2-API.md).
 
 Free study timers, planning, habits and syllabus tracking at https://studytimely.com/ . React 19 / Vite 6 / Cloudflare Workers + D1.
 
 ## Features
 
-Seven timing tools including a local-time alarm, local study history, task-linked sessions, daily/weekly habits and rest days, weekly schedules, exam plans and nested chapters, editable sourced starter outlines and personal outline reuse, eight static themes, six original synthesised sound textures, JSON/CSV export and PWA offline timers. The V2 candidate adds optional Google sign-in, public/private study rooms, invitations, server-checked timers, chat/moderation and opted-in global rankings. Existing unlinked email accounts retain recovery; explicit cloud sync and anonymous tools remain available. Anonymous use is intended for ages 13+, optional accounts for ages 16+.
+Seven timing tools including a local-time alarm, local study history, task-linked sessions, daily/weekly habits and rest days, weekly schedules, exam plans and nested chapters, editable sourced starter outlines and personal outline reuse, eight static themes, six original synthesised sound textures, JSON/CSV export and PWA offline timers. V2 adds optional Google sign-in, public/private study rooms, invitations, server-checked timers, chat/moderation and opted-in global rankings. Existing unlinked email accounts retain recovery; explicit cloud sync and anonymous tools remain available. Anonymous use is intended for ages 13+, optional accounts for ages 16+.
 
 ## Development
 
@@ -44,6 +44,6 @@ Public policies are in `docs/compliance/v1.1`; generated third-party notices are
 
 Public source availability does not imply an additional open-source licence. Third-party dependencies and assets retain their respective licences.
 
-Latest production release notes: [V1.1.2, optional analytics](docs/releases/V1.1.2-2026-11-13.md). GA4 Realtime and the verified Ahrefs project both received the controlled page visit. [V1.1.1 closure](docs/releases/V1.1.1-2026-11-13.md) and the [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) record earlier verification states. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
+Current deployed V2 status: [V2.0.0](docs/releases/V2-2026-11-13.md). Previous production release: [V1.1.2, optional analytics](docs/releases/V1.1.2-2026-11-13.md). GA4 Realtime and the verified Ahrefs project both received the controlled page visit. [V1.1.1 closure](docs/releases/V1.1.1-2026-11-13.md) and the [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) record earlier verification states. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
 
 V1.1 closure adds a wall-time alarm with snooze, study-time calculator, explicit opt-in presentation-settings sync and self-hosted web-vitals 5.1.0 readings that stay in tab memory. These are not site-wide CrUX percentiles.
