@@ -1,3 +1,4 @@
+import {cityFor} from './world-clock.mjs';
 import {PREFERENCE_KEYS,pickPreferences} from './preferences.mjs';
 import {emptyWorkspace,validateWorkspace,workspaceAction,mergeWorkspace} from './workspace.mjs';
 export const SCHEMA=1;
@@ -5,7 +6,7 @@ export const MAX_GAP=30*60*1000;
 export const MAX_RUN=24*60*60*1000;
 export const MODES=['study','pomodoro','focus','countdown','stopwatch','clock','alarm'];
 const EXTRA_LAST_PAGES={alarm:'/alarm-clock',tracker:'/study-tracker',planner:'/study-planner',schedule:'/study-schedule-maker',habits:'/study-habit-tracker',syllabus:'/syllabus-tracker',exam:'/exam-countdown',aesthetic:'/aesthetic-timer',calculator:'/study-time-calculator'};
-export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},lastTool:'study',lastPage:'',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
+export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},worldClockCities:[],lastTool:'study',lastPage:'',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
 export function emptyState(epoch='initial'){return{schema:SCHEMA,epoch,revision:0,settings:structuredClone(DEFAULT_SETTINGS),subjects:[],dailyGoal:0,sessions:[],timer:null,workspace:emptyWorkspace()};}
 export class DomainError extends Error{constructor(code,message){super(message);this.code=code;}}
 const fail=(code,message)=>{throw new DomainError(code,message);};
@@ -61,6 +62,7 @@ export function validateSettings(input){
  s.ambient=Object.fromEntries(Object.entries(s.ambient).map(([k,v])=>{if(!['rain','cafe','forest','white','waves','nature'].includes(k))fail('INVALID','Unsupported ambient sound.');return[k,integer(v,0,100,'Sound volume')];}));
  for(const k of ['reducedMotion','rememberPreferences','sound','clock24','showSeconds','showDate','autoBreak','autoStudy','analytics'])if(typeof s[k]!=='boolean')fail('INVALID','Invalid preference.');
  integer(s.volume,0,100,'Volume');integer(s.studyMinutes,1,240,'Study duration');integer(s.shortBreak,1,60,'Short break');integer(s.longBreak,1,120,'Long break');integer(s.longEvery,2,12,'Long-break interval');integer(s.cycleLimit,0,100,'Cycle limit');integer(s.focusSeconds,1,14400,'Focus duration');integer(s.countdownSeconds,1,86399,'Countdown duration');
+ if(!Array.isArray(s.worldClockCities)||s.worldClockCities.length>6||new Set(s.worldClockCities).size!==s.worldClockCities.length||s.worldClockCities.some(id=>typeof id!=='string'||!cityFor(id)))fail('INVALID','Choose up to six supported world-clock cities.');
  if(typeof s.subject!=='string'||s.subject.length>40)fail('INVALID','Use a subject label of up to 40 characters.');
  return Object.fromEntries(Object.keys(DEFAULT_SETTINGS).map(k=>[k,s[k]]));
 }

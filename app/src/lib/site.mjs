@@ -3,7 +3,7 @@ export const site=typeof __STUDY_SITE__==='undefined'?{origin:'',supportEmail:''
 export function metadata(path,config=site){
  const route=routeFor(path),title=`${route?.title||'Page Not Found'} — StudyTimely`,description=route?.description||'Open a free StudyTimely timer for your next session.';
  const canonical=route&&config.origin?config.origin.replace(/\/$/,'')+route.path:'';
- return{title,description,canonical,robots:route&&route.indexable!==false&&config.indexable&&config.origin?'index,follow':'noindex,nofollow',ogImage:config.origin?config.origin.replace(/\/$/,'')+'/design-assets/brand/og-image.png':'/design-assets/brand/og-image.png',schema:TOOLS.some(t=>t.path===path)&&canonical?{'@context':'https://schema.org','@type':'WebApplication',name:route.title,url:canonical,applicationCategory:'EducationalApplication',operatingSystem:'Any',isAccessibleForFree:true,description}:null};
+ return{title,description,canonical,robots:route&&route.indexable!==false&&config.indexable&&config.origin?'index,follow':'noindex,nofollow',ogImage:config.origin?config.origin.replace(/\/$/,'')+'/design-assets/brand/og-image.png':'/design-assets/brand/og-image.png',schema:(TOOLS.some(t=>t.path===path)||route?.worldClock)&&canonical?{'@context':'https://schema.org','@type':'WebApplication',name:route.title,url:canonical,applicationCategory:'EducationalApplication',operatingSystem:'Any',isAccessibleForFree:true,description}:null};
 }
 export function applyMetadata(path){
  const m=metadata(path);document.title=m.title;
