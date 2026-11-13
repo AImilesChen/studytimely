@@ -16,7 +16,7 @@ The operator will create the Google Cloud project/client personally. No OAuth cr
 | Requested scopes | `openid`, `email` only |
 | Public support contact | `support@studytimely.com` |
 
-Use the actual operator-owned account for developer-contact fields; where Google restricts the support-address dropdown, choose an address the operator controls. No Drive, calendar, contacts, profile-photo permission, offline access or refresh token is required. External audience Testing allows only permitted test users; inspect Publishing status and the console's actual branding/domain/verification requirements before treating sign-in as publicly available. Do not enable billing or another project's APIs merely to follow this checklist.
+Use the actual operator-owned account for developer-contact fields; where Google restricts the support-address dropdown, choose an address the operator controls. No Drive, calendar, contacts, profile-photo permission, offline access or refresh token is required. For scopes beyond basic identity, an External audience in Testing is restricted to listed test users. Google documents an exception for basic identity scopes such as this app's `openid email`; therefore Testing alone does not prove sign-in is blocked. Inspect the actual branding/domain state and verify the real sign-in flow before declaring availability. Do not enable billing or another project's APIs merely to follow this checklist.
 
 Keep the client secret out of chat, screenshots, Git and frontend code. Place both values in ignored `app/.dev.vars` on the operator's computer:
 
