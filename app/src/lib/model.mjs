@@ -1,8 +1,9 @@
+import {PREFERENCE_KEYS,pickPreferences} from './preferences.mjs';
 import {emptyWorkspace,validateWorkspace,workspaceAction,mergeWorkspace} from './workspace.mjs';
 export const SCHEMA=1;
 export const MAX_GAP=30*60*1000;
 export const MAX_RUN=24*60*60*1000;
-export const MODES=['study','pomodoro','focus','countdown','stopwatch','clock'];
+export const MODES=['study','pomodoro','focus','countdown','stopwatch','clock','alarm'];
 export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},lastTool:'study',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
 export function emptyState(epoch='initial'){return{schema:SCHEMA,epoch,revision:0,settings:structuredClone(DEFAULT_SETTINGS),subjects:[],dailyGoal:0,sessions:[],timer:null,workspace:emptyWorkspace()};}
 export class DomainError extends Error{constructor(code,message){super(message);this.code=code;}}
@@ -31,6 +32,7 @@ function review(t,now,reason){
 }
 function settle(state,now){
  const t=state.timer;if(!t||t.status!=='running')return null;
+ if(t.mode==='alarm'){t.lastObserved=now;if(now>=t.alarmAt){t.status='completed';t.since=null;return'completed';}return null;}
  if(now<t.lastObserved-1000){review(t,now,'clock');return'review';}
  if(now-t.lastObserved>MAX_GAP||elapsedMs(t,now)>=MAX_RUN){review(t,now,'gap');return'review';}
  if(!t.durationSeconds||elapsedMs(t,now)<t.durationSeconds*1000){t.lastObserved=now;return null;}
@@ -66,6 +68,8 @@ export function transition(previous,action,{now,owner,id}){
  if(action.timerId&&state.timer?.id!==action.timerId)fail('STALE','The timer changed. Review its current phase.');
  if(workspaceAction(state,action,{now,owner,id})){state.revision++;return{state,event:action.type==='workspace-start'?'task-started':'workspace-saved'};}
  switch(action.type){
+ case 'alarm-arm':{if(hasProgress(state.timer)&&state.timer.mode!=='alarm')fail('BUSY','Finish or reset the active timer first.');if(!Number.isFinite(action.at)||action.at<=now||action.at>now+MAX_RUN)fail('INVALID','Choose an alarm within the next 24 hours.');state.timer={...makeTimer('alarm',state.settings,id,now,owner),alarmAt:action.at,status:'running',since:now,startedAt:now};event='alarm-set';break;}
+
  case 'start':{
    if(!MODES.includes(action.mode)||action.mode==='clock')fail('INVALID','Choose a timing tool.');
    if(hasProgress(state.timer)&&state.timer.mode!==action.mode)fail('BUSY','Finish or reset the active timer before switching tools.');
@@ -75,10 +79,10 @@ export function transition(previous,action,{now,owner,id}){
  }
  case 'pause':event=settle(state,now);if(state.timer?.status==='running')pauseTimer(state.timer,now);break;
  case 'tick':event=settle(state,now);break;
- case 'clock-change':if(state.timer?.status==='running'){review(state.timer,now,'clock');event='review';}break;
+ case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){review(state.timer,now,'clock');event='review';}break;
  case 'claim':{
    if(!state.timer)break;
-   event=settle(state,now);if(state.timer.status==='running')pauseTimer(state.timer,now);state.timer.owner=owner;event=event||'moved';break;
+   event=settle(state,now);if(state.timer.status==='running'&&state.timer.mode!=='alarm')pauseTimer(state.timer,now);state.timer.owner=owner;event=event||(state.timer.mode==='alarm'?'alarm-moved':'moved');break;
  }
  case 'review':{
    const t=state.timer;if(t?.status!=='review')fail('STALE','There is no time review pending.');
@@ -106,7 +110,7 @@ export function transition(previous,action,{now,owner,id}){
    const next=validateSettings({...state.settings,...action.patch});
    const timedKeys=['studyMinutes','shortBreak','longBreak','longEvery','cycleLimit','focusSeconds','countdownSeconds','subject'];
    if(hasProgress(state.timer)&&timedKeys.some(k=>next[k]!==state.settings[k]))fail('BUSY','Finish or reset the session before changing its timing or subject.');
-   const timingChanged=timedKeys.some(k=>next[k]!==state.settings[k]);state.settings=next;
+   const timingChanged=timedKeys.some(k=>next[k]!==state.settings[k]);state.settings=next;if(PREFERENCE_KEYS.some(k=>JSON.stringify(next[k])!==JSON.stringify(previous.settings[k])))state.preferencesUpdatedAt=now;
    if(state.timer&&!hasProgress(state.timer)&&timingChanged){const previous=state.timer;state.timer=makeTimer(previous.mode,next,id,now,owner);if(previous.status==='ready'){state.timer.phase=previous.phase;state.timer.completedStudies=previous.completedStudies;state.timer.durationSeconds=durationFor(previous.mode,previous.phase,next);}}
    event='settings';break;
  }
@@ -119,7 +123,7 @@ export function transition(previous,action,{now,owner,id}){
  case 'delete':state.sessions=state.sessions.filter(s=>s.id!==action.recordId);state.workspace.deletedSessions[action.recordId]=now;event='deleted';break;
  case 'import':{
    if(hasProgress(state.timer))fail('BUSY','Finish or reset the current timer before importing.');
-   const data=validateBackup(action.backup);state.workspace=mergeWorkspace(state.workspace,data.workspace);const seen=new Set(state.sessions.map(s=>s.id));
+   const data=validateBackup(action.backup);if(action.applyPreferences&&data.preferences){state.settings=validateSettings({...state.settings,...data.preferences.values});state.preferencesUpdatedAt=data.preferences.updatedAt;}state.workspace=mergeWorkspace(state.workspace,data.workspace);const seen=new Set(state.sessions.map(s=>s.id));
    state.sessions.push(...data.sessions.filter(s=>!seen.has(s.id)));
    state.sessions=state.sessions.filter(s=>!Object.hasOwn(state.workspace.deletedSessions,s.id));
    state.sessions.sort((a,b)=>b.endedAt-a.endedAt);
@@ -147,7 +151,8 @@ export function validateBackup(b,{internal=false}={}){
  });
  const subjects=b.subjects.map(s=>{if(typeof s!=='string'||!s.trim()||s.length>40)fail('INVALID','The backup contains an invalid subject.');return s.trim();});
  const dailyGoal=b.dailyGoal===undefined?0:integer(b.dailyGoal,0,1440,'Daily goal');
- return{sessions,subjects,dailyGoal,workspace:validateWorkspace(b.workspace)};
+ let preferences;if(b.preferences!==undefined){const p=b.preferences;if(!p||!Number.isFinite(p.updatedAt)||p.updatedAt<0||p.updatedAt>Date.now()+86400000||!p.values||typeof p.values!=='object'||Array.isArray(p.values))fail('INVALID','Invalid synced preferences.');preferences={updatedAt:p.updatedAt,values:pickPreferences(validateSettings({...DEFAULT_SETTINGS,...Object.fromEntries(PREFERENCE_KEYS.filter(k=>Object.hasOwn(p.values,k)).map(k=>[k,p.values[k]]))}))};}
+ return{sessions,subjects,dailyGoal,workspace:validateWorkspace(b.workspace),...(preferences?{preferences}:{})};
 }
 export function dayKey(at){const d=new Date(at);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 export function dailyTotals(sessions){const days={};for(const s of sessions)for(const [start,end] of s.segments){let at=start;while(at<end){const date=new Date(at);date.setHours(24,0,0,0);const boundary=Math.min(end,date.getTime());days[dayKey(at)]=(days[dayKey(at)]||0)+(boundary-at)/1000;at=boundary;}}return days;}

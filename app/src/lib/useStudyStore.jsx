@@ -47,7 +47,7 @@ export function useStudyStore(){
      const t=ref.current.timer,now=Date.now(),mono=performance.now(),clockChanged=Math.abs((now-observed.wall)-(mono-observed.mono))>2000;
      observed={wall:now,mono};
      if(working.current||pending.current||!t||t.owner!==owner.current||t.status!=='running')return;
-     const due=t.durationSeconds&&elapsedMs(t,now)>=t.durationSeconds*1000;
+     const due=t.mode==='alarm'?now>=t.alarmAt:t.durationSeconds&&elapsedMs(t,now)>=t.durationSeconds*1000;
      if(!clockChanged&&!due&&now-tickAt.current<5000&&now>=t.lastObserved)return;
      tickAt.current=now;working.current=true;
      execute({action:{type:clockChanged?'clock-change':'tick',epoch:ref.current.epoch,timerId:t.id},at:now,id:crypto.randomUUID()}).finally(()=>working.current=false);

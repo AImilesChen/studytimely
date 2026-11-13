@@ -10,7 +10,7 @@ This policy covers our free browser-based timers and local study records. You do
 
 ## 2. Your study data stays in your browser
 
-Active timer state, study-session dates and durations, subject labels, goals and preferences are stored in your browser using IndexedDB. Anonymous use does not upload this database. Signing in alone does not upload records. Choosing Sync now merges saved sessions, subjects, goals, tasks, habits, schedules and exam progress with a private cloud snapshot. The active timer, appearance and analytics preferences stay on this device. JSON import reads a file locally; export downloads a file to your device.
+Active timer state, study-session dates and durations, subject labels, goals and preferences are stored in your browser using IndexedDB. Anonymous use does not upload this database. Signing in alone does not upload records. Choosing Sync now merges saved sessions, subjects, goals, tasks, habits, schedules and exam progress with a private cloud snapshot. The active timer and analytics choice stay on this device. If you explicitly select Include and apply appearance and sound settings during sync, those selected preferences are also included in the cloud snapshot; they do not start audio automatically. JSON import reads a file locally; export downloads a file to your device.
 
 Other people using the same browser profile may see these records. Avoid putting your full name, school, address, health information or other sensitive details in subject labels or messages.
 
@@ -48,7 +48,7 @@ The rules for storing information on your device are assessed separately from th
 
 Local records remain until you delete them or your browser clears or evicts them. There is no automatic history expiry. Private browsing, storage restrictions, device loss or a browser change can make data unavailable. Local storage is not a guaranteed backup.
 
-Open Settings → Data to export or import a JSON backup, or clear local study data. Clearing stops the active timer and removes saved sessions, subjects, the daily goal and preferences across this site's tabs in the same browser profile. You may also delete individual sessions in Study Tracker. A JSON backup also includes tasks, habits, schedules and exam plans. It excludes the active timer, account session and appearance preferences. CSV exports saved study sessions and linked task/chapter labels. Import merges records by ID and keeps an existing daily goal.
+Open Settings → Data to export or import a JSON backup, or clear local study data. Clearing stops the active timer and removes saved sessions, subjects, the daily goal and preferences across this site's tabs in the same browser profile. You may also delete individual sessions in Study Tracker. A JSON backup also includes tasks, habits, schedules and exam plans. An ordinary local backup excludes the active timer, account session and appearance preferences; a cloud snapshot may include appearance and sound settings when you explicitly select that option. CSV exports saved study sessions and linked task/chapter labels. Import merges records by ID and keeps an existing daily goal.
 
 Clearing browser data does not delete downloaded files, device backups, support emails or provider-held technical records. We cannot remotely recover or delete records held only in your browser.
 
@@ -79,3 +79,5 @@ Parents or guardians can contact our privacy email with a concern. We will asses
 We use HTTPS and restrict access to our support mailbox. No website or storage system is completely secure. Protect shared devices and exported backups.
 
 We will update this policy when relevant practices change and display the effective date. Material changes will receive appropriate notice. An updated notice alone does not authorise new processing that requires prior consent or another legal step.
+
+Page-performance measurements (LCP, INP and CLS) are computed locally in the current tab’s memory. They are not uploaded or persisted and do not create a visitor identifier.

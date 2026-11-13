@@ -36,3 +36,5 @@ Your browser can block cookies or clear this website's stored data. This may res
 Open Settings → Data for the export, import and clear controls described above. Clear local study data removes saved sessions, subjects, the daily goal, active timer and saved preferences across this site's tabs in the same browser profile. A stale tab cannot write the cleared session back. Temporary mode, offered if storage is unavailable, instead keeps data only in that open tab and labels its clear action accordingly. Do not clear data you want to keep without first making a backup.
 
 We update this notice when the actual storage or tracking setup changes. Contact our privacy email with questions.
+
+Optional appearance and sound sync includes only the selected presentation preferences when you opt in from Account. Local page-performance readings stay in memory; they are not cookies, persisted records or remote analytics.

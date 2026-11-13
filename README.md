@@ -4,13 +4,13 @@ Free study timers, planning, habits and syllabus tracking at https://studytimely
 
 ## Features
 
-Six timer tools, local study history, task-linked sessions, daily/weekly habits and rest days, weekly schedules, exam plans and nested chapters, editable sourced starter outlines and personal outline reuse, eight static themes, six original synthesised sound textures, JSON/CSV export and PWA offline timers. Optional email sign-in and explicit cloud sync; anonymous tools remain available. Anonymous use is intended for ages 13+, optional accounts for ages 16+.
+Seven timing tools including a local-time alarm, local study history, task-linked sessions, daily/weekly habits and rest days, weekly schedules, exam plans and nested chapters, editable sourced starter outlines and personal outline reuse, eight static themes, six original synthesised sound textures, JSON/CSV export and PWA offline timers. Optional email sign-in and explicit cloud sync; anonymous tools remain available. Anonymous use is intended for ages 13+, optional accounts for ages 16+.
 
 ## Development
 
 Use Node 24. From `app`, run `npm ci`, `npm run dev`. Vite preview supports local tools; account integration needs a Worker/D1 environment.
 
-Run `npm run build` then `npm test` for the local candidate and regression suite. `npm run build:release` creates the production-indexable build after configuration/policy checks. When testing a production build, set STUDY_TEST_RELEASE=1 before npm test. Current suite: 48 tests. `npm run test:sites` checks the protected Sites adapter.
+Run `npm run build` then `npm test` for the local candidate and regression suite. `npm run build:release` creates the production-indexable build after configuration/policy checks. When testing a production build, set STUDY_TEST_RELEASE=1 before npm test. Current suite: 54 tests. `npm run test:sites` checks the protected Sites adapter.
 
 For full local Worker integration, build and use official Wrangler:
 
@@ -32,3 +32,5 @@ Public policies are in `docs/compliance/v1.1`; third-party asset notices are in 
 Public source availability does not imply an additional open-source licence. Third-party dependencies and assets retain their respective licences.
 
 Production release notes: [V1.1, 2026-11-13](docs/releases/V1.1-2026-11-13.md). The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
+
+V1.1 closure adds a wall-time alarm with snooze, study-time calculator, explicit opt-in presentation-settings sync and self-hosted web-vitals 5.1.0 readings that stay in tab memory. These are not site-wide CrUX percentiles.

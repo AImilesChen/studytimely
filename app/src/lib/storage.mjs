@@ -1,3 +1,4 @@
+import {pickPreferences} from './preferences.mjs';
 import {emptyState,transition,SCHEMA,DEFAULT_SETTINGS,validateSettings,validateBackup,DomainError} from './model.mjs';
 import {validateWorkspace} from './workspace.mjs';
 export const DATABASE='studytimely';
@@ -53,6 +54,6 @@ export function createRepository({indexedDB=globalThis.indexedDB,makeId=uuid,not
    close(){db?.close();db=null;opening=null;}
  };
 }
-export function backupOf(state,now=Date.now()){return{app:'StudyTimely',schema:SCHEMA,exportedAt:new Date(now).toISOString(),subjects:[...state.subjects],dailyGoal:state.dailyGoal,sessions:structuredClone(state.sessions),workspace:validateWorkspace(state.workspace)};}
+export function backupOf(state,now=Date.now(),{includePreferences=false}={}){return{app:'StudyTimely',schema:SCHEMA,exportedAt:new Date(now).toISOString(),subjects:[...state.subjects],dailyGoal:state.dailyGoal,sessions:structuredClone(state.sessions),workspace:validateWorkspace(state.workspace),...(includePreferences?{preferences:{values:pickPreferences(state.settings),updatedAt:state.preferencesUpdatedAt||0}}:{})};}
 export function downloadCSV(text){const blob=new Blob([text],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='studytimely-sessions.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export function downloadJSON(data,filename='studytimely-backup.json'){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}

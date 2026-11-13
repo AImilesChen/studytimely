@@ -1,0 +1,6 @@
+import {useEffect,useState} from 'react';
+import {onLCP,onINP,onCLS} from '../vendor/web-vitals.js';
+let started=false;const values={},listeners=new Set();
+function measure(metric){values[metric.name]={value:metric.value,rating:metric.rating};for(const f of listeners)f({...values});}
+export function useVitals(){const [metrics,setMetrics]=useState({});useEffect(()=>{listeners.add(setMetrics);setMetrics({...values});if(!started){started=true;onLCP(measure,{reportAllChanges:true});onINP(measure,{reportAllChanges:true});onCLS(measure,{reportAllChanges:true});}return()=>listeners.delete(setMetrics);},[]);return metrics;}
+export function VitalsPanel(){const metrics=useVitals();return <details className="chart-details"><summary>Page performance on this device</summary><p className="help">Measurements for this page load only. They stay in this tab’s memory and are not uploaded or saved. Interact with the page to measure INP. This is not a site-wide field-data score.</p><dl>{['LCP','INP','CLS'].map(name=><div key={name}><dt>{name}</dt><dd>{metrics[name]?`${name==='CLS'?metrics[name].value.toFixed(3):Math.round(metrics[name].value)+' ms'} · ${metrics[name].rating}`:'Waiting for a supported browser measurement'}</dd></div>)}</dl></details>;}

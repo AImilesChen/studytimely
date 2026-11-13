@@ -8,6 +8,8 @@ export const TOOLS=[
 ];
 export const ROUTES=[...TOOLS,{id:'tracker',path:'/study-tracker',title:'Study Tracker',description:'Review study time, daily goals, recent sessions, and a study heatmap. Saved locally, with optional manual cloud sync. Free to use without an account.'},{id:'privacy',path:'/privacy',title:'Privacy Policy',description:'Read how StudyTimely handles local records, optional accounts and cloud sync, website requests, and privacy choices.'},{id:'terms',path:'/terms',title:'Terms of Use',description:'Read the terms for the free StudyTimely timing and local study-record tools.'},{id:'cookies',path:'/cookies',title:'Cookies and Local Storage',description:'Learn about local storage used for your StudyTimely timer, study records, and preferences.'}];
 export const MANAGEMENT_ROUTES=[
+ {id:'calculator',path:'/study-time-calculator',title:'Study Time Calculator',h1:'Plan the hours before you start',description:'Calculate weekly study hours from your own daily target, study days and weeks. Include session breaks without adding estimates to your study history.'},
+ {id:'alarm',name:'Alarm',path:'/alarm-clock',title:'Free Online Alarm Clock',h1:'Set an alarm for your next break',description:'Set a local-time browser alarm, test the sound and snooze for five minutes. Keep the tab and device awake; alarms do not add study time.'},
  {id:'planner',path:'/study-planner',title:'Free Study Planner',h1:'Turn your study tasks into sessions',description:'Plan study tasks by date, subject, priority and estimated time. Start a study timer from a task and record actual time. Free local planning.'},
  {id:'schedule',path:'/study-schedule-maker',title:'Study Schedule Maker',h1:'Plan your study week',description:'Build a recurring weekly study schedule with local-time blocks and subjects. Leave room for breaks. Planned blocks do not count as study time.'},
  {id:'habits',path:'/study-habit-tracker',title:'Study Habit Tracker',h1:'Build a routine with room to rest',description:'Set daily and weekly study goals, plan rest days and review real progress. Track study minutes, sessions and your own check-ins.'},
@@ -19,7 +21,7 @@ export const MANAGEMENT_ROUTES=[
 ];
 ROUTES.push(...MANAGEMENT_ROUTES);
 export const routeFor=path=>ROUTES.find(r=>r.path===path);
-export const toolFor=mode=>TOOLS.find(t=>t.id===mode)||TOOLS[1];
+export const toolFor=mode=>TOOLS.find(t=>t.id===mode)||MANAGEMENT_ROUTES.find(t=>t.id===mode)||TOOLS[1];
 export const LEGAL_LINKS=[['Privacy Policy','/privacy'],['Terms of Use','/terms'],['Cookies & Local Storage','/cookies']];
 export const GUIDES={
  study:[['Choose your session.','Count upwards with Study Timer, or alternate study and rest with Pomodoro.'],['Start studying.','Add a subject in Settings if it helps. Pause whenever you need to.'],['Review your time.','Finish your session and see your activity in the study workspace.']],
