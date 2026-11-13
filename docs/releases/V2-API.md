@@ -1,11 +1,14 @@
 # V2 API and data contract
 
-All API responses are private/no-store/noindex. Mutations require JSON, same-origin and an authenticated session plus `x-csrf-token`, except the browser-bound Google entry/callback and legacy email recovery. Participation requires a Google-linked account and an explicitly accepted nickname profile. Errors are `{error:{code,message}}`; UI must handle 401, 403, 404, 409, 429 and 503.
+All API responses are private/no-store/noindex. Mutations require JSON, same-origin and an authenticated session plus `x-csrf-token`, except the browser-bound Google entry/callback, pending-registration proof flow and legacy email recovery. Pending registration uses its own browser binding and CSRF; it is not an account session. Participation requires a Google-linked account and an explicitly accepted nickname profile. Errors are `{error:{code,message}}`; UI must handle 401, 403, 404, 409, 429 and 503.
 
 | Method / route | Purpose |
 |---|---|
-| POST `/api/auth/google/start` | `{accepted,link?,returnTo?}` → Google URL and ten-minute binder cookie; link requires an existing live session/CSRF |
-| GET `/api/auth/google/callback` | One-use state/binder, token exchange, signed ID-token validation, account/session creation and safe redirect |
+| POST `/api/auth/google/start` | `{link?,returnTo?}` → Google URL and ten-minute binder cookie; link requires an existing live session/CSRF |
+| GET `/api/auth/google/callback` | One-use state/binder, token exchange, signed ID-token validation, existing-account session or pending new-registration proof, and safe redirect |
+| GET `/api/auth/google/registration` | Pending first-account email, expiry, current age/policy requirement and its own CSRF; no account access |
+| POST `/api/auth/google/registration` | Explicit `{accepted,policyVersion}`; atomically create first account/session and consume pending proof |
+| DELETE `/api/auth/google/registration` | Browser/CSRF-validated cancellation; no account is created |
 | GET `/api/auth/me` | User Google-link flag, CSRF, Google readiness; no secret values |
 | GET `/api/community/me` | Own profile/version, rooms, timer, blocks, last 30 rank snapshots and moderator availability |
 | PUT `/api/community/profile` | `{nickname,publicRanking,accepted,version}`; compare-and-swap prevents stale opt-in |

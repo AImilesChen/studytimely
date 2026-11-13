@@ -10,7 +10,7 @@ These Terms explain the conditions for using our free browser-based study and ti
 
 ## 2. Age and access
 
-The service is intended for users aged 13 and over. Optional accounts and cloud sync are available to users aged 16 and over. If you are under 13, do not use it. If you have not reached legal adulthood where you live, review these Terms with a parent or guardian and obtain their permission where required. Additional parental consent requirements for personal-information processing are explained in our [Privacy Policy](/privacy).
+The service is intended for users aged 13 and over. Optional accounts and cloud sync are available to users aged 16 and over. New accounts confirm these account requirements once after Google verifies the identity and before the account is created; existing accounts do not repeat the declaration at each sign-in. If you are under 13, do not use it. If you have not reached legal adulthood where you live, review these Terms with a parent or guardian and obtain their permission where required. Additional parental consent requirements for personal-information processing are explained in our [Privacy Policy](/privacy).
 
 You do not need an account for the free tools. The absence of registration is not age verification and does not override protections required by law.
 

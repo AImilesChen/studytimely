@@ -20,6 +20,7 @@ Cookies are small pieces of information a browser may send with website requests
 | `__Host-studytimely-session` (optional HTTPS sign-in) | Necessary random session token; Secure, HttpOnly, SameSite=Lax, Path=/ | Up to 30 days. Sign out revokes it; account deletion revokes all account sessions. |
 
 | `__Host-studytimely-oauth` (Google sign-in) | Necessary browser binding for an OAuth transaction; Secure, HttpOnly, SameSite=Lax, Path=/ | Up to 10 minutes; cleared after callback. Server state includes nonce and PKCE verifier with matching expiry. |
+| `__Host-studytimely-registration` (first account setup) | Necessary random browser-bound proof of a verified Google identity; Secure, HttpOnly, SameSite=Lax, Path=/; it does not grant account access | Usable for up to 10 minutes; cleared on completed/cancelled setup or when an expired transaction is revisited. Server records use a hashed token and are cleaned on setup or daily maintenance. |
 | sessionStorage `studytimely-room-lease` | Remember which tab controls a server-checked room timer; not an account/session credential | For the tab session. It does not permit access without the authenticated session and CSRF validation. |
 | sessionStorage `studytimely-room-invite` | Carry an invitation through sign-in | Used for up to 10 minutes, removed after joining; the invite is stripped from the current page URL. |
 

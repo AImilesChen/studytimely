@@ -16,7 +16,7 @@ export async function communityMaintenance(env,at=Date.now()){
   q(env,'DELETE FROM community_rank_history WHERE day<?',year),
   q(env,'DELETE FROM community_daily WHERE day<?',year),
   q(env,'DELETE FROM community_room_daily WHERE day<?',year),
-  q(env,'DELETE FROM oauth_states WHERE expires_at<?',at),q(env,'DELETE FROM rate_limits WHERE expires_at<?',at),q(env,'DELETE FROM sessions WHERE expires_at<?',at),q(env,'DELETE FROM login_codes WHERE expires_at<?',at),
+  q(env,'DELETE FROM pending_google_registrations WHERE expires_at<=?',at),q(env,'DELETE FROM oauth_states WHERE expires_at<?',at),q(env,'DELETE FROM rate_limits WHERE expires_at<?',at),q(env,'DELETE FROM sessions WHERE expires_at<?',at),q(env,'DELETE FROM login_codes WHERE expires_at<?',at),
   q(env,'UPDATE community_members SET last_seen=0 WHERE last_seen<?',at-90000),
   q(env,"UPDATE community_timers SET status='check' WHERE status='running' AND last_at<?",at-90000)
  ]);return {day:today,snapshot:yesterday};
@@ -56,7 +56,7 @@ export function createCommunityApi({now=Date.now}={}){
     return result({profile:profile?{id:profile.id,nickname:profile.nickname,publicRanking:!!profile.public_ranking,version:profile.version}:null,rooms:mine,history,blocks,timer:await timer(),serverNow:at,creditedToday:profile?(await q(env,'SELECT seconds FROM community_daily WHERE profile_id=? AND day=?',profile.id,day).first())?.seconds||0:0,moderator:isAdmin,moderationAvailable:admins(env).length>0,rules:communityRules()});
    }
    if(path==='/profile'&&method==='PUT'){
-    requireUser();const input=await body(request);if(input.accepted!==true||typeof input.publicRanking!=='boolean')fail(400,'COMMUNITY_POLICY','Confirm the community rules and choose whether to join public rankings.');
+    requireUser();const input=await body(request);if((!profile&&input.accepted!==true)||typeof input.publicRanking!=='boolean')fail(400,'COMMUNITY_POLICY','Confirm the community rules and choose whether to join public rankings.');
     const name=nickname(input.nickname);await rateLimit(env,'profile',user.id,20,3600000,at);
     const version=profile?input.version:0;if(!Number.isInteger(version)||version<0)fail(400,'VERSION','Reload your community profile before saving.');
     const saved=profile?await q(env,'UPDATE community_profiles SET nickname=?,public_ranking=?,version=version+1 WHERE account_id=? AND version=? RETURNING id,version',name,input.publicRanking?1:0,user.id,version).first():await q(env,'INSERT INTO community_profiles(id,account_id,nickname,public_ranking,accepted_at,created_at) VALUES(?,?,?,?,?,?) ON CONFLICT(account_id) DO NOTHING RETURNING id,version',crypto.randomUUID(),user.id,name,input.publicRanking?1:0,at,at).first();

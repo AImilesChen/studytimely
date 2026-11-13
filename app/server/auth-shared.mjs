@@ -21,7 +21,7 @@ export async function body(request,limit=4096){
 export async function identity(request,env,at=Date.now(),required=true,csrf=true){
  sameOrigin(request);if(!env.DB||!env.AUTH_HMAC||env.AUTH_HMAC.length<32)fail(503,'NOT_CONFIGURED','The account service is not configured.');
  const token=readCookie(request),hash=/^[a-f0-9]{64}$/.test(token)?await digest(token):'';
- const user=hash?await env.DB.prepare('SELECT a.id,a.email,a.google_sub,a.created_at,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?').bind(hash,at).first():null;
+ const user=hash?await env.DB.prepare('SELECT a.id,a.email,a.google_sub,a.created_at,a.policy_accepted_at,a.policy_version,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?').bind(hash,at).first():null;
  if(!user){if(required)fail(401,'NO_AUTH','Sign in with Google to continue.');return null;}
  const anti=await hmac(env.AUTH_HMAC,'csrf:'+token);if(csrf&&!['GET','HEAD'].includes(request.method)&&!equal(request.headers.get('x-csrf-token'),anti))fail(403,'CSRF','Refresh the page and try again.');
  return {...user,sessionHash:hash,csrf:anti};

@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+const base='http://127.0.0.1:4184';
+const request=(path,method='GET',data,cookie='',csrf='')=>fetch(base+path,{method,redirect:'manual',headers:{origin:base,'Content-Type':'application/json',cookie,'x-csrf-token':csrf},body:data===undefined?undefined:JSON.stringify(data)});
+const preview=await request('/__test/registration','POST');assert.equal(preview.status,303);
+const proof=preview.headers.getSetCookie().find(c=>c.startsWith('studytimely-local-registration=')).split(';')[0];
+const form=await(await request('/api/auth/google/registration','GET',undefined,proof)).json();assert.equal(form.pending.minimumAge,16);assert.equal((await(await request('/api/auth/me','GET',undefined,proof)).json()).user,null);
+assert.equal((await request('/api/auth/google/registration','POST',{accepted:false,policyVersion:form.pending.policyVersion},proof,form.csrf)).status,400);
+const completed=await request('/api/auth/google/registration','POST',{accepted:true,policyVersion:form.pending.policyVersion},proof,form.csrf);assert.equal(completed.status,200,JSON.stringify(await completed.clone().json()));
+const session=completed.headers.getSetCookie().find(c=>c.startsWith('studytimely-local-session=')).split(';')[0];
+const me=await(await request('/api/auth/me','GET',undefined,session)).json();assert.equal(me.user.googleLinked,true);
+assert.equal((await request('/api/auth/google/registration','POST',{accepted:true,policyVersion:form.pending.policyVersion},proof,form.csrf)).status,410);
+const exported=await(await request('/api/account/export','GET',undefined,session)).json();assert.ok(exported.account.policyAcceptedAt>0);assert.equal(exported.account.policyVersion,form.pending.policyVersion);
+assert.equal((await request('/api/account','DELETE',{confirm:'DELETE'},session,me.csrf)).status,200);assert.equal((await(await request('/api/auth/me','GET',undefined,session)).json()).user,null);
+const report={at:new Date().toISOString(),environment:'isolated local Worker/D1',syntheticIdentity:true,realGoogleAuthentication:false,passed:true,checks:['pending proof does not authenticate an account','new account requires explicit first-registration acceptance','atomic first account/session creation succeeds in actual local D1','used proof cannot issue another session','account export records actual policy version/time','only this disposable synthetic account removed after validation']};
+await fs.writeFile(new URL('../../../docs/development/evidence/auth-onboarding-2026-11-13/local-integration.json',import.meta.url),JSON.stringify(report,null,2));console.log(JSON.stringify(report));

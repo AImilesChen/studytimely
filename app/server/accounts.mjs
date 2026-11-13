@@ -23,7 +23,7 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
    let identity=null,sessionToken=readCookie(request),sessionHash='';
    if(sessionToken&&/^[a-f0-9]{64}$/.test(sessionToken)){
     sessionHash=await digest(sessionToken);
-    identity=await query('SELECT a.id,a.email,a.google_sub,a.created_at,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?',sessionHash,at).first();
+    identity=await query('SELECT a.id,a.email,a.google_sub,a.created_at,a.policy_accepted_at,a.policy_version,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?',sessionHash,at).first();
    }
    const csrf=identity?await hmac(env.AUTH_HMAC,'csrf:'+sessionToken):'';
    if(path==='/api/auth/me'&&method==='GET')return result({user:identity?{email:identity.email,createdAt:identity.created_at,googleLinked:!!identity.google_sub}:null,csrf:identity?csrf:null,providers:{google:!!(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)}});
@@ -31,7 +31,7 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
    if(identity&&!publicPaths.includes(path)&&!['GET','HEAD'].includes(method)&&!equal(request.headers.get('x-csrf-token'),csrf))fail(403,'CSRF','Refresh your account page and try again.');
    if(path==='/api/auth/request-code'&&method==='POST'){
     const input=await body(request),address=email(input.email);
-    if(input.accepted!==true)fail(400,'AGE_POLICY','Confirm the account age and privacy requirements before continuing.');
+    if(!emailRecoveryOnly&&input.accepted!==true)fail(400,'AGE_POLICY','Confirm the account age and privacy requirements before continuing.');
     await limit('request-ip',ip,20,3600000);await limit('request-email',address,3,900000);
     if(emailRecoveryOnly){const legacy=await query('SELECT google_sub FROM accounts WHERE email=?',address).first();if(!legacy||legacy.google_sub)return result({sent:true,expiresIn:600},202);}
     if(!env.EMAIL?.send)fail(503,'MAIL_UNAVAILABLE','Sign-in email is unavailable. Please try again later.');
@@ -78,7 +78,7 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
     const row=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();
     const profile=await query('SELECT id,nickname,public_ranking,accepted_at FROM community_profiles WHERE account_id=?',identity.id).first();
     const community=profile?{profile,ownedRooms:(await query('SELECT id,name,visibility,goal_minutes,capacity,invitations_open,created_at,closed_at FROM community_rooms WHERE owner_id=?',profile.id).all()).results,roomTime:(await query('SELECT room_id,day,seconds FROM community_room_daily WHERE profile_id=?',profile.id).all()).results,rankHistory:(await query('SELECT day,rank,seconds FROM community_rank_history WHERE profile_id=?',profile.id).all()).results,blocks:(await query('SELECT blocked_id FROM community_blocks WHERE blocker_id=?',profile.id).all()).results,memberships:(await query('SELECT room_id,joined_at,left_at,banned FROM community_members WHERE profile_id=?',profile.id).all()).results,daily:(await query('SELECT day,seconds FROM community_daily WHERE profile_id=?',profile.id).all()).results,messages:(await query('SELECT room_id,text,created_at FROM community_messages WHERE author_id=?',profile.id).all()).results,reports:(await query('SELECT room_id,reason,detail,status,created_at FROM community_reports WHERE reporter_id=?',profile.id).all()).results}:null;
-    return result({community,account:{email:identity.email,createdAt:identity.created_at,googleSubject:identity.google_sub||null},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
+    return result({community,account:{email:identity.email,createdAt:identity.created_at,googleSubject:identity.google_sub||null,policyAcceptedAt:identity.policy_accepted_at||null,policyVersion:identity.policy_version||null},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
    }
    if(path==='/api/account'&&method==='DELETE'){
     const input=await body(request);if(input.confirm!=='DELETE')fail(400,'CONFIRM','Confirm account deletion explicitly.');

@@ -42,3 +42,5 @@ test('oversized bodies, cross-site auth and missing acceptance do not create usa
  assert.equal(s.sent.length,0);assert.equal(s.db.prepare('SELECT count(*) n FROM login_codes').get().n,0);
  s.db.prepare('INSERT INTO accounts(id,email,created_at) VALUES(?,?,?)').run(crypto.randomUUID(),'legacy@example.invalid',Date.now());const a=await s.login('legacy@example.invalid');assert.ok(a.cookie);assert.equal(s.sent.length,1);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,2);
  }finally{s.close();}});
+
+test('existing email recovery does not repeat new-account age confirmation',async()=>{const s=setup({emailRecoveryOnly:true});try{s.db.prepare('INSERT INTO accounts(id,email,created_at) VALUES(?,?,?)').run('legacy','legacy@example.invalid',Date.now());assert.equal((await s.call('/api/auth/request-code','POST',{email:'legacy@example.invalid'})).status,202);assert.equal((await s.call('/api/auth/verify-code','POST',{email:'legacy@example.invalid',code:'123456'})).status,200);assert.equal(s.db.prepare('SELECT policy_accepted_at FROM accounts').get().policy_accepted_at,null);}finally{s.close();}});

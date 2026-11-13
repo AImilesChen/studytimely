@@ -1,3 +1,4 @@
+import {pendingRegistration,registration} from './registration.mjs';
 import {ApiError,fail,result,body,randomToken,digest,equal,readCookie,cookie,sameOrigin,identity,issueSession,rateLimit} from './auth-shared.mjs';
 const AUTH='https://accounts.google.com/o/oauth2/v2/auth',TOKEN='https://oauth2.googleapis.com/token',CERTS='https://www.googleapis.com/oauth2/v3/certs';
 const b64=bytes=>btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=','');
@@ -21,11 +22,13 @@ export function createGoogleAuth({now=Date.now,fetcher=fetch,keys}={}){
  return async(request,env)=>{
   const url=new URL(request.url),at=now(),callback=url.origin+'/api/auth/google/callback';
   let returnPath='/account';
-  const redirect=(code,session)=>{const headers=new Headers({'Location':url.origin+(code==='success'&&returnPath==='/study-groups'?returnPath:'/account?signin='+code),'Cache-Control':'no-store, private','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'});headers.append('Set-Cookie',cookie(request,'',0,binderName(request)));if(session)headers.append('Set-Cookie',session.cookie);return new Response(null,{status:303,headers});};
+  const redirect=(code,session,registrationCookie)=>{const headers=new Headers({'Location':url.origin+(code==='success'&&returnPath==='/study-groups'?returnPath:'/account?signin='+code),'Cache-Control':'no-store, private','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'});headers.append('Set-Cookie',cookie(request,'',0,binderName(request)));if(session)headers.append('Set-Cookie',session.cookie);if(registrationCookie)headers.append('Set-Cookie',registrationCookie);return new Response(null,{status:303,headers});};
   try{
-   if(!env.DB||!env.AUTH_HMAC||env.AUTH_HMAC.length<32||!env.GOOGLE_CLIENT_ID||!env.GOOGLE_CLIENT_SECRET)fail(503,'GOOGLE_NOT_CONFIGURED','Google sign-in is not configured yet. Anonymous tools still work.');
+   if(!env.DB||!env.AUTH_HMAC||env.AUTH_HMAC.length<32)fail(503,'NOT_CONFIGURED','The account service is not configured.');
+   if(url.pathname==='/api/auth/google/registration')return await registration(request,env,at);
+   if(!env.GOOGLE_CLIENT_ID||!env.GOOGLE_CLIENT_SECRET)fail(503,'GOOGLE_NOT_CONFIGURED','Google sign-in is not configured yet. Anonymous tools still work.');
    if(url.pathname==='/api/auth/google/start'&&request.method==='POST'){
-    sameOrigin(request);const input=await body(request);if(input.accepted!==true)fail(400,'AGE_POLICY','Confirm the account age and privacy requirements.');
+    sameOrigin(request);const input=await body(request);
     await rateLimit(env,'google-start',request.headers.get('cf-connecting-ip')||'local',30,3600000,at);
     const linked=input.link===true?await identity(request,env,at):null;
     const state=randomToken(),binder=randomToken(),verifier=randomToken(),nonce=randomToken();
@@ -48,8 +51,7 @@ export function createGoogleAuth({now=Date.now,fetcher=fetch,keys}={}){
     await env.DB.prepare('UPDATE accounts SET google_sub=? WHERE id=? AND (google_sub IS NULL OR google_sub=?)').bind(claims.sub,existing.id,claims.sub).run();account=existing;
    }else if(!account){
     if(await env.DB.prepare('SELECT id FROM accounts WHERE email=?').bind(claims.email).first())return redirect('link_required');
-    await env.DB.prepare('INSERT INTO accounts(id,email,google_sub,created_at) VALUES(?,?,?,?) ON CONFLICT(google_sub) WHERE google_sub IS NOT NULL DO NOTHING').bind(crypto.randomUUID(),claims.email,claims.sub,at).run();
-    account=await env.DB.prepare('SELECT id,email,google_sub FROM accounts WHERE google_sub=?').bind(claims.sub).first();
+    return redirect('register',null,await pendingRegistration(request,env,claims,returnPath,at));
    }
    if(!account)return redirect('failed');
    if(account.email!==claims.email){if(await env.DB.prepare('SELECT id FROM accounts WHERE email=? AND id<>?').bind(claims.email,account.id).first())return redirect('link_failed');await env.DB.prepare('UPDATE accounts SET email=? WHERE id=?').bind(claims.email,account.id).run();account.email=claims.email;}
