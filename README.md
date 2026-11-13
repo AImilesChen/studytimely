@@ -1,6 +1,6 @@
 # StudyTimely
 
-**V2.0.1 is deployed. Returning Google sign-in no longer repeats the age checkbox; new accounts confirm once after Google verification. A reproduced Cloudflare OAuth redirect-mode error has been fixed. Real Google login after this fix and authenticated production-community acceptance remain pending.** See [current release evidence](docs/releases/V2.0.1-2026-11-13.md), [V2 scope and release gates](docs/releases/V2-CANDIDATE-2026-11-13.md) and [V2 API contract](docs/releases/V2-API.md).
+**V2.0.1 is deployed. Returning Google sign-in no longer repeats the age checkbox; new accounts confirm once after Google verification. The Cloudflare OAuth redirect-mode error is fixed, and real Google login, first community-profile save, public-ranking opt-out and moderator-queue loading have now been verified. Production room/timer/chat and actual moderation actions remain pending; main has not been promoted.** See [current release evidence](docs/releases/V2.0.1-2026-11-13.md), [V2 scope and release gates](docs/releases/V2-CANDIDATE-2026-11-13.md) and [V2 API contract](docs/releases/V2-API.md).
 
 Free study timers, planning, habits and syllabus tracking at https://studytimely.com/ . React 19 / Vite 6 / Cloudflare Workers + D1.
 
