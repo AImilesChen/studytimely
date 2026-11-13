@@ -1,6 +1,6 @@
 # StudyTimely
 
-**V2.0.1 is deployed. Returning Google sign-in no longer repeats the age checkbox; new accounts confirm once after Google verification. The Cloudflare OAuth redirect-mode error is fixed, and real Google login, first community-profile save, public-ranking opt-out and moderator-queue loading have now been verified. Production room/timer/chat and actual moderation actions remain pending; main has not been promoted.** See [current release evidence](docs/releases/V2.0.1-2026-11-13.md), [V2 scope and release gates](docs/releases/V2-CANDIDATE-2026-11-13.md) and [V2 API contract](docs/releases/V2-API.md).
+**V2.1.0 World Clock is deployed.** Browse [32 city clocks](https://studytimely.com/time), open independent city pages, compare time zones and save up to six favourites locally. The existing Flip Clock has a 12-city entry below the clock. 95 automated tests and 142 public HTTP checks passed, with production browser desktop/mobile checks. See [current release evidence](docs/releases/V2.1.0-2026-11-13.md). Real Google login, first community-profile save, public-ranking opt-out and moderator-queue loading were previously verified; production room/timer/chat and actual moderation actions remain pending, and main has not been promoted. [V2 scope and release gates](docs/releases/V2-CANDIDATE-2026-11-13.md), [V2 API contract](docs/releases/V2-API.md).
 
 Free study timers, planning, habits and syllabus tracking at https://studytimely.com/ . React 19 / Vite 6 / Cloudflare Workers + D1.
 
@@ -12,7 +12,7 @@ Seven timing tools including a local-time alarm, local study history, task-linke
 
 Use Node 24. From `app`, run `npm ci`, `npm run dev`. Vite preview supports local tools; account integration needs a Worker/D1 environment.
 
-Run `npm run build` then `npm test` for the local candidate and regression suite. `npm run build:release` creates the production-indexable build after configuration/policy checks. When testing a production build, set STUDY_TEST_RELEASE=1 before npm test. Current suite: 87 tests. `npm run test:sites` checks the protected Sites adapter.
+Run `npm run build` then `npm test` for the local candidate and regression suite. `npm run build:release` creates the production-indexable build after configuration/policy checks. When testing a production build, set STUDY_TEST_RELEASE=1 before npm test. Current suite: 95 tests. `npm run test:sites` checks the protected Sites adapter.
 
 For full local Worker integration, build and use official Wrangler:
 
@@ -44,6 +44,6 @@ Public policies are in `docs/compliance/v1.1`; generated third-party notices are
 
 Public source availability does not imply an additional open-source licence. Third-party dependencies and assets retain their respective licences.
 
-Current deployed V2 status: [V2.0.1](docs/releases/V2.0.1-2026-11-13.md). [V2.0.0](docs/releases/V2-2026-11-13.md) and [V1.1.2, optional analytics](docs/releases/V1.1.2-2026-11-13.md) retain earlier release evidence. GA4 Realtime and the verified Ahrefs project both received the controlled page visit. [V1.1.1 closure](docs/releases/V1.1.1-2026-11-13.md) and the [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) record earlier verification states. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
+Current deployed status: [V2.1.0 World Clock](docs/releases/V2.1.0-2026-11-13.md). [V2.0.1](docs/releases/V2.0.1-2026-11-13.md), [V2.0.0](docs/releases/V2-2026-11-13.md) and [V1.1.2, optional analytics](docs/releases/V1.1.2-2026-11-13.md) retain earlier release evidence. GA4 Realtime and the verified Ahrefs project previously received the controlled page visit; backend ingestion for new city URLs is not revalidated in V2.1. [V1.1.1 closure](docs/releases/V1.1.1-2026-11-13.md) and the [initial V1.1 report](docs/releases/V1.1-2026-11-13.md) record earlier verification states. The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
 
 V1.1 closure adds a wall-time alarm with snooze, study-time calculator, explicit opt-in presentation-settings sync and self-hosted web-vitals 5.1.0 readings that stay in tab memory. These are not site-wide CrUX percentiles.
