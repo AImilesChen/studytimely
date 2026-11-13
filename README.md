@@ -30,3 +30,5 @@ Sign-in uses Cloudflare Email Service, with per-IP/email rate limits, hashed one
 Public policies are in `docs/compliance/v1.1`; third-party asset notices are in `app/public/THIRD-PARTY-NOTICES.txt`. Analytics is disabled. GSC/Bing verification and submission are separate operational steps and are not claimed complete.
 
 Public source availability does not imply an additional open-source licence. Third-party dependencies and assets retain their respective licences.
+
+Production release notes: [V1.1, 2026-11-13](docs/releases/V1.1-2026-11-13.md). The production deployment was performed from the verified source; automatic deploy-on-push is not configured.
