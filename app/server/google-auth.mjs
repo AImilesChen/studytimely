@@ -40,9 +40,10 @@ export function createGoogleAuth({now=Date.now,fetcher=fetch,keys}={}){
    const state=url.searchParams.get('state')||'',binder=readCookie(request,binderName(request));if(!/^[a-f0-9]{64}$/.test(state)||!/^[a-f0-9]{64}$/.test(binder))return redirect('expired');
    const saved=await env.DB.prepare('DELETE FROM oauth_states WHERE state_hash=? AND binder_hash=? AND expires_at>? RETURNING verifier,nonce,link_account,link_session_hash,return_path').bind(await digest(state),await digest(binder),at).first();if(!saved)return redirect('expired');returnPath=saved.return_path;
    if(url.searchParams.has('error'))return redirect('cancelled');const code=url.searchParams.get('code');if(!code||code.length>4096)return redirect('expired');
-   failure='exchange_failed';
+   failure='exchange_unavailable';
    const exchanged=await fetcher(TOKEN,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({code,client_id:env.GOOGLE_CLIENT_ID,client_secret:env.GOOGLE_CLIENT_SECRET,redirect_uri:callback,grant_type:'authorization_code',code_verifier:saved.verifier}),redirect:'error',signal:AbortSignal.timeout(10000)});
-   if(!exchanged.ok){const reason=(await exchanged.json().catch(()=>({}))).error;return redirect(reason==='invalid_client'?'provider_config':'exchange_failed');}failure='verification_failed';const claims=await verifyGoogleIdToken((await exchanged.json()).id_token,{clientId:env.GOOGLE_CLIENT_ID,nonce:saved.nonce,now:at,fetcher,keys});
+   failure='exchange_failed';
+   if(!exchanged.ok){const reason=(await exchanged.json().catch(()=>({}))).error;const stages={invalid_client:'provider_config',unauthorized_client:'provider_config',invalid_grant:'exchange_rejected',invalid_request:'exchange_request'};return redirect(Object.hasOwn(stages,reason)?stages[reason]:'exchange_failed');}failure='verification_failed';const claims=await verifyGoogleIdToken((await exchanged.json()).id_token,{clientId:env.GOOGLE_CLIENT_ID,nonce:saved.nonce,now:at,fetcher,keys});
    failure='storage_failed';
    let account=await env.DB.prepare('SELECT id,email,google_sub FROM accounts WHERE google_sub=?').bind(claims.sub).first();
    if(saved.link_account){
