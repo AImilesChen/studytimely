@@ -36,7 +36,7 @@ test('explicit same-email linking requires the old session and CSRF, preserving 
  }finally{s.close();}
 });
 test('expired, cancelled and wrong-nonce flows never create an account; arbitrary return URLs are ignored',async()=>{
- const s=await setup();try{let f=await s.start({accepted:true,returnTo:'https://evil.test'});s.advance(601000);assert.match((await s.callback(f)).headers.get('location'),/expired$/);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,0);s.advance(-601000);f=await s.start();s.setClaims({nonce:'wrong'});assert.match((await s.callback(f)).headers.get('location'),/failed$/);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,0);
+ const s=await setup();try{let f=await s.start({accepted:true,returnTo:'https://evil.test'});s.advance(601000);assert.match((await s.callback(f)).headers.get('location'),/expired$/);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,0);s.advance(-601000);f=await s.start();s.setClaims({nonce:'wrong'});assert.match((await s.callback(f)).headers.get('location'),/verification_failed$/);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,0);
  f=await s.start();const r=await s.call('/api/auth/google/callback?state='+f.url.searchParams.get('state')+'&error=access_denied','GET',undefined,f.binder);assert.match(r.headers.get('location'),/cancelled$/);assert.equal(s.db.prepare('SELECT count(*) n FROM sessions').get().n,0);
  }finally{s.close();}
 });
