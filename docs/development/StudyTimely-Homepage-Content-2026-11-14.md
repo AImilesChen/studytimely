@@ -1,5 +1,7 @@
 # Homepage content update — 2026-11-14
 
+Historical local-validation snapshot. These changes were subsequently released as V2.2.0; see [production release record](StudyTimely-V2.2.0-Release.md).
+
 Status: implemented and verified locally; not committed, pushed or deployed in this task. Production remains V2.1.4.
 
 Scope: the below-fold content on `/`. Existing timer controls, heading, progress data, other tool pages and legal policies are preserved.

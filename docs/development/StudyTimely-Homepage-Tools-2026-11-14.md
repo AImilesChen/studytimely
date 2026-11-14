@@ -1,5 +1,7 @@
 # Homepage content and quick tools — 2026-11-14
 
+Historical local-validation snapshot. These changes were subsequently released as V2.2.0; see [production release record](StudyTimely-V2.2.0-Release.md).
+
 Implemented and verified locally. Not committed, pushed or deployed in this task; production remains V2.1.4. This extends the earlier homepage content update.
 
 ## Delivered

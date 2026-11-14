@@ -1,5 +1,7 @@
 # Whole-homepage typography revision — 2026-11-14
 
+Historical local-validation snapshot. These changes were subsequently released as V2.2.0; see [production release record](StudyTimely-V2.2.0-Release.md).
+
 Implemented and verified locally. Not committed, pushed or deployed in this task. Preview: http://localhost:4185/.
 
 The user clarified that the screenshot was an example and requested consistent treatment across the entire homepage. This revision covers the progress teaser, introduction, timer choices, instructions, learning scenarios, interval guidance, workspace, comfort controls, records, installation notice, FAQ and footer.
