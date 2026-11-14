@@ -36,8 +36,9 @@ function documentFor(route){
  const m=metadata(route,effective);
  let html=base.replace(/<title>.*?<\/title>/s,`<title>${escape(m.title)}</title>`).replace(/\s*<meta (?:name="(?:description|robots)"|property="og:(?:title|description|image|url)")[^>]*>/g,'');
  const head=`<meta name="description" content="${escape(m.description)}"><meta name="robots" content="${m.robots}"><meta property="og:title" content="${escape(m.title)}"><meta property="og:description" content="${escape(m.description)}"><meta property="og:image" content="${escape(m.ogImage)}">`+(m.canonical?`<link rel="canonical" href="${escape(m.canonical)}"><meta property="og:url" content="${escape(m.canonical)}">`:'')+(m.schema?`<script id="page-schema" type="application/ld+json">${JSON.stringify(m.schema).replaceAll('<','\\u003c')}</script>`:'')+(config.gscVerification?`<meta name="google-site-verification" content="${escape(config.gscVerification)}">`:'')+(config.bingVerification?`<meta name="msvalidate.01" content="${escape(config.bingVerification)}">`:'');
+ const breadcrumbHead=m.breadcrumb?`<script id="breadcrumb-schema" type="application/ld+json">${JSON.stringify(m.breadcrumb).replaceAll('<','\\u003c')}</script>`:'';
  const ahrefsHead=config.ahrefsVerification?`<meta name="ahrefs-site-verification" content="${escape(config.ahrefsVerification)}">`:'';
- return html.replace('</head>',head+ahrefsHead+'</head>').replace('<div id="root"></div>',`<div id="root" data-rendered-at="${now}">${render(route,now)}</div>`);
+ return html.replace('</head>',head+breadcrumbHead+ahrefsHead+'</head>').replace('<div id="root"></div>',`<div id="root" data-rendered-at="${now}">${render(route,now)}</div>`);
 }
 for(const route of ROUTES){const dir=route.path==='/'?'dist/client':path.join('dist/client',route.path.slice(1));await fs.mkdir(dir,{recursive:true});await fs.writeFile(path.join(dir,'index.html'),documentFor(route.path));}
 await fs.writeFile('dist/client/404.html',documentFor('/404'));

@@ -1,3 +1,4 @@
+import {cityContent,cityDescription} from './city-content.mjs';
 import {CITIES} from './world-clock.mjs';
 export const TOOLS=[
  {id:'clock',path:'/flip-clock',name:'Clock',title:'Free Online Flip Clock',sub:'A clear view of the time.',description:"Display your device's time with a free online flip clock. Choose 12- or 24-hour time, show seconds, and switch between light and dark themes."},
@@ -22,7 +23,7 @@ export const MANAGEMENT_ROUTES=[
  {id:'account',path:'/account',title:'Account and Cloud Sync',h1:'Your study workspace, across devices',description:'Optional email sign-in and manual cloud sync. Anonymous tools remain free. Review what you upload and manage account data.',indexable:false},
  {id:'app',path:'/app',title:'StudyTimely App',h1:'Opening your workspace',description:'Open the last timing tool used in your StudyTimely app.',indexable:false}
 ];
-export const WORLD_CLOCK_ROUTES=[{id:'world-clock',path:'/time',title:'World Clock',h1:'World clock',description:'Find the current time in 32 cities. Compare time zones, search cities and keep your favourite clocks on this device. Free and no account required.',worldClock:true},...CITIES.map(c=>({id:'time-'+c.slug,path:'/time/'+c.slug,title:'Current Time in '+c.name,h1:'Time in '+c.name,description:'See the current time in '+c.name+', '+c.country+'. View the '+c.zone+' time zone, local date and time difference from your device, with related city clocks.',worldClock:true}))];
+export const WORLD_CLOCK_ROUTES=[{id:'world-clock',path:'/time',title:'World Clock',h1:'World clock',description:'Find the current time in 32 cities. Compare time zones, search cities and keep your favourite clocks on this device. Free and no account required.',worldClock:true},...CITIES.map(c=>({id:'time-'+c.slug,path:'/time/'+c.slug,title:cityContent(c.slug).title,h1:'Time in '+c.name,description:cityDescription(c),worldClock:true}))];
 ROUTES.push(...MANAGEMENT_ROUTES,...WORLD_CLOCK_ROUTES);
 export const routeFor=path=>ROUTES.find(r=>r.path===path);
 export const toolFor=mode=>ROUTES.find(t=>t.id===mode)||TOOLS[1];
