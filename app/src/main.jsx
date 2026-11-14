@@ -12,3 +12,5 @@ import './music-controls.css';
 const root=document.getElementById('root');
 const app=<App initialPath={location.pathname} initialNow={Number(root.dataset.renderedAt)||0}/>;
 if(root.hasChildNodes())hydrateRoot(root,app);else createRoot(root).render(app);
+
+import './timer-presentation.css';

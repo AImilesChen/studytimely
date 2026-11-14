@@ -1,4 +1,4 @@
-import {ArrowRight,BookOpen,Clock,CornersOut,Hourglass,Orange,Timer,CaretDown} from '@phosphor-icons/react';
+import {ArrowRight,BookOpen,Clock,EyeSlash,Hourglass,Orange,Timer,CaretDown} from '@phosphor-icons/react';
 import {FAQ,GUIDES} from '../lib/routes.mjs';
 import {PwaStatus} from './PwaStatus.jsx';
 import '../study-home.css';
@@ -37,7 +37,7 @@ export function StudyHomeContent({navigate,onFocus,pwa,locked}){
   <section className="how-section" aria-labelledby="study-how-heading">
    <h2 id="study-how-heading">How to use the study timer</h2>
    <div className="steps">{GUIDES.study.map(([heading,body],i)=><div key={heading}><span>{String(i+1).padStart(2,'0')}</span><h3>{heading}</h3><p>{body}</p></div>)}</div>
-   <button className="text-button" onClick={onFocus}>Enter Focus Mode <CornersOut size={18} aria-hidden="true"/></button>
+   <button className="text-button" onClick={onFocus} title="Hide menus in this window">Enter Focus Mode <EyeSlash size={18} aria-hidden="true"/></button>
    <aside className="study-session-example"><span>One session, step by step</span><p>For example, choose “Revise chapter 3” as your task, start the timer and pause for any interruption. When you finish, save the session rather than adding the time you originally hoped to study. Your history then gives you a record of the session you completed.</p></aside>
   </section>
   <section aria-labelledby="study-scenarios-heading">

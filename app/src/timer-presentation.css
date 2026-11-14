@@ -1,0 +1,57 @@
+/* Fullscreen and in-window Focus share a quiet face, without remounting engines. */
+.app.presentation-view{position:fixed;inset:0;z-index:30;overflow:auto;overscroll-behavior:contain;background:var(--bg)}
+.presentation-view>.global-site-header,
+.presentation-view>.skip,
+.presentation-view>.below-fold,
+.presentation-view>footer,
+.presentation-view .timer-bottom-tools,
+.presentation-view .timer-heading,
+.presentation-view .phase-tabs,
+.presentation-view .world-clock-feature .clock-heading,
+.presentation-view .world-clock-feature .clock-actions,
+.presentation-view .world-clock-feature .tool-dock,
+.presentation-view .world-clock-feature .below-fold,
+.presentation-view .world-clock-feature .relative-time{display:none}
+.presentation-view .timer-screen.timer-face-screen.with-quick-tools{
+ --face-base:min(54dvh,calc((100vw - 80px) / 2.16),520px);
+ --clock-card-height:min(calc(var(--face-base) * var(--face-scale)),calc(100dvh - 250px),calc((100vw - 80px) / 2.16));
+ --clock-card-gap:clamp(12px,2vw,32px);
+ height:100dvh;min-height:0;justify-content:center;padding:68px 24px 80px;
+}
+.presentation-view .timer-screen.timer-face-screen.with-quick-tools .flip-clock{margin:0;max-width:100%}
+.presentation-view .timer-screen.timer-face-screen.with-quick-tools .timer-controls{position:relative;inset:auto;transform:none;margin:28px 0 0;min-height:52px}
+.presentation-view .timer-screen.timer-face-screen.local-clock-screen .timer-controls{margin-top:32px;min-height:24px}
+.presentation-phase{font-size:14px;color:var(--muted);margin:0 0 18px;text-align:center}
+.presentation-view .timer-screen.timer-face-screen.with-quick-tools .lap-preview{margin:44px 0 0}
+.presentation-exit{position:fixed;top:max(18px,env(safe-area-inset-top));right:max(20px,env(safe-area-inset-right));z-index:40;opacity:.7;transition:opacity .2s}
+.presentation-exit button{display:flex;gap:9px;align-items:center;min-height:44px;padding:9px 14px;border-radius:24px;background:var(--surface);color:var(--muted);border:1px solid var(--line);font-size:13px}
+.presentation-exit:hover,.presentation-exit:focus-within{opacity:1}
+.presentation-exit[data-idle=true]{opacity:0;pointer-events:none}
+.presentation-exit[data-idle=true]:focus-within{opacity:1;pointer-events:auto}
+.presentation-view .world-clock-feature .clock-hero{position:relative;inset:auto;height:100dvh;min-height:0;background:var(--bg);z-index:auto}
+.presentation-view .world-clock-feature .flip-display{top:26%;height:43%;left:7%;width:86%}
+.presentation-view .world-clock-feature .flip-display.two-groups{left:17%;width:66%}
+.presentation-view .world-clock-feature .digit{font-size:min(20vw,38dvh)}
+.presentation-view .world-clock-feature .two-groups .digit{font-size:min(26vw,38dvh)}
+.presentation-view .world-clock-feature .clock-under{top:calc(69% + 28px)}
+.presentation-view .world-clock-feature .clock-date{font-size:16px}
+.presentation-view .runtime-notice,.presentation-view .session-notice{position:relative;z-index:35}
+@media(max-width:600px){
+ .presentation-view .timer-screen.timer-face-screen.with-quick-tools{--face-base:min(48dvh,calc((100vw - 56px) / 2.16));--clock-card-height:min(calc(var(--face-base) * var(--face-scale)),calc(100dvh - 250px),calc((100vw - 56px) / 2.16));--clock-card-gap:12px;padding-inline:16px}
+ .presentation-exit{right:12px;top:max(12px,env(safe-area-inset-top))}
+ .presentation-exit button{font-size:12px;padding:8px 12px}
+ .presentation-view .timer-screen.timer-face-screen.local-clock-screen .timer-controls{margin-top:26px}
+ .presentation-view .world-clock-feature .flip-display{top:32%;height:28%;left:4%;width:92%}
+ .presentation-view .world-clock-feature .flip-display.two-groups{left:10%;width:80%}
+ .presentation-view .world-clock-feature .clock-under{top:calc(60% + 24px)}
+ .presentation-view .world-clock-feature .clock-date{font-size:13px}
+}
+@media(max-height:600px){
+ .presentation-view .timer-screen.timer-face-screen.with-quick-tools{--face-base:min(48dvh,calc((100vw - 80px) / 2.16),360px);--clock-card-height:min(calc(var(--face-base) * var(--face-scale)),calc(100dvh - 210px),calc((100vw - 80px) / 2.16));padding-top:54px;padding-bottom:60px}
+ .presentation-view .timer-screen.timer-face-screen.with-quick-tools .timer-controls{margin-top:18px;min-height:40px}
+ .presentation-view .timer-screen.timer-face-screen.local-clock-screen .timer-controls{margin-top:22px;min-height:22px}
+ .presentation-view .timer-face-screen .secondary-control{top:44px}
+ .presentation-phase{margin-bottom:12px}
+ .presentation-view .timer-screen.timer-face-screen.with-quick-tools .lap-preview{margin-top:40px;font-size:11px}
+ .presentation-view .world-clock-feature .clock-under{top:calc(69% + 18px)}
+}

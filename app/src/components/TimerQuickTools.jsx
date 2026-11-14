@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Bell,CornersOut,Palette,SpeakerHigh,SpeakerSlash,MusicNotes} from '@phosphor-icons/react';
+import {Bell,EyeSlash,Palette,SpeakerHigh,SpeakerSlash,MusicNotes} from '@phosphor-icons/react';
 import {MusicControls} from './MusicControls.jsx';
 import {Dialog} from './Dialog.jsx';
 import {AmbientControls,ThemePicker,TimerSizePicker} from './StudySpace.jsx';
@@ -19,7 +19,7 @@ export function TimerQuickTools({mode,store,ambient,music,onFocus,playSound}){
    <button type="button" disabled={!ready} aria-label="Study music" aria-haspopup="dialog" aria-expanded={panel==='music'} onClick={()=>setPanel('music')}><MusicNotes size={19}/><span>Music</span>{music.status==='playing'&&!music.muted&&music.volume>0&&<small>On</small>}</button>
    {!['clock','stopwatch'].includes(mode)&&<button type="button" disabled={!ready} aria-label="Timer alert" aria-haspopup="dialog" aria-expanded={panel==='alert'} onClick={()=>setPanel('alert')}><Bell size={19}/><span>Alert</span></button>}
    <button type="button" disabled={!ready} aria-label="Themes" aria-haspopup="dialog" aria-expanded={panel==='themes'} onClick={()=>setPanel('themes')}><Palette size={19}/><span>Themes</span></button>
-   <button type="button" onClick={onFocus}><CornersOut size={19}/><span>Focus</span></button>
+   <button type="button" onClick={onFocus} title="Focus Mode · hide menus in this window"><EyeSlash size={19} aria-hidden="true"/><span>Focus</span></button>
   </div>
   <Dialog open={!!panel} title={titles[panel]||'Quick timer tools'} close={()=>setPanel(null)} className={`quick-tools-panel ${panel==='music'?'music-panel':''}`} preserveScroll>
    <div className="settings-body">
