@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: 2026-11-13.
+Effective date: 2026-11-13. Last updated: 2026-11-14.
 
 ## 1. Who is responsible
 
@@ -11,6 +11,8 @@ This policy covers our free browser-based timers and local study records. You do
 ## 2. Your study data stays in your browser
 
 Active timer state, study-session dates and durations, subject labels, goals and preferences are stored in your browser using IndexedDB. Anonymous use does not upload this database. World-clock city favourites are saved as local preferences on this device, respect Remember preferences on this device, and are not included in account sync or ordinary study backups. Signing in alone does not upload records. Choosing Sync now merges saved sessions, subjects, goals, tasks, habits, schedules and exam progress with a private cloud snapshot. The active timer and analytics choice stay on this device. If you explicitly select Include and apply appearance and sound settings during sync, those selected preferences are also included in the cloud snapshot; they do not start audio automatically. JSON import reads a file locally; export downloads a file to your device.
+
+The built-in music player loads audio from StudyTimely only after you choose playback; it does not connect to Spotify, YouTube or the composer’s website to play music. Track choice, volume and repeat settings are presentation preferences and follow the remember/sync choices above. Playback intent and position are not stored, so music does not start automatically on a new visit. Audio delivery creates ordinary website requests as described below. Opening a composer or license link takes you to that external website.
 
 Other people using the same browser profile may see these records. Avoid putting your full name, school, address, health information or other sensitive details in subject labels or messages.
 

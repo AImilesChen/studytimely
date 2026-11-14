@@ -1,3 +1,4 @@
+import {verifyMusicLibrary} from './verify-music-library.mjs';
 import {build} from 'vite';
 import {buildPwa} from './build-pwa.mjs';
 import fs from 'node:fs/promises';
@@ -23,6 +24,7 @@ if(release){
  if(config.accountsEnabled&&(!config.accountsReviewed||config.localAccountsTest))missing.push('production account setup and policy review');
  if(missing.length)throw Error('Release configuration is incomplete: '+missing.join(', ')+'. Local preview remains available.');
 }
+console.log('Verified licensed music:',await verifyMusicLibrary(root));
 process.env.STUDY_RELEASE=release?'1':'0';
 await build();
 await build({build:{ssr:'src/entry-server.jsx',outDir:'dist/ssr',emptyOutDir:true}});

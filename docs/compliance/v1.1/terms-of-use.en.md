@@ -1,6 +1,6 @@
 # Terms of Use
 
-Effective date: 2026-11-13.
+Effective date: 2026-11-13. Last updated: 2026-11-14.
 
 ## 1. The service and operator
 
@@ -44,7 +44,7 @@ Study totals describe recorded timer activity; they do not certify learning, att
 
 ## 7. Intellectual property and links
 
-We or the relevant licensors retain rights in the website's code, design and supplied materials, subject to any separately stated licences. Free access does not by itself make the code open source or permit redistribution of licensed sounds, fonts or artwork. This does not restrict your rights in your own records or rights granted by law.
+We or the relevant licensors retain rights in the website's code, design and supplied materials, subject to any separately stated licences. Free access does not by itself make the code open source or permit redistribution of licensed sounds, fonts or artwork. This does not restrict your rights in your own records or rights granted by law. The built-in music recordings by Kevin MacLeod are separately licensed under Creative Commons Attribution 4.0. Their titles, source links and attribution are available in the player and in [Music credits](/music/CREDITS.txt), with the [license PDF](/music/CC-BY-4.0.pdf). These Terms do not limit the rights granted by that music license.
 
 External websites have their own terms and policies. References to an exam, school or third-party brand do not imply endorsement or an official relationship.
 

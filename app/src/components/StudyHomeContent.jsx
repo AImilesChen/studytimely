@@ -68,10 +68,11 @@ export function StudyHomeContent({navigate,onFocus,pwa,locked}){
   </section>
   <section aria-labelledby="study-comfort-heading">
    <h2 id="study-comfort-heading">Make your study space comfortable</h2>
-   <p className="section-intro">The quick toolbar beneath the timer puts sounds, themes and a quieter view within reach.</p>
+   <p className="section-intro">The quick toolbar beneath the timer puts sounds, music, themes and a quieter view within reach.</p>
    <div className="study-comfort-grid">
-    <div><h3>Themes &amp; motion</h3><p>Open Themes to choose a light or dark look, or a colour palette that suits your desk. Turn on Reduce motion if you prefer simpler transitions. You can also find themes and ambient controls together in <a href="/aesthetic-timer" onClick={navigate}>Study Space</a>.</p></div>
-    <div><h3>Ambient sounds</h3><p>Open Sounds to try rain, café murmur, forest, ocean waves, white noise or breeze and chimes. Mix sound textures at separate volumes, check the On indicator, or mute the mix. Sound starts only after you choose to play it.</p></div>
+    <div><h3>Themes &amp; motion</h3><p>Open Themes to choose a light or dark look, a colour palette that suits your desk, and a small, medium or large timer. Turn on Reduce motion if you prefer simpler transitions. You can also find themes and ambient controls together in <a href="/aesthetic-timer" onClick={navigate}>Study Space</a>.</p></div>
+    <div><h3>Ambient sounds</h3><p>Open Sounds for 12 original synthesised textures, including rain, café murmur, forest, ocean waves, white, brown and pink noise, fireplace, fan, stream, keyboard, and breeze and chimes. Set each sound’s level and the master volume, save your own mixes, or start with a preset. Mute keeps your levels; playback starts only when you choose it.</p></div>
+    <div><h3>Free study music</h3><p>Open Music for five complete instrumental recordings by Kevin MacLeod, licensed under CC BY 4.0. Choose piano, harp or ambient music, adjust the volume, and repeat one track or the playlist. Music and ambient sounds have independent controls. Playback starts only when you choose it; credits and source links are available in the player.</p></div>
     <div><h3>Focus Mode</h3><p>Choose Focus to clear the surrounding workspace while your timer continues. You can keep your current session and take pauses as needed. Use Back to workspace when you want to see the full page, your study tools and progress again.</p></div>
     <div><h3>Timer alerts</h3><p>Ambient sound and end alerts have separate controls. Use Alert to enable, adjust and test the sound for a Pomodoro, Focus or Countdown period. Keep the page open and the device awake; browser audio is not a substitute for a dependable alarm.</p></div>
    </div>

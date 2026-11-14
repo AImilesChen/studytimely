@@ -1,108 +1,70 @@
-/* Keep the local clock together; sizing responds to both viewport axes. */
-.timer-screen.local-clock-screen {
-  --clock-card-height: clamp(104px, min(44svh, calc(100svh - 430px)), 400px);
-  --clock-card-gap: clamp(12px, 2vw, 28px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100svh;
-  min-height: 560px;
-  padding: 90px 20px 24px;
+/* Six local timing tools share one portrait face; city clocks stay independent. */
+.timer-screen.timer-face-screen.with-quick-tools{--face-base:clamp(118px,min(42svh,calc(100svh - 495px)),400px);--face-scale:1;--clock-card-height:min(calc(var(--face-base) * var(--face-scale)),calc((100vw - 100px) / 2.16));--clock-card-gap:clamp(12px,2vw,28px);--dock-height:70px;display:flex;flex-direction:column;align-items:center;height:100svh;min-height:680px;padding:88px 20px 22px}
+body:has(.timer-face-screen){min-width:0}
+.timer-screen.timer-face-screen[data-size=small]{--face-scale:.8}
+.timer-screen.timer-face-screen[data-size=large]{--face-scale:1.16}
+.timer-screen.timer-face-screen.with-quick-tools .timer-heading{position:static;width:100%;padding:0;margin-top:auto;text-align:center;flex:none}
+.timer-face-screen .timer-heading p{margin-top:4px;font-size:16px}
+.timer-screen.timer-face-screen.with-quick-tools .phase-tabs{position:static;inset:auto;transform:none;flex:none;gap:8px;margin:12px 0 0;font-size:13px}
+.timer-face-screen .phase-tabs button{min-height:36px;padding:5px 14px;border-radius:24px}
+.timer-face-screen .phase-tabs .selected{background:var(--surface);text-decoration:none}
+.timer-screen.timer-face-screen.with-quick-tools .flip-clock{position:relative;inset:auto;flex:none;width:calc(var(--clock-card-height) * 2.16 + var(--clock-card-gap) * 2);max-width:100%;height:var(--clock-card-height);gap:var(--clock-card-gap);margin-top:20px}
+.timer-face-screen .flip-card{border-radius:clamp(14px,2vw,28px)}
+.timer-face-screen .number,.timer-face-screen .two-groups .number{font-size:calc(var(--clock-card-height) * .52);font-weight:500;letter-spacing:-.045em;padding-right:.045em;transform:none;line-height:1}
+.timer-face-screen .number.ticking{animation-name:local-clock-digit}
+@keyframes local-clock-digit{from{opacity:.7}to{opacity:1}}
+.timer-face-screen .colon{display:flex;left:calc(-1 * var(--clock-card-gap));width:var(--clock-card-gap);font-size:clamp(18px,calc(var(--clock-card-height) * .14),54px)}
+.timer-face-screen .hinge{border-top-width:1px}
+.timer-face-screen .hinge::before,.timer-face-screen .hinge::after{display:none}
+.timer-screen.timer-face-screen.with-quick-tools .flip-clock.two-groups{width:calc(var(--clock-card-height) * 1.44 + var(--clock-card-gap))}
+.timer-screen.timer-face-screen.with-quick-tools .timer-controls{position:relative;inset:auto;flex:none;width:100%;min-height:52px;margin:24px 0 44px}
+.timer-face-screen .start-button{width:190px;height:52px;font-size:22px;font-weight:600}
+.timer-face-screen .reset-button{margin-right:-68px}
+.timer-face-screen .secondary-control{top:58px;min-height:32px;padding:4px 12px}
+.timer-screen.timer-face-screen.with-quick-tools .lap-preview{position:static;inset:auto;transform:none;flex-direction:row;flex-wrap:wrap;max-width:100%;gap:6px 18px;margin:-6px 0 12px;font-size:12px}
+.timer-screen.timer-face-screen.with-quick-tools .timer-bottom-tools{position:relative;inset:auto;transform:none;flex:none;width:min(76%,860px);margin-top:auto;gap:10px}
+.timer-screen.timer-face-screen.local-clock-screen{--face-base:clamp(118px,min(44svh,calc(100svh - 430px)),400px)}
+.timer-screen.timer-face-screen.local-clock-screen .timer-controls{min-height:26px;margin:40px 0 28px}
+.timer-face-screen .clock-date{position:static;font-size:16px}
+.timer-screen.timer-face-screen[data-mode=pomodoro]{--face-base:clamp(118px,min(38svh,calc(100svh - 535px)),360px)}
+@media(max-width:800px){
+ .timer-screen.timer-face-screen.with-quick-tools{--face-base:clamp(112px,37.5vw,250px);--clock-card-height:min(calc(var(--face-base) * var(--face-scale)),calc((100vw - 66px) / 2.16));--clock-card-gap:12px;--dock-height:73px;padding:88px 16px 24px;min-height:640px}
+ .timer-screen.timer-face-screen.with-quick-tools .timer-bottom-tools{width:100%;max-width:600px}
+ .timer-face-screen .timer-heading p{font-size:14px}
+ .timer-screen.timer-face-screen.with-quick-tools .timer-controls{margin:24px 0 42px}
+ .timer-screen.timer-face-screen.local-clock-screen .timer-controls{margin:40px 0 28px}
+ .timer-face-screen .clock-date{font-size:14px}
+ .timer-screen.timer-face-screen[data-mode=pomodoro]{--face-base:clamp(112px,37.5vw,250px)}
 }
-.local-clock-screen .timer-heading {
-  position: static;
-  width: 100%;
-  padding: 0;
-  margin-top: auto;
-  text-align: center;
+@media(max-width:360px){
+ .timer-face-screen .phase-tabs button{padding:5px 10px;font-size:12px}
+ .timer-face-screen .start-button{width:156px;height:48px;font-size:20px}
+ .timer-face-screen .timer-heading h1{font-size:21px}
+ .timer-face-screen .tool-dock a{font-size:11px}
 }
-.local-clock-screen .timer-heading p { margin-top: 4px; font-size: 16px; }
-.local-clock-screen .flip-clock {
-  position: relative;
-  inset: auto;
-  flex: none;
-  width: calc(var(--clock-card-height) * 2.16 + var(--clock-card-gap) * 2);
-  max-width: 100%;
-  height: var(--clock-card-height);
-  gap: var(--clock-card-gap);
-  margin-top: 20px;
+@media(max-height:600px) and (min-width:650px){
+ .timer-screen.timer-face-screen.with-quick-tools{--face-base:clamp(86px,calc(100svh - 335px),180px);--dock-height:52px;display:flex;min-height:450px;padding:68px 16px 12px}
+ .timer-screen.timer-face-screen[data-mode=pomodoro]{--face-base:clamp(86px,calc(100svh - 365px),150px)}
+ .timer-screen.timer-face-screen.with-quick-tools .timer-heading{margin-top:0}
+ .timer-face-screen .timer-heading h1{font-size:18px}
+ .timer-face-screen .timer-heading p{display:none}
+ .timer-screen.timer-face-screen.with-quick-tools .phase-tabs{margin:4px 0 0}
+ .timer-screen.timer-face-screen.with-quick-tools .flip-clock{margin-top:10px}
+ .timer-screen.timer-face-screen.with-quick-tools .timer-controls{min-height:40px;margin:12px 0 32px}
+ .timer-face-screen .start-button{width:150px;height:40px;font-size:18px}
+ .timer-face-screen .secondary-control{top:42px;font-size:12px;min-height:28px}
+ .timer-screen.timer-face-screen.local-clock-screen .timer-controls{min-height:20px;margin:18px 0 14px}
+ .timer-face-screen .clock-date{font-size:12px}
+ .timer-screen.timer-face-screen.with-quick-tools .timer-bottom-tools{width:min(76%,680px);gap:8px}
 }
-.local-clock-screen .flip-card { border-radius: clamp(16px, 2vw, 28px); }
-.local-clock-screen .number {
-  font-size: calc(var(--clock-card-height) * .52);
-  font-weight: 500;
-  letter-spacing: -.045em;
-  padding-right: .045em;
-  transform: none;
-  line-height: 1;
+.focus-view .timer-screen.timer-face-screen.with-quick-tools{--face-base:min(45svh,30vw,400px);display:flex;justify-content:center;min-height:560px;padding:70px 20px 85px}
+.focus-view .timer-screen.timer-face-screen.with-quick-tools .timer-heading{display:none}
+.focus-view .timer-screen.timer-face-screen.with-quick-tools .flip-clock{margin-top:0}
+.focus-view .timer-screen.timer-face-screen.with-quick-tools .timer-controls{margin:24px 0 0}
+.focus-view .timer-screen.timer-face-screen.with-quick-tools .timer-bottom-tools{display:none}
+@media(max-height:600px){.focus-view .timer-screen.timer-face-screen.with-quick-tools{min-height:420px}}
+@media(max-width:360px){
+ .timer-face-screen .tool-dock{gap:2px;padding-inline:2px}
+ .timer-face-screen .tool-dock :is(a,button){font-size:10px;letter-spacing:-.02em}
+ .timer-face-screen .timer-quick-tools button{padding-inline:5px}
 }
-.local-clock-screen .number.ticking { animation-name: local-clock-digit; }
-@keyframes local-clock-digit { from { opacity: .7; } to { opacity: 1; } }
-.local-clock-screen .colon {
-  display: flex;
-  left: calc(-1 * var(--clock-card-gap));
-  width: var(--clock-card-gap);
-  font-size: clamp(18px, calc(var(--clock-card-height) * .14), 54px);
-}
-.local-clock-screen .hinge { border-top-width: 1px; }
-.local-clock-screen .hinge::before, .local-clock-screen .hinge::after { display: none; }
-.local-clock-screen .clock-date { position: relative; top: 40px; }
-.local-clock-screen .timer-controls {
-  position: static;
-  flex: none;
-  min-height: 26px;
-  margin-top: 8px;
-  margin-bottom: 64px;
-}
-.local-clock-screen .tool-dock {
-  position: relative;
-  inset: auto;
-  transform: none;
-  flex: none;
-  width: min(76%, 860px);
-  height: 76px;
-  margin-top: auto;
-}
-.local-clock-screen .flip-clock.two-groups { width: calc(var(--clock-card-height) * 1.44 + var(--clock-card-gap)); }
-.local-clock-screen .two-groups .number { font-size: calc(var(--clock-card-height) * .52); }
-@media(max-width:800px) {
-  .timer-screen.local-clock-screen {
-    --clock-card-height: clamp(104px, min(37.5vw, calc((100vw - 71px) / 2.16)), 220px);
-    --clock-card-gap: 12px;
-    padding: 85px 16px 24px;
-  }
-  .local-clock-screen .timer-heading p { font-size: 14px; }
-  .local-clock-screen .timer-controls { min-height: 22px; }
-  .local-clock-screen .tool-dock { width: 100%; max-width: 600px; height: 73px; }
-}
-@media(max-height:600px) and (min-width:650px) {
-  .timer-screen.local-clock-screen {
-    --clock-card-height: clamp(70px, calc(100svh - 240px), 160px);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto var(--clock-card-height) 44px 58px;
-    align-content: center;
-    justify-items: center;
-    gap: 12px 0;
-    min-height: 360px;
-    padding: 64px 16px 12px;
-  }
-  .local-clock-screen .timer-heading { grid-column: 1 / -1; margin: 0; }
-  .local-clock-screen .timer-heading h1 { font-size: 18px; }
-  .local-clock-screen .timer-heading p { display: none; }
-  .local-clock-screen .flip-clock { grid-column: 1 / -1; margin: 0; }
-  .local-clock-screen .timer-controls { grid-column: 1 / -1; grid-row: 3; justify-self: center; margin: 0; min-height: 0; }
-  .local-clock-screen .clock-date { font-size: 12px; top: 0; }
-  .local-clock-screen .tool-dock { grid-column: 1 / -1; margin: 0; width: min(76%, 680px); height: 58px; }
-}
-.focus-view .timer-screen.local-clock-screen {
-  --clock-card-height: min(45svh, 30vw, 400px);
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  min-height: 0;
-  padding: 48px 20px 80px;
-}
-.focus-view .local-clock-screen .timer-heading { display: none; }
-.focus-view .local-clock-screen .flip-clock { margin-top: 0; }
-.focus-view .local-clock-screen .timer-controls { margin: 20px 0 0; }

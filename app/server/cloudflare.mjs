@@ -1,3 +1,5 @@
+import {MUSIC_TRACKS} from '../src/lib/music-catalog.mjs';
+import {musicAssetResponse} from './music-assets.mjs';
 import {ROUTES} from '../src/lib/routes.mjs';
 import {createAccountsApi} from './accounts.mjs';
 import {createGoogleAuth} from './google-auth.mjs';
@@ -5,6 +7,7 @@ import {createCommunityApi,communityMaintenance} from './community.mjs';
 const accountApi=createAccountsApi({emailRecoveryOnly:true}),googleApi=createGoogleAuth(),communityApi=createCommunityApi();
 const accountPaths=new Set(['/api/auth/me','/api/auth/request-code','/api/auth/verify-code','/api/auth/logout','/api/workspace','/api/account/export','/api/account']);
 const paths=new Set(ROUTES.map(r=>r.path));
+const musicFiles=new Map(MUSIC_TRACKS.map(t=>[t.src,t.bytes]));
 export function createWorker(config={indexable:false}){return{async fetch(request,env,ctx){
  const url=new URL(request.url),path=url.pathname;
  if(path.startsWith('/api/auth/google/'))return googleApi(request,env);
@@ -24,12 +27,14 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  if(path.startsWith('/design-review')||path==='/site.config.json'||path.startsWith('/api/'))return new Response('Not found',{status:404,headers:{...headers,'X-Robots-Tag':'noindex'}});
  let assetPath=paths.has(path)?(path==='/'?'/index.html':path+'/index.html'):path;
  const assetUrl=new URL(request.url);assetUrl.pathname=assetPath;assetUrl.search='';
+ const musicAsset=musicFiles.has(path);
  let response=await env.ASSETS.fetch(new Request(assetUrl,{method:request.method}));
+ if(musicAsset)response=await musicAssetResponse(request,response,musicFiles.get(path));
  const missing=response.status===404;
  if(missing&&request.headers.get('accept')?.includes('text/html')){assetUrl.pathname='/404.html';response=await env.ASSETS.fetch(new Request(assetUrl,{method:request.method}));}
  const out=new Headers(response.headers);for(const [key,value] of Object.entries(headers))out.set(key,value);
  if(path==='/analytics-frame.html'||path==='/analytics-frame.js'||missing)out.set('X-Robots-Tag','noindex, nofollow');
- if(path.startsWith('/assets/'))out.set('Cache-Control','public, max-age=31536000, immutable');else out.set('Cache-Control','no-cache');
+ if(path.startsWith('/assets/')||musicAsset)out.set('Cache-Control','public, max-age=31536000, immutable');else out.set('Cache-Control','no-cache');
  const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com":'';
  out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${config.communityEnabled&&path==='/study-groups'?' '+(url.protocol==='https:'?'wss://':'ws://')+url.host:''}${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});

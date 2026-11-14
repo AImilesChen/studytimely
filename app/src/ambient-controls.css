@@ -1,0 +1,60 @@
+/* Shared by the toolbar, Settings and Study Space. */
+.ambient-controls{min-width:0}
+.ambient-controls .sound-intro{font-size:13px;line-height:1.6;margin:0 0 16px}
+.ambient-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sound-tile{min-width:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.sound-tile.selected{border-color:var(--muted)}
+.sound-tile>button{width:100%;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px 3px 4px;font-size:12px;line-height:1.3}
+.sound-tile>button:hover{background:var(--raised)}
+.sound-tile>button>span{min-height:16px;text-align:center}
+.sound-tile small{height:15px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.sound-tile button[aria-pressed=true] small{color:var(--fg)}
+.sound-channel{padding:4px 8px 8px;display:flex;align-items:center;gap:5px}
+.sound-channel input{width:100%;min-width:0;margin:0;accent-color:var(--fg);height:18px}
+.sound-channel output{font-size:10px;flex:none;color:var(--muted);font-variant-numeric:tabular-nums}
+.ambient-master{display:flex;align-items:center;gap:16px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.ambient-master>label{display:grid;grid-template-columns:1fr auto;gap:6px;flex:1;font-size:13px;min-width:0}
+.ambient-master input{grid-column:1/-1;width:100%;min-width:0;accent-color:var(--fg);height:24px;margin:0}
+.ambient-master output{color:var(--muted)}
+.ambient-master .button{min-height:44px;white-space:nowrap;gap:6px;font-size:12px;padding:8px 12px}
+.ambient-controls .mute-note{font-size:12px;margin:8px 0 20px;line-height:1.5}
+.ambient-controls .mix-heading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.ambient-controls .mix-heading h3{margin:0;font-size:14px;font-weight:600}
+.mix-heading>button{display:flex;align-items:center;gap:3px;font-size:12px;text-decoration:underline;text-underline-offset:3px;min-height:32px}
+.mix-presets{display:flex;flex-wrap:wrap;gap:7px}
+.mix-presets>button{border:1px solid var(--line);display:flex;align-items:center;gap:5px;border-radius:20px;padding:7px 11px;min-height:36px;font-size:12px;max-width:100%;overflow-wrap:anywhere;text-align:left}
+.mix-presets>button:hover,.mix-presets>button.selected{background:var(--surface);border-color:var(--muted)}
+.ambient-controls .restore-mixes{font-size:11px;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:10px 0;min-height:36px}
+.mix-editor{margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:12px}
+.mix-editor>label{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.mix-editor input{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:9px 10px;width:100%;color:var(--fg);min-width:0}
+.mix-editor>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.mix-editor .button{font-size:12px;min-height:38px;padding:7px 12px}
+.mix-editor>.text-button{font-size:12px;margin-top:10px}
+.timer-size-picker{border:0;padding:0;margin:22px 0 18px;min-width:0}
+.timer-size-picker legend{font-size:14px;font-weight:600;padding:0;margin-bottom:10px}
+.timer-size-picker>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.timer-size-picker button{position:relative;border:1px solid var(--line);border-radius:12px;min-height:90px;padding:10px 4px;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;gap:4px;font-size:12px}
+.timer-size-picker button[aria-pressed=true]{background:var(--surface);border-color:var(--fg)}
+.timer-size-picker button>svg{position:absolute;top:8px;right:8px}
+.timer-size-picker .size-sample{font-variant-numeric:tabular-nums;line-height:1;font-weight:500}
+.size-sample.small{font-size:22px}.size-sample.medium{font-size:30px}.size-sample.large{font-size:38px}
+.timer-size-picker .help{font-size:12px;margin:10px 0 0}
+dialog.quick-tools-panel{width:500px;max-width:calc(100vw - 28px);max-height:88svh;inset:auto auto max(16px,5svh) 50%}
+@media(max-width:540px){
+ .ambient-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .sound-tile>button{min-height:76px}
+ .quick-tools-panel .modal-head{padding:16px 18px}
+ .quick-tools-panel .settings-body{padding:12px 18px 18px}
+ .quick-tools-panel{max-height:90svh}
+}
+@media(max-width:340px){
+ .sound-tile>button{font-size:11px}
+ .sound-channel{padding:6px 7px 8px}
+ .ambient-grid{gap:6px}
+ .ambient-master{gap:10px}
+ .ambient-master .button{padding:8px;font-size:11px}
+}
+
+.quick-tools-panel .modal-head{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line)}
+.quick-tools-panel .sound-tile>button:focus-visible{outline-offset:-3px}
