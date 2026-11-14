@@ -2,11 +2,19 @@
 import worker,{StudyRoom} from '../../dist/cloudflare/worker.mjs';
 import {issueSession} from '../../server/auth-shared.mjs';
 import {pendingRegistration} from '../../server/registration.mjs';
+import {createCommunityApi} from '../../server/community.mjs';
 export {StudyRoom};
+// No network request: deterministic safety responses for localhost UI/integration QA only.
+const fixtureCommunity=createCommunityApi({reviewFetch:async(_url,options)=>{
+ const {text}=JSON.parse(options.body);
+ if(text.includes('synthetic-review-unavailable'))return new Response('',{status:429});
+ return Response.json({categoriesAnalysis:['Hate','SelfHarm','Sexual','Violence'].map(category=>({category,severity:category==='Violence'&&text.includes('synthetic-review-block')?6:0}))});
+}});
 const emails=['owner@studytimely.invalid','learner@studytimely.invalid','admin@studytimely.invalid'];
 export default {async fetch(request,env,ctx){
  const url=new URL(request.url);if(!['127.0.0.1','localhost','[::1]'].includes(url.hostname))return new Response('Local synthetic fixture only',{status:403});
- const fixture={...env,COMMUNITY_ADMIN_EMAILS:'admin@studytimely.invalid'};
+ const fixture={...env,COMMUNITY_ADMIN_EMAILS:'admin@studytimely.invalid',COMMUNITY_REVIEW_ENABLED:'true',AZURE_CONTENT_SAFETY_ENDPOINT:'https://synthetic.cognitiveservices.azure.com',AZURE_CONTENT_SAFETY_KEY:'synthetic-local-review-not-a-real-key'};
+ if(url.pathname.startsWith('/api/community/'))return fixtureCommunity(request,fixture,true,ctx);
  if(url.pathname==='/__test/registration'&&request.method==='POST'){if(request.headers.get('origin')!==url.origin)return new Response('Forbidden',{status:403});const id=crypto.randomUUID();const proof=await pendingRegistration(request,env,{sub:'synthetic-new-google:'+id,email:'new-'+id.slice(0,8)+'@studytimely.invalid'},'/account',Date.now());return new Response(null,{status:303,headers:{Location:'/account?signin=register','Set-Cookie':proof,'Cache-Control':'no-store'}});}
  if(url.pathname==='/__test/notify'&&request.method==='POST'){const {roomId}=await request.json();if(!/^[a-f0-9-]{36}$/.test(roomId||''))return new Response('Invalid fixture room',{status:400});return env.ROOMS.get(env.ROOMS.idFromName(roomId)).fetch('https://room.internal/notify',{method:'POST'});}
  if(url.pathname==='/__test/sign-in'){

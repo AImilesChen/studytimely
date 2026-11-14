@@ -1,0 +1,4 @@
+import {COMMUNITY} from '../lib/community-model.mjs';
+export function RoomCapacity({value,onChange,minimum=2,disabled=false}){
+ return <fieldset className="room-capacity" disabled={disabled}><legend>Member limit</legend><div className="room-capacity-options">{COMMUNITY.capacityPresets.map(n=><button key={n} type="button" className="button" aria-pressed={Number(value)===n} disabled={n<minimum} onClick={()=>onChange(n)}>{n} people</button>)}</div><label className="field">Custom member limit<input name="capacity" type="number" min={Math.max(2,minimum)} max={COMMUNITY.maxCapacity} step="1" value={value} onChange={e=>onChange(e.target.value)} required/></label><p className="help">2–24 members, including the owner. Offline members keep their places. {minimum>2?`There are ${minimum} members; remove members before reducing the limit below this.`:'8 members is recommended for a small study group.'}</p></fieldset>;
+}

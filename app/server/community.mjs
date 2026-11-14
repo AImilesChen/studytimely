@@ -1,5 +1,6 @@
 import {ApiError,fail,result,body,identity,rateLimit,randomToken} from './auth-shared.mjs';
 import {COMMUNITY,utcDay,weekStart,nickname,cleanText,roomInput,creditWindow,communityRules} from '../src/lib/community-model.mjs';
+import {reviewConfiguration,enforceLocalContent,reviewChat} from './chat-review.mjs';
 const uuid=value=>typeof value==='string'&&/^[a-f0-9-]{36}$/.test(value);
 const admins=env=>(env.COMMUNITY_ADMIN_EMAILS||'').toLowerCase().split(/[\s,;]+/).filter(Boolean);
 const q=(env,sql,...args)=>env.DB.prepare(sql).bind(...args);
@@ -21,7 +22,7 @@ export async function communityMaintenance(env,at=Date.now()){
   q(env,"UPDATE community_timers SET status='check' WHERE status='running' AND last_at<?",at-90000)
  ]);return {day:today,snapshot:yesterday};
 }
-export function createCommunityApi({now=Date.now}={}){
+export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeoutMs=5000}={}){
  return async(request,env,enabled=true,ctx)=>{
   const url=new URL(request.url),path=url.pathname.replace('/api/community',''),method=request.method,at=Math.floor(now()/1000)*1000,day=utcDay(at);
   try{
@@ -53,11 +54,11 @@ export function createCommunityApi({now=Date.now}={}){
     const mine=profile?await rows(q(env,`SELECT r.id,r.name,r.visibility,r.owner_id,r.closed_at FROM community_rooms r JOIN community_members m ON m.room_id=r.id WHERE m.profile_id=? AND m.banned=0 AND m.left_at=0 ORDER BY (r.closed_at>0) ASC,r.created_at DESC LIMIT 10`,profile.id)):[];
     const history=profile?await rows(q(env,'SELECT day,rank,seconds FROM community_rank_history WHERE profile_id=? ORDER BY day DESC LIMIT 30',profile.id)):[];
     const blocks=profile?await rows(q(env,'SELECT b.blocked_id AS id,p.nickname FROM community_blocks b JOIN community_profiles p ON p.id=b.blocked_id WHERE b.blocker_id=?',profile.id)):[];
-    return result({profile:profile?{id:profile.id,nickname:profile.nickname,publicRanking:!!profile.public_ranking,version:profile.version}:null,rooms:mine,history,blocks,timer:await timer(),serverNow:at,creditedToday:profile?(await q(env,'SELECT seconds FROM community_daily WHERE profile_id=? AND day=?',profile.id,day).first())?.seconds||0:0,moderator:isAdmin,moderationAvailable:admins(env).length>0,rules:communityRules()});
+    return result({profile:profile?{id:profile.id,nickname:profile.nickname,publicRanking:!!profile.public_ranking,version:profile.version}:null,rooms:mine,history,blocks,timer:await timer(),serverNow:at,creditedToday:profile?(await q(env,'SELECT seconds FROM community_daily WHERE profile_id=? AND day=?',profile.id,day).first())?.seconds||0:0,moderator:isAdmin,moderationAvailable:admins(env).length>0,chatReviewAvailable:!!reviewConfiguration(env),rules:communityRules()});
    }
    if(path==='/profile'&&method==='PUT'){
     requireUser();const input=await body(request);if((!profile&&input.accepted!==true)||typeof input.publicRanking!=='boolean')fail(400,'COMMUNITY_POLICY','Confirm the community rules and choose whether to join public rankings.');
-    const name=nickname(input.nickname);await rateLimit(env,'profile',user.id,20,3600000,at);
+    const name=nickname(input.nickname);enforceLocalContent(name);await rateLimit(env,'profile',user.id,20,3600000,at);
     const version=profile?input.version:0;if(!Number.isInteger(version)||version<0)fail(400,'VERSION','Reload your community profile before saving.');
     const saved=profile?await q(env,'UPDATE community_profiles SET nickname=?,public_ranking=?,version=version+1 WHERE account_id=? AND version=? RETURNING id,version',name,input.publicRanking?1:0,user.id,version).first():await q(env,'INSERT INTO community_profiles(id,account_id,nickname,public_ranking,accepted_at,created_at) VALUES(?,?,?,?,?,?) ON CONFLICT(account_id) DO NOTHING RETURNING id,version',crypto.randomUUID(),user.id,name,input.publicRanking?1:0,at,at).first();
     if(!saved)fail(409,'CONFLICT','Your community profile changed elsewhere. Reload it before saving.');
@@ -67,12 +68,13 @@ export function createCommunityApi({now=Date.now}={}){
     const list=await rows(q(env,`SELECT r.id,r.name,r.goal_minutes,r.capacity,p.nickname AS host,
      (SELECT count(*) FROM community_members m WHERE m.room_id=r.id AND m.banned=0 AND m.left_at=0) AS members,
      (SELECT count(*) FROM community_members m WHERE m.room_id=r.id AND m.banned=0 AND m.left_at=0 AND m.last_seen>?) AS online,
+     (SELECT count(*) FROM community_members m JOIN community_timers t ON t.profile_id=m.profile_id AND t.room_id=m.room_id WHERE m.room_id=r.id AND m.banned=0 AND m.left_at=0 AND m.last_seen>? AND t.status='running' AND t.last_at>=? AND t.check_at>?) AS studying,
      COALESCE((SELECT sum(seconds) FROM community_room_daily d WHERE d.room_id=r.id AND d.day=?),0) AS today_seconds
-     FROM community_rooms r JOIN community_profiles p ON p.id=r.owner_id WHERE r.visibility='public' AND r.closed_at=0 ORDER BY r.created_at DESC LIMIT 30`,at-75000,day));
+     FROM community_rooms r JOIN community_profiles p ON p.id=r.owner_id WHERE r.visibility='public' AND r.closed_at=0 ORDER BY r.created_at DESC LIMIT 30`,at-75000,at-75000,at-COMMUNITY.maxHeartbeatGapMs,at,day));
     return result({rooms:list});
    }
    if(path==='/rooms'&&method==='POST'){
-    requireProfile();const input=await body(request),data=roomInput(input);if(!uuid(input.id))fail(400,'INVALID','Provide a new room request ID.');
+    requireProfile();const input=await body(request),data=roomInput(input);enforceLocalContent(data.name);if(!uuid(input.id))fail(400,'INVALID','Provide a new room request ID.');
     const exists=await q(env,'SELECT owner_id FROM community_rooms WHERE id=?',input.id).first();if(exists){if(exists.owner_id!==profile.id)fail(409,'CONFLICT','Choose a new room request.');return result({id:input.id});}
     await rateLimit(env,'room-create',profile.id,5,86400000,at);await rateLimit(env,'room-create-ip',request.headers.get('cf-connecting-ip')||'local',20,86400000,at);
     await env.DB.batch([q(env,'INSERT INTO community_rooms(id,owner_id,name,visibility,goal_minutes,capacity,invite_token,created_at) VALUES(?,?,?,?,?,?,?,?)',input.id,profile.id,data.name,data.visibility,data.goalMinutes,data.capacity,randomToken().slice(0,24),at),q(env,'INSERT INTO community_members(room_id,profile_id,joined_at) VALUES(?,?,?)',input.id,profile.id,at)]);
@@ -80,7 +82,7 @@ export function createCommunityApi({now=Date.now}={}){
    }
    if(path==='/invite'&&method==='POST'){
     requireProfile();const input=await body(request),code=String(input.code||'').trim().toLowerCase();await rateLimit(env,'invite-lookup',user.id,30,3600000,at);await rateLimit(env,'invite-ip',request.headers.get('cf-connecting-ip')||'local',60,3600000,at);
-    if(!/^[a-f0-9]{24}$/.test(code))fail(404,'INVITE','This invitation is invalid or closed.');const room=await q(env,'SELECT id,name,visibility FROM community_rooms WHERE invite_token=? AND invitations_open=1 AND closed_at=0',code).first();
+    if(!/^[a-f0-9]{24}$/.test(code))fail(404,'INVITE','This invitation is invalid or closed.');const room=await q(env,'SELECT id,name,visibility,capacity,(SELECT count(*) FROM community_members m WHERE m.room_id=community_rooms.id AND m.banned=0 AND m.left_at=0) AS members,EXISTS(SELECT 1 FROM community_members m WHERE m.room_id=community_rooms.id AND m.profile_id=? AND m.banned=0 AND m.left_at=0) AS alreadyMember FROM community_rooms WHERE invite_token=? AND invitations_open=1 AND closed_at=0',profile.id,code).first();
     if(!room)fail(404,'INVITE','This invitation is invalid or closed.');return result({room});
    }
    const match=path.match(/^\/rooms\/([a-f0-9-]{36})(?:\/(join|leave|settings|round|members|messages|reports|socket))?$/);
@@ -101,18 +103,18 @@ export function createCommunityApi({now=Date.now}={}){
      const members=await rows(q(env,`SELECT p.id,p.nickname,m.last_seen,m.muted_until,
       COALESCE((SELECT seconds FROM community_room_daily d WHERE d.room_id=? AND d.profile_id=p.id AND d.day=?),0) AS today_seconds,
       COALESCE((SELECT sum(seconds) FROM community_room_daily d WHERE d.room_id=? AND d.profile_id=p.id),0) AS total_seconds,
-      t.status AS timer_status FROM community_members m JOIN community_profiles p ON p.id=m.profile_id LEFT JOIN community_timers t ON t.profile_id=p.id AND t.room_id=m.room_id
+      t.status AS timer_status,t.last_at AS timer_last_at,t.check_at AS timer_check_at FROM community_members m JOIN community_profiles p ON p.id=m.profile_id LEFT JOIN community_timers t ON t.profile_id=p.id AND t.room_id=m.room_id
       WHERE m.room_id=? AND m.banned=0 AND m.left_at=0 ORDER BY today_seconds DESC,p.nickname LIMIT 24`,id,day,id,id));
      const totals=await q(env,'SELECT COALESCE(sum(seconds),0) AS total_seconds,COALESCE(sum(CASE WHEN day=? THEN seconds ELSE 0 END),0) AS today_seconds FROM community_room_daily WHERE room_id=?',day,id).first();
      const messages=r.member?await rows(q(env,`SELECT m.id,m.author_id,p.nickname,m.text,m.created_at FROM community_messages m JOIN community_profiles p ON p.id=m.author_id WHERE m.room_id=? AND m.hidden=0 AND m.created_at>=? AND NOT EXISTS(SELECT 1 FROM community_blocks b WHERE b.blocker_id=? AND b.blocked_id=m.author_id) ORDER BY m.created_at DESC,m.id DESC LIMIT 50`,id,at-30*86400000,profile.id)):[];
-     return result({room:{id,name:r.room.name,visibility:r.room.visibility,host:members.find(m=>m.id===r.room.owner_id)?.nickname||'Room owner',ownerId:r.room.owner_id,goalMinutes:r.room.goal_minutes,capacity:r.room.capacity,invitationsOpen:!!r.room.invitations_open,roundEndsAt:r.room.round_ends_at,closed:!!r.room.closed_at,version:r.room.version,...(r.room.owner_id===profile?.id?{inviteCode:r.room.invite_token}:{})},members:members.map(m=>({...m,online:m.last_seen>at-75000})),totals,messages:messages.reverse(),member:!!r.member,owner:r.room.owner_id===profile?.id,mutedUntil:r.membership?.muted_until||0,removedMembers:r.room.owner_id===profile?.id?await rows(q(env,'SELECT p.id,p.nickname FROM community_members m JOIN community_profiles p ON p.id=m.profile_id WHERE m.room_id=? AND m.banned=1',id)):[],moderationAvailable:admins(env).length>0,serverNow:at});
+     return result({room:{id,name:r.room.name,visibility:r.room.visibility,host:members.find(m=>m.id===r.room.owner_id)?.nickname||'Room owner',ownerId:r.room.owner_id,goalMinutes:r.room.goal_minutes,capacity:r.room.capacity,invitationsOpen:!!r.room.invitations_open,roundEndsAt:r.room.round_ends_at,closed:!!r.room.closed_at,version:r.room.version,...(r.room.owner_id===profile?.id?{inviteCode:r.room.invite_token}:{})},members:members.map(m=>({...m,online:m.last_seen>at-75000,studying:m.last_seen>at-75000&&m.timer_status==='running'&&m.timer_last_at>=at-COMMUNITY.maxHeartbeatGapMs&&m.timer_check_at>at})),totals,messages:messages.reverse(),member:!!r.member,owner:r.room.owner_id===profile?.id,mutedUntil:r.membership?.muted_until||0,removedMembers:r.room.owner_id===profile?.id?await rows(q(env,'SELECT p.id,p.nickname FROM community_members m JOIN community_profiles p ON p.id=m.profile_id WHERE m.room_id=? AND m.banned=1',id)):[],moderationAvailable:admins(env).length>0,chatReviewAvailable:!!reviewConfiguration(env),serverNow:at});
     }
     if(action==='leave'&&method==='POST'){
      requireMember(r);if(r.room.owner_id===profile.id)fail(409,'OWNER','Close the room before leaving as its owner.');
      await env.DB.batch([q(env,'UPDATE community_members SET left_at=?,last_seen=0 WHERE room_id=? AND profile_id=?',at,id,profile.id),q(env,"UPDATE community_timers SET status='paused' WHERE profile_id=? AND room_id=?",profile.id,id)]);await signal(id);return result({left:true});
     }
     if(action==='settings'&&method==='PATCH'){
-     requireProfile();const input=await body(request),data=roomInput({...input,visibility:r.room.visibility});if(!Number.isInteger(input.version))fail(400,'VERSION','Reload the room before saving settings.');
+     requireProfile();const input=await body(request),data=roomInput({...input,visibility:r.room.visibility});enforceLocalContent(data.name);if(!Number.isInteger(input.version))fail(400,'VERSION','Reload the room before saving settings.');
      const count=await q(env,'SELECT count(*) AS n FROM community_members WHERE room_id=? AND banned=0 AND left_at=0',id).first();if(data.capacity<count.n)fail(409,'CAPACITY','Capacity cannot be smaller than current membership.');
      const updated=await q(env,'UPDATE community_rooms SET name=?,goal_minutes=?,capacity=?,invitations_open=?,invite_token=?,closed_at=?,round_ends_at=CASE WHEN ? THEN 0 ELSE round_ends_at END,version=version+1 WHERE id=? AND version=? RETURNING version',data.name,data.goalMinutes,data.capacity,input.invitationsOpen===true?1:0,input.rotateInvite===true?randomToken().slice(0,24):r.room.invite_token,input.close===true?at:r.room.closed_at,input.close===true?1:0,id,input.version).first();if(!updated)fail(409,'CONFLICT','Room settings changed. Reload and review before saving again.');
      if(input.close===true)await q(env,"UPDATE community_timers SET status='paused' WHERE room_id=?",id).run();await signal(id);return result({saved:true,version:updated.version});
@@ -135,8 +137,12 @@ export function createCommunityApi({now=Date.now}={}){
      requireMember(r);if(!admins(env).length)fail(503,'MODERATION_UNAVAILABLE','Chat opens after a platform moderator has been configured.');if(r.membership.muted_until>at)fail(403,'MUTED','You are currently muted in this room.');
      const input=await body(request),text=cleanText(input.text,{max:500,label:'Message'});if(!uuid(input.id))fail(400,'INVALID','Provide a message request ID.');
      const prior=await q(env,'SELECT author_id,room_id,text FROM community_messages WHERE id=?',input.id).first();if(prior){if(prior.author_id!==profile.id||prior.room_id!==id||prior.text!==text)fail(409,'CONFLICT','Use a new message request ID.');return result({sent:true,id:input.id});}
-     await rateLimit(env,'chat-fast',profile.id,5,10000,at);await rateLimit(env,'chat-hour',profile.id,200,3600000,at);
-     const written=await q(env,`INSERT INTO community_messages(id,room_id,author_id,text,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM community_members WHERE room_id=? AND profile_id=? AND banned=0 AND left_at=0 AND muted_until<=?) RETURNING id`,input.id,id,profile.id,text,at,id,profile.id,at).first();if(!written)fail(403,'MEMBERSHIP','Your room permissions changed.');await signal(id);return result({sent:true,id:input.id},201);
+     await rateLimit(env,'chat-fast',profile.id,3,10000,at);await rateLimit(env,'chat-hour',profile.id,30,3600000,at);
+     await reviewChat(text,env,{at,fetcher:reviewFetch,timeoutMs:reviewTimeoutMs});
+     const finishedAt=Math.floor(now()/1000)*1000;
+     // Review can take seconds. Re-check membership, mute, room and session before publishing.
+     const written=await q(env,`INSERT INTO community_messages(id,room_id,author_id,text,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM community_members m JOIN community_rooms r ON r.id=m.room_id JOIN community_profiles p ON p.id=m.profile_id JOIN sessions s ON s.account_id=p.account_id WHERE m.room_id=? AND m.profile_id=? AND m.banned=0 AND m.left_at=0 AND m.muted_until<=? AND r.closed_at=0 AND s.token_hash=? AND s.expires_at>?) ON CONFLICT(id) DO NOTHING RETURNING id`,input.id,id,profile.id,text,finishedAt,id,profile.id,finishedAt,user.sessionHash,finishedAt).first();
+     if(!written){const duplicate=await q(env,'SELECT author_id,room_id,text FROM community_messages WHERE id=?',input.id).first();if(duplicate?.author_id===profile.id&&duplicate.room_id===id&&duplicate.text===text)return result({sent:true,id:input.id});if(duplicate)fail(409,'CONFLICT','Use a new message request ID.');fail(403,'MEMBERSHIP','Your room permissions changed.');}await signal(id);return result({sent:true,id:input.id},201);
     }
     if(action==='reports'&&method==='POST'){
      requireMember(r);const input=await body(request);if(!['spam','harassment','privacy','other'].includes(input.reason)||!uuid(input.messageId))fail(400,'INVALID','Choose a message and report reason.');
@@ -188,7 +194,7 @@ export function createCommunityApi({now=Date.now}={}){
    fail(404,'NOT_FOUND','This community endpoint does not exist.');
   }catch(error){
    if(error instanceof ApiError)return result({error:{code:error.code,message:error.message}},error.status);
-   const message=String(error?.message||'');for(const [key,text]of [['ROOM_FULL','This room is full.'],['ROOM_LIMIT','You can own up to three open rooms.'],['MEMBERSHIP_LIMIT','Leave another room before joining.'],['DAILY_CAP','The daily credited-time limit has been reached.']])if(message.includes(key))return result({error:{code:key,message:text}},409);
+   const message=String(error?.message||'');for(const [key,text]of [['CAPACITY_INVALID','Choose 2–24 places, at least the current number of members.'],['ROOM_FULL','This room is full.'],['ROOM_LIMIT','You can own up to three open rooms.'],['MEMBERSHIP_LIMIT','Leave another room before joining.'],['DAILY_CAP','The daily credited-time limit has been reached.']])if(message.includes(key))return result({error:{code:key,message:text}},409);
    if(error?.constructor===Error&&!/SQL|D1|constraint|database|syntax|no such|FOREIGN KEY/i.test(message)&&/must|Choose|nickname|required|characters|Use a/.test(message))return result({error:{code:'INVALID',message}},400);
    return result({error:{code:'UNAVAILABLE',message:'The community service is temporarily unavailable. Your local tools still work.'}},503);
   }

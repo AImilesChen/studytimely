@@ -28,7 +28,7 @@ test('configured hostname uses HTTPS and redirects www while retaining the path 
 });
 test('preview metadata never invents a domain; production metadata uses only real routes',()=>{
  const preview=metadata('/',{origin:'',indexable:false});assert.equal(preview.canonical,'');assert.match(preview.robots,/noindex/);assert.equal(preview.schema,null);
- const configured={origin:'https://example.test',indexable:true};const actual=metadata('/focus-timer',configured);assert.equal(actual.canonical,'https://example.test/focus-timer');assert.equal(actual.schema.isAccessibleForFree,true);assert.equal(metadata('/study-groups',configured).robots,'noindex,nofollow');assert.equal(metadata('/account',configured).robots,'noindex,nofollow');assert.equal(metadata('/study-planner',configured).robots,'index,follow');
+ const configured={origin:'https://example.test',indexable:true};const actual=metadata('/focus-timer',configured);assert.equal(actual.canonical,'https://example.test/focus-timer');assert.equal(actual.schema.isAccessibleForFree,true);assert.equal(metadata('/study-groups',configured).robots,'index,follow');assert.equal(metadata('/account',configured).robots,'noindex,nofollow');assert.equal(metadata('/study-planner',configured).robots,'index,follow');
 });
 test('the built HTML contains real title/body/links for every route and no review pages',async()=>{
  const release=process.env.STUDY_TEST_RELEASE==='1';
