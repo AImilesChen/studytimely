@@ -1,0 +1,54 @@
+/* The quick controls and mode dock share one bottom stack. */
+.timer-screen.with-quick-tools{--dock-height:85px;--tools-bottom:3.6%;--quick-height:44px;--tools-gap:12px}
+.timer-bottom-tools{position:absolute;bottom:var(--tools-bottom);left:50%;transform:translateX(-50%);width:60%;max-width:900px;display:flex;flex-direction:column;align-items:center;gap:var(--tools-gap);z-index:2}
+.timer-screen .timer-bottom-tools .tool-dock{position:static;inset:auto;transform:none;width:100%;max-width:none;height:var(--dock-height);margin:0;flex:none}
+.timer-quick-tools{display:flex;justify-content:center;align-items:center;gap:2px;max-width:100%;min-height:var(--quick-height);padding:3px 8px;background:var(--bg);border:1px solid var(--line);border-radius:30px}
+.timer-quick-tools button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:6px 15px;border-radius:24px;font-size:13px;white-space:nowrap;color:var(--muted)}
+.timer-quick-tools button:hover,.timer-quick-tools button[aria-expanded=true]{background:var(--surface);color:var(--fg)}
+.timer-quick-tools svg{flex-shrink:0}
+.timer-quick-tools small{font-size:10px;font-weight:600;color:var(--fg);border:1px solid var(--line);border-radius:5px;padding:0 4px}
+.timer-screen.with-quick-tools:not(.local-clock-screen) .timer-controls{top:auto;bottom:calc(var(--tools-bottom) + var(--dock-height) + var(--quick-height) + var(--tools-gap) + 40px)}
+.timer-screen.with-quick-tools:not(.local-clock-screen) .flip-clock{top:28%;height:30%}
+.timer-screen.with-quick-tools .lap-preview{top:24%;bottom:auto;max-width:92%;flex-wrap:wrap;justify-content:center}
+.timer-screen.with-quick-tools .phase-tabs{top:22%}
+.timer-screen.local-clock-screen .timer-bottom-tools{position:relative;inset:auto;transform:none;flex:none;width:min(76%,860px);margin-top:auto}
+.timer-screen.local-clock-screen .timer-controls{margin-bottom:54px}
+.timer-screen.local-clock-screen{--dock-height:76px}
+.quick-tools-panel{position:fixed;inset:auto auto max(24px,12svh) 50%;transform:translateX(-50%);margin:0;width:420px;max-height:72svh;box-shadow:0 20px 80px #0006}
+.quick-tools-panel::backdrop{background:#0005;backdrop-filter:blur(3px)}
+.quick-tools-panel .modal-head h2{font-size:20px}
+.quick-tools-panel .settings-body{padding-top:12px}
+.quick-tools-panel .space-themes{margin-top:12px}
+.quick-tools-panel .ambient-row .button{min-width:110px}
+.quick-sound-status{font-size:13px;line-height:1.7;margin:0 0 12px}
+.focus-view .timer-bottom-tools{display:none}
+.focus-view .timer-screen.with-quick-tools:not(.local-clock-screen) .timer-controls{bottom:19%}
+@media(max-width:800px){
+ .timer-screen.with-quick-tools{--dock-height:76px;--tools-bottom:4%}
+ .timer-bottom-tools{width:90%}
+ .timer-screen.with-quick-tools:not(.local-clock-screen) .flip-clock{top:31%;height:25%}
+ .timer-screen.local-clock-screen .timer-bottom-tools{width:100%;max-width:600px}
+ .timer-screen.local-clock-screen{--dock-height:73px}
+ .timer-quick-tools button{padding:6px 12px;font-size:12px;gap:5px}
+}
+@media(max-width:420px){
+ .timer-screen.with-quick-tools{--dock-height:73px;--tools-bottom:4%;min-height:640px}
+ .timer-bottom-tools{width:94%}
+ .timer-quick-tools{padding:3px 5px}
+ .timer-quick-tools button{padding:6px;font-size:11px;gap:4px}
+ .timer-quick-tools button svg{width:17px;height:17px}
+ .timer-screen.local-clock-screen{min-height:560px}
+ .quick-tools-panel .ambient-row{gap:10px}
+}
+@media(max-height:600px) and (min-width:650px){
+ .timer-screen.with-quick-tools{--dock-height:58px;--quick-height:38px;--tools-bottom:12px;--tools-gap:8px;min-height:440px}
+ .timer-bottom-tools{width:68%}
+ .timer-quick-tools button{min-height:32px;padding:4px 12px;font-size:11px}
+ .timer-screen.with-quick-tools:not(.local-clock-screen) .timer-controls{bottom:calc(var(--tools-bottom) + var(--dock-height) + var(--quick-height) + var(--tools-gap) + 30px);min-height:42px}
+ .timer-screen.with-quick-tools:not(.local-clock-screen) .flip-clock{top:29%;height:25%}
+ .timer-screen.with-quick-tools .phase-tabs{top:21%}
+ .timer-screen.with-quick-tools .lap-preview{top:23%;right:4%;left:auto;transform:none;font-size:10px}
+ .timer-screen.local-clock-screen{--clock-card-height:clamp(70px,calc(100svh - 310px),150px);grid-template-rows:auto var(--clock-card-height) 32px 104px;gap:8px 0}
+ .timer-screen.local-clock-screen .timer-controls{margin:0}
+ .timer-screen.local-clock-screen .timer-bottom-tools{grid-column:1 / -1;margin:0;width:min(76%,680px)}
+}
