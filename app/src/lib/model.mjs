@@ -38,6 +38,11 @@ function review(t,now,reason){
 function settle(state,now){
  const t=state.timer;if(!t||t.status!=='running')return null;
  if(t.mode==='alarm'){t.lastObserved=now;if(now>=t.alarmAt){t.status='completed';t.since=null;return'completed';}return null;}
+ if(t.mode==='stopwatch'){
+  if(now<t.lastObserved-1000){pauseTimer(t,t.lastObserved);t.lastObserved=now;return'stopwatch-clock';}
+  if(elapsedMs(t,now)>=MAX_RUN){pauseTimer(t,t.since+Math.max(0,MAX_RUN-t.baseMs));t.status='completed';t.lastObserved=now;return'stopwatch-limit';}
+  t.lastObserved=now;return null;
+ }
  // General countdowns measure elapsed duration, not verified study. Delayed
  // callbacks settle at the original deadline and never ask for study credit.
  if(t.mode==='countdown'){
@@ -99,10 +104,13 @@ export function transition(previous,action,{now,owner,id}){
  }
  case 'pause':event=settle(state,now);if(state.timer?.status==='running')pauseTimer(state.timer,now);break;
  case 'tick':event=settle(state,now);break;
- case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){if(state.timer.mode==='countdown'){pauseTimer(state.timer,state.timer.lastObserved);state.timer.lastObserved=now;event='countdown-clock';}else{review(state.timer,now,'clock');event='review';}}break;
+ case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){if(['countdown','stopwatch'].includes(state.timer.mode)){const mode=state.timer.mode;pauseTimer(state.timer,state.timer.lastObserved);state.timer.lastObserved=now;event=mode+'-clock';}else{review(state.timer,now,'clock');event='review';}}break;
  case 'claim':{
    if(!state.timer)break;
-   event=settle(state,now);if(state.timer.status==='running'&&!['alarm','countdown'].includes(state.timer.mode))pauseTimer(state.timer,now);state.timer.owner=owner;event=event||(state.timer.mode==='alarm'?'alarm-moved':state.timer.mode==='countdown'?'countdown-moved':'moved');break;
+   if(state.timer.mode==='stopwatch'&&state.timer.status==='review'){
+    const t=state.timer,kept=Math.min(MAX_RUN,Math.max(t.baseMs,t.laps.at(-1)?.totalMs||0));t.segments=takeIntervals(t.reviewSegments||t.segments,kept);t.baseMs=kept;t.since=null;t.status=kept>=MAX_RUN?'completed':'paused';t.lastObserved=now;delete t.reviewSegments;delete t.reviewReason;delete t.reviewMaxSeconds;
+   }
+   event=settle(state,now);if(state.timer.status==='running'&&!['alarm','countdown','stopwatch'].includes(state.timer.mode))pauseTimer(state.timer,now);state.timer.owner=owner;event=event||(state.timer.mode==='alarm'?'alarm-moved':state.timer.mode==='countdown'?'countdown-moved':state.timer.mode==='stopwatch'?'stopwatch-moved':'moved');break;
  }
  case 'review':{
    const t=state.timer;if(t?.status!=='review')fail('STALE','There is no time review pending.');
@@ -118,6 +126,8 @@ export function transition(previous,action,{now,owner,id}){
  case 'reset':state.timer=makeTimer(action.mode||state.timer?.mode||'study',state.settings,id,now,owner);event='reset';break;
  case 'lap':{
    const t=state.timer;if(t?.mode!=='stopwatch')fail('INVALID','Laps are available on Stopwatch.');
+   if(t.status!=='running')fail('INVALID','Resume the stopwatch before marking another lap.');
+   event=settle(state,now);if(t.status!=='running')break;
    const total=Math.floor(elapsedMs(t,now));const last=t.laps.at(-1)?.totalMs||0;
    if(total>last)t.laps.push({number:t.laps.length+1,totalMs:total,splitMs:total-last});break;
  }
