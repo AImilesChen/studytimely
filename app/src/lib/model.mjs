@@ -38,6 +38,13 @@ function review(t,now,reason){
 function settle(state,now){
  const t=state.timer;if(!t||t.status!=='running')return null;
  if(t.mode==='alarm'){t.lastObserved=now;if(now>=t.alarmAt){t.status='completed';t.since=null;return'completed';}return null;}
+ // General countdowns measure elapsed duration, not verified study. Delayed
+ // callbacks settle at the original deadline and never ask for study credit.
+ if(t.mode==='countdown'){
+  if(now<t.lastObserved-1000){pauseTimer(t,t.lastObserved);t.lastObserved=now;return'countdown-clock';}
+  if(elapsedMs(t,now)>=t.durationSeconds*1000){pauseTimer(t,now);t.status='completed';return'completed';}
+  t.lastObserved=now;return null;
+ }
  if(now<t.lastObserved-1000){review(t,now,'clock');return'review';}
  if(now-t.lastObserved>MAX_GAP||elapsedMs(t,now)>=MAX_RUN){review(t,now,'gap');return'review';}
  if(!t.durationSeconds||elapsedMs(t,now)<t.durationSeconds*1000){t.lastObserved=now;return null;}
@@ -92,10 +99,10 @@ export function transition(previous,action,{now,owner,id}){
  }
  case 'pause':event=settle(state,now);if(state.timer?.status==='running')pauseTimer(state.timer,now);break;
  case 'tick':event=settle(state,now);break;
- case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){review(state.timer,now,'clock');event='review';}break;
+ case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){if(state.timer.mode==='countdown'){pauseTimer(state.timer,state.timer.lastObserved);state.timer.lastObserved=now;event='countdown-clock';}else{review(state.timer,now,'clock');event='review';}}break;
  case 'claim':{
    if(!state.timer)break;
-   event=settle(state,now);if(state.timer.status==='running'&&state.timer.mode!=='alarm')pauseTimer(state.timer,now);state.timer.owner=owner;event=event||(state.timer.mode==='alarm'?'alarm-moved':'moved');break;
+   event=settle(state,now);if(state.timer.status==='running'&&!['alarm','countdown'].includes(state.timer.mode))pauseTimer(state.timer,now);state.timer.owner=owner;event=event||(state.timer.mode==='alarm'?'alarm-moved':state.timer.mode==='countdown'?'countdown-moved':'moved');break;
  }
  case 'review':{
    const t=state.timer;if(t?.status!=='review')fail('STALE','There is no time review pending.');
