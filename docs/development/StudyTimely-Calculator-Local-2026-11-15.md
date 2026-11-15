@@ -1,5 +1,7 @@
 # Study Time Calculator — local implementation
 
+Publication update: this calculator was subsequently committed and published as V2.9.0. See `StudyTimely-V2.9.0-Release.md` for exact runtime source, production checks and limitations. The local-only statuses and build hashes below describe their respective earlier verification stages.
+
 Implemented on 2026-11-15 against the accepted calculator analysis. Preview: http://127.0.0.1:4208/study-time-calculator . Built noindex HTTP preview: http://127.0.0.1:4209/study-time-calculator . This work is local and uncommitted; it was not pushed or deployed. Production remains V2.8.0 from `4279dedbe68c64fe7a1cb2462b0904a77eaaced1`. The package version is unchanged until a future release is prepared.
 
 ## Completed scope
