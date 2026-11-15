@@ -1,4 +1,5 @@
 import {DomainError,dayKey,dailyTotals,hasProgress,makeTimer} from './model.mjs';
+import {BLOCK_KINDS,blockConflicts,conflictMessage,scheduleDraftDays} from './schedule.mjs';
 
 export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],weeklyGoal:0,deletedSessions:Object.create(null)});
 const invalid=message=>{throw new DomainError('INVALID',message);};
@@ -29,7 +30,7 @@ export function validateWorkspace(input){
   if(!Array.isArray(x.subjects||[])||(x.subjects||[]).length>100)invalid('Invalid exam subjects.');
   return{...base(x),title:text(x.title),examDate:date(x.examDate||''),templateId:text(x.templateId||'',100,true),templateSource:text(x.templateSource||'',500,true),subjects:(x.subjects||[]).map(s=>text(s,40)),chapters};
  });
- const blocks=list(input.blocks||[],1000).map(x=>{const start=number(x.start,0,1439),end=number(x.end,1,1440);if(start>=end)invalid('End time must be after start time.');return{...base(x),title:text(x.title),subject:text(x.subject||'',40,true),weekday:number(x.weekday,1,7),start,end};});
+ const blocks=list(input.blocks||[],1000).map(x=>{const start=number(x.start,0,1439),end=number(x.end,1,1440),kind=x.kind||'study';if(!Object.hasOwn(BLOCK_KINDS,kind))invalid('Choose a supported block type.');if(start>=end)invalid('End time must be after start time.');return{...base(x),title:text(x.title),subject:text(x.subject||'',40,true),kind,weekday:number(x.weekday,1,7),start,end};});
  const deletedSessions=Object.create(null);if(!input.deletedSessions||typeof input.deletedSessions!=='object')input={...input,deletedSessions:{}};
  if(Object.keys(input.deletedSessions).length>50000)invalid('Too many deletion markers.');
  for(const [id,t]of Object.entries(input.deletedSessions)){identifier(id);deletedSessions[id]=stamp(t);}
@@ -75,9 +76,12 @@ export function workspaceAction(state,action,{id,now,owner}){
   item.deletedAt=now;item.updatedAt=now;
   if(action.collection==='chapters')for(const child of list.filter(c=>c.parentId===item.id)){child.deletedAt=now;child.updatedAt=now;}
  }
- else if(type==='block-save'){
-  if(alive(w.blocks).some(b=>b.id!==action.itemId&&b.weekday===action.weekday&&action.start<b.end&&action.end>b.start))invalid('This block overlaps another block on the same day.');
-  upsert('blocks',{title:action.title,subject:action.subject||'',weekday:action.weekday,start:action.start,end:action.end});
+ else if(type==='block-save'||type==='blocks-save'){
+  let days;try{days=scheduleDraftDays(action);}catch(e){invalid(e.message);}
+  const conflict=blockConflicts(w.blocks,action,days)[0];if(conflict)invalid(conflictMessage(conflict));
+  const old=action.itemId?w.blocks.find(b=>b.id===action.itemId&&!b.deletedAt):null;if(action.itemId&&!old)invalid('This block changed or was removed.');
+  const entries=days.map(day=>({...old,id:old?.id||(days.length===1?id:id+':'+day),title:action.title,subject:action.subject||'',kind:action.kind||'study',weekday:day,start:action.start,end:action.end,updatedAt:now,deletedAt:0}));
+  state.workspace=validateWorkspace({...w,blocks:old?w.blocks.map(b=>b.id===old.id?entries[0]:b):[...w.blocks,...entries]});
  }
  else if(type==='weekly-goal'){w.weeklyGoal=number(action.minutes,0,10080);w.goalUpdatedAt=now;}
  else if(type==='workspace-start'){
