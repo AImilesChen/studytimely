@@ -1,3 +1,4 @@
+import {reminderAction} from './reminder.mjs';
 import {MUSIC_TRACKS,MUSIC_REPEAT,musicTrack} from './music-catalog.mjs';
 import {DEFAULT_MIXES,validateMix,validateMixes} from './sound-settings.mjs';
 import {cityFor} from './world-clock.mjs';
@@ -9,7 +10,7 @@ export const MAX_RUN=24*60*60*1000;
 export const MODES=['study','pomodoro','focus','countdown','stopwatch','clock','alarm'];
 const EXTRA_LAST_PAGES={alarm:'/alarm-clock',tracker:'/study-tracker',planner:'/study-planner',schedule:'/study-schedule-maker',habits:'/study-habit-tracker',syllabus:'/syllabus-tracker',exam:'/exam-countdown',aesthetic:'/aesthetic-timer',calculator:'/study-time-calculator'};
 export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},ambientVolume:60,ambientPresets:DEFAULT_MIXES,timerSize:'medium',musicTrack:MUSIC_TRACKS[0].id,musicVolume:35,musicRepeat:'all',worldClockCities:[],lastTool:'study',lastPage:'',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
-export function emptyState(epoch='initial'){return{schema:SCHEMA,epoch,revision:0,settings:structuredClone(DEFAULT_SETTINGS),subjects:[],dailyGoal:0,sessions:[],timer:null,workspace:emptyWorkspace()};}
+export function emptyState(epoch='initial'){return{schema:SCHEMA,epoch,revision:0,settings:structuredClone(DEFAULT_SETTINGS),subjects:[],dailyGoal:0,sessions:[],timer:null,reminder:null,workspace:emptyWorkspace()};}
 export class DomainError extends Error{constructor(code,message){super(message);this.code=code;}}
 const fail=(code,message)=>{throw new DomainError(code,message);};
 export const isStudy=mode=>['study','focus','pomodoro'].includes(mode);
@@ -77,6 +78,7 @@ export function transition(previous,action,{now,owner,id}){
  if(action.type==='clear')return{state:{...emptyState(id),revision:previous.revision+1},event:'cleared'};
  if(['start','pause','finish','reset','lap','phase','tick','review','clock-change'].includes(action.type))ownerGuard(state,owner);
  if(action.timerId&&state.timer?.id!==action.timerId)fail('STALE','The timer changed. Review its current phase.');
+ if(action.type.startsWith('reminder-')){try{event=reminderAction(state,action,{now,owner,id});}catch(e){fail(e.code||'INVALID',e.message);}state.revision++;return {state,event};}
  if(workspaceAction(state,action,{now,owner,id})){state.revision++;return{state,event:action.type==='workspace-start'?'task-started':'workspace-saved'};}
  switch(action.type){
  case 'alarm-arm':{if(hasProgress(state.timer)&&state.timer.mode!=='alarm')fail('BUSY','Finish or reset the active timer first.');if(!Number.isFinite(action.at)||action.at<=now||action.at>now+MAX_RUN)fail('INVALID','Choose an alarm within the next 24 hours.');state.timer={...makeTimer('alarm',state.settings,id,now,owner),alarmAt:action.at,status:'running',since:now,startedAt:now};event='alarm-set';break;}

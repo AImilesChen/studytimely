@@ -1,3 +1,4 @@
+import {validateReminder,legacyReminder} from './reminder.mjs';
 import {pickPreferences} from './preferences.mjs';
 import {emptyState,transition,SCHEMA,DEFAULT_SETTINGS,validateSettings,validateBackup,DomainError} from './model.mjs';
 import {validateWorkspace} from './workspace.mjs';
@@ -16,7 +17,8 @@ export function checkState(value){
  if(!value||value.schema!==SCHEMA||typeof value.epoch!=='string'||!Number.isInteger(value.revision))throw new DomainError('CORRUPT','Saved data could not be read. It has not been overwritten.');
  validateSettings(value.settings);validateBackup({app:'StudyTimely',schema:SCHEMA,subjects:value.subjects,sessions:value.sessions},{internal:true});
  if(!Number.isInteger(value.dailyGoal)||value.dailyGoal<0||value.dailyGoal>1440)throw new DomainError('CORRUPT','The saved goal could not be read.');
- return{...value,settings:validateSettings(value.settings),workspace:validateWorkspace(value.workspace)};
+ let reminder;try{reminder=validateReminder(value.reminder??(value.timer?.mode==='alarm'?legacyReminder(value.timer):null));}catch(e){throw new DomainError(e.code,e.message);}
+ return{...value,reminder,timer:value.timer?.mode==='alarm'?null:value.timer,settings:validateSettings(value.settings),workspace:validateWorkspace(value.workspace)};
 }
 export function createRepository({indexedDB=globalThis.indexedDB,makeId=uuid,notify=()=>{}}={}){
  let opening=null,db=null;

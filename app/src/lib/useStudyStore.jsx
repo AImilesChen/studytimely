@@ -46,6 +46,8 @@ export function useStudyStore(){
    const tick=()=>{
      const t=ref.current.timer,now=Date.now(),mono=performance.now(),clockChanged=Math.abs((now-observed.wall)-(mono-observed.mono))>2000;
      observed={wall:now,mono};
+     const alarm=ref.current.reminder;
+     if(!working.current&&!pending.current&&alarm?.owner===owner.current&&((alarm.status==='armed'&&now>=alarm.at)||(alarm.status==='ringing'&&now-alarm.firedAt>=60000))){working.current=true;execute({action:{type:'reminder-tick',epoch:ref.current.epoch,reminderId:alarm.id},at:now,id:crypto.randomUUID()}).finally(()=>working.current=false);return;}
      if(working.current||pending.current||!t||t.owner!==owner.current||t.status!=='running')return;
      const due=t.mode==='alarm'?now>=t.alarmAt:t.durationSeconds&&elapsedMs(t,now)>=t.durationSeconds*1000;
      if(!clockChanged&&!due&&now-tickAt.current<5000&&now>=t.lastObserved)return;
