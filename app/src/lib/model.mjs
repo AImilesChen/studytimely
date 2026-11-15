@@ -35,6 +35,9 @@ function review(t,now,reason){
  const candidate=intervalsAt(t,now);const last=Math.min(now,t.lastObserved);
  pauseTimer(t,last);t.status='review';t.reviewReason=reason;t.reviewSegments=candidate;t.reviewMaxSeconds=Math.floor(sumIntervals(candidate)/1000);t.lastObserved=now;
 }
+function nextPomodoro(state,t,now,phase,completed=t.completedStudies,run=false){
+ state.timer={...makeTimer('pomodoro',state.settings,t.rootId,now,t.owner),...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle'].filter(k=>t[k]).map(k=>[k,t[k]])),id:t.rootId+':'+(t.sequence+1),sequence:t.sequence+1,phase,completedStudies:completed,durationSeconds:durationFor('pomodoro',phase,state.settings),subject:t.subject,status:run?'running':'ready',since:run?now:null,startedAt:run?now:null};
+}
 function settle(state,now){
  const t=state.timer;if(!t||t.status!=='running')return null;
  if(t.mode==='alarm'){t.lastObserved=now;if(now>=t.alarmAt){t.status='completed';t.since=null;return'completed';}return null;}
@@ -50,8 +53,9 @@ function settle(state,now){
   if(elapsedMs(t,now)>=t.durationSeconds*1000){pauseTimer(t,now);t.status='completed';return'completed';}
   t.lastObserved=now;return null;
  }
- if(now<t.lastObserved-1000){review(t,now,'clock');return'review';}
- if(now-t.lastObserved>MAX_GAP||elapsedMs(t,now)>=MAX_RUN){review(t,now,'gap');return'review';}
+ const resting=t.mode==='pomodoro'&&t.phase!=='Study';
+ if(now<t.lastObserved-1000){if(resting){pauseTimer(t,t.lastObserved);t.lastObserved=now;return'pomodoro-break-clock';}review(t,now,'clock');return'review';}
+ if(!resting&&(now-t.lastObserved>MAX_GAP||elapsedMs(t,now)>=MAX_RUN)){review(t,now,'gap');return'review';}
  if(!t.durationSeconds||elapsedMs(t,now)<t.durationSeconds*1000){t.lastObserved=now;return null;}
  const saved=record(state,t,now,'Completed');
  if(t.mode!=='pomodoro') {pauseTimer(t,now);t.status='completed';return saved?'saved':'completed';}
@@ -59,7 +63,7 @@ function settle(state,now){
  if(t.phase==='Study'&&state.settings.cycleLimit&&completed>=state.settings.cycleLimit){pauseTimer(t,now);t.completedStudies=completed;t.status='completed';return'saved';}
  const phase=t.phase==='Study'?(completed%state.settings.longEvery===0?'Long break':'Short break'):'Study';
  const auto=phase==='Study'?state.settings.autoStudy:state.settings.autoBreak;
- state.timer={...makeTimer('pomodoro',state.settings,t.rootId,now,t.owner),...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle'].filter(k=>t[k]).map(k=>[k,t[k]])),id:t.rootId+':'+(t.sequence+1),sequence:t.sequence+1,phase,completedStudies:completed,durationSeconds:durationFor('pomodoro',phase,state.settings),subject:t.subject,status:auto?'running':'ready',since:auto?now:null,startedAt:auto?now:null};
+ nextPomodoro(state,t,now,phase,completed,auto);
  // A delayed browser callback never fabricates a chain of unattended sessions.
  return phase==='Study'?'next-study':'break';
 }
@@ -88,7 +92,8 @@ export function transition(previous,action,{now,owner,id}){
  if(action.epoch!==previous.epoch)fail('STALE','Site data changed in another tab. Review the current state and try again.');
  let state=structuredClone(previous),event=null;state.workspace=validateWorkspace(state.workspace);
  if(action.type==='clear')return{state:{...emptyState(id),revision:previous.revision+1},event:'cleared'};
- if(['start','pause','finish','reset','lap','phase','tick','review','clock-change'].includes(action.type))ownerGuard(state,owner);
+ if(['start','pause','finish','reset','lap','phase','tick','review','clock-change'].includes(action.type)||action.type.startsWith('pomodoro-'))ownerGuard(state,owner);
+ if(action.type.startsWith('pomodoro-')&&state.timer?.mode==='pomodoro'&&state.timer.completedStudies>0&&state.timer.owner!==owner)fail('OTHER_TAB','Move this Pomodoro routine here before changing it.');
  if(action.timerId&&state.timer?.id!==action.timerId)fail('STALE','The timer changed. Review its current phase.');
  if(action.type.startsWith('reminder-')){try{event=reminderAction(state,action,{now,owner,id});}catch(e){fail(e.code||'INVALID',e.message);}state.revision++;return {state,event};}
  if(workspaceAction(state,action,{now,owner,id})){state.revision++;return{state,event:action.type==='workspace-start'?'task-started':'workspace-saved'};}
@@ -104,7 +109,7 @@ export function transition(previous,action,{now,owner,id}){
  }
  case 'pause':event=settle(state,now);if(state.timer?.status==='running')pauseTimer(state.timer,now);break;
  case 'tick':event=settle(state,now);break;
- case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){if(['countdown','stopwatch'].includes(state.timer.mode)){const mode=state.timer.mode;pauseTimer(state.timer,state.timer.lastObserved);state.timer.lastObserved=now;event=mode+'-clock';}else{review(state.timer,now,'clock');event='review';}}break;
+ case 'clock-change':if(state.timer?.mode==='alarm'){event=settle(state,now);break;}if(state.timer?.status==='running'){if(['countdown','stopwatch'].includes(state.timer.mode)||(state.timer.mode==='pomodoro'&&state.timer.phase!=='Study')){const mode=state.timer.mode;pauseTimer(state.timer,state.timer.lastObserved);state.timer.lastObserved=now;event=mode==='pomodoro'?'pomodoro-break-clock':mode+'-clock';}else{review(state.timer,now,'clock');event='review';}}break;
  case 'claim':{
    if(!state.timer)break;
    if(state.timer.mode==='stopwatch'&&state.timer.status==='review'){
@@ -135,6 +140,41 @@ export function transition(previous,action,{now,owner,id}){
    if(hasProgress(state.timer))fail('BUSY','Finish or reset before changing periods.');
    if(!['Study','Short break','Long break'].includes(action.phase))fail('INVALID','Choose a supported period.');
    const t=makeTimer('pomodoro',state.settings,id,now,owner);t.phase=action.phase;t.durationSeconds=durationFor('pomodoro',t.phase,state.settings);state.timer=t;break;
+ }
+ case 'pomodoro-end':case 'pomodoro-skip':case 'pomodoro-reset':case 'pomodoro-restart':case 'pomodoro-phase':case 'pomodoro-keep-break':{
+   const t=state.timer;if(t&&t.mode!=='pomodoro'&&hasProgress(t))fail('BUSY','Finish or reset your active timer first.');
+   if(action.type==='pomodoro-restart'){if(t?.mode==='pomodoro')settle(state,now);state.timer=makeTimer('pomodoro',state.settings,id,now,owner);event='pomodoro-restarted';break;}
+   if(action.type==='pomodoro-phase'){
+    if(!['Study','Short break','Long break'].includes(action.phase))fail('INVALID','Choose a supported period.');
+    if(t&&(hasProgress(t)||t.baseMs>0||t.status==='completed'))fail('BUSY','Finish or reset this period before choosing another phase.');
+    if(t?.mode==='pomodoro'){nextPomodoro(state,t,now,action.phase);state.timer.owner=owner;}else{state.timer=makeTimer('pomodoro',state.settings,id,now,owner);state.timer.phase=action.phase;state.timer.durationSeconds=durationFor('pomodoro',action.phase,state.settings);}event='pomodoro-phase';break;
+   }
+   if(t?.mode!=='pomodoro')fail('STALE','Open an existing Pomodoro routine first.');
+   if(action.type==='pomodoro-keep-break'){
+    if(t.status!=='review'||t.phase==='Study')fail('INVALID','Only an interrupted break can use this action.');t.status='paused';t.since=null;t.lastObserved=now;delete t.reviewSegments;delete t.reviewMaxSeconds;delete t.reviewReason;event='pomodoro-break-kept';break;
+   }
+   if(action.type==='pomodoro-reset'){
+    if(t.status==='completed')fail('INVALID','Start a new routine after completing this one.');
+    event=settle(state,now);if(state.timer.id!==t.id||state.timer.status==='completed')break;
+    nextPomodoro(state,t,now,t.phase);event='pomodoro-reset';break;
+   }
+   if(t.status==='review')fail('REVIEW','Review your study time before saving or continuing.');
+   if(t.status==='completed')fail('INVALID','This routine is already complete.');
+   if(action.type==='pomodoro-end'&&t.phase!=='Study')fail('INVALID','Only a study period can be ended and saved.');
+   if(action.type==='pomodoro-skip'&&t.phase==='Study')fail('INVALID','Use the study finish action to save actual learning time.');
+   event=settle(state,now);if(state.timer.id!==t.id||state.timer.status==='completed'||state.timer.status==='review')break;
+   if(action.type==='pomodoro-end'){const saved=record(state,t,now,'Ended early');nextPomodoro(state,t,now,'Short break');event=saved?'saved':'pomodoro-no-study';}
+   else{nextPomodoro(state,t,now,'Study');event='pomodoro-break-skipped';}break;
+ }
+ case 'pomodoro-settings':{
+   const t=state.timer;if(t&&t.mode!=='pomodoro'&&hasProgress(t))fail('BUSY','Finish or reset your active timer first.');
+   const label=String(action.newSubject||'').trim();if(label.length>40)fail('INVALID','Use a subject label of up to 40 characters.');
+   const existing=state.subjects.find(x=>x.toLowerCase()===label.toLowerCase());
+   const patch={...action.patch,...(label?{subject:existing||label}:{})};const next=validateSettings({...state.settings,...patch});
+   const timing=['studyMinutes','shortBreak','longBreak','longEvery','cycleLimit','subject'],changed=timing.some(k=>next[k]!==state.settings[k]);
+   if(t?.mode==='pomodoro'&&(hasProgress(t)||t.baseMs>0||t.completedStudies>0||t.status==='completed')&&changed)fail('BUSY','Restart the routine before changing durations, target or subject.');
+   state.settings=next;if(label&&!existing)state.subjects.push(label);if(PREFERENCE_KEYS.some(k=>JSON.stringify(next[k])!==JSON.stringify(previous.settings[k])))state.preferencesUpdatedAt=now;
+   if(t?.mode==='pomodoro'&&changed){nextPomodoro(state,t,now,t.phase);state.timer.subject=next.subject;state.timer.owner=owner;}event='pomodoro-settings';break;
  }
  case 'settings':{
    const next=validateSettings({...state.settings,...action.patch});
