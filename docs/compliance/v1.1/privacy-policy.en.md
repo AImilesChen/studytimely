@@ -16,6 +16,8 @@ The built-in music player loads audio from StudyTimely only after you choose pla
 
 A single active alarm and its optional reminder name, scheduled timestamp, sound settings and controlling-tab identifier are stored locally alongside the workspace. The alarm runs independently of study timers and is excluded from ordinary exports and cloud sync, including appearance/sound sync. Refreshing requires you to resume alarm checks in the chosen tab; closing the browser or device sleep can prevent reminders. Clearing local study data also clears this alarm.
 
+Study-time calculator inputs and estimates stay in page memory and are not saved to browser storage or included in exports. Reviewing a suggested task does not save it; if you choose Save task in Study Planner, that task follows the local storage and optional manual cloud-sync choices above. Preparing a focus duration changes your timer preference only after confirmation and does not start recording study.
+
 Other people using the same browser profile may see these records. Avoid putting your full name, school, address, health information or other sensitive details in subject labels or messages.
 
 StudyTimely provides optional Google sign-in and manual cloud sync, with email recovery for existing unlinked accounts. It has no payments or AI study feature. Optional study groups, community nicknames and member chat are described below. The free local tools do not require an account. Optional usage statistics are off by default. Google Analytics and Ahrefs load only after you enable them in Settings → Data; no advertising or remote error-reporting SDK is enabled.
