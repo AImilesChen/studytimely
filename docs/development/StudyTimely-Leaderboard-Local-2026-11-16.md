@@ -1,5 +1,7 @@
 # Leaderboard — local implementation
 
+Publication update: released as V2.24.0. See `StudyTimely-V2.24.0-Release.md` for exact source, deployment and production verification. Local-only notes below document implementation history and are superseded by that release record.
+
 Local preview: <http://127.0.0.1:4278/leaderboard>. This isolated localhost fixture has zero accounts and zero leaderboard rows. The signed-out state and empty board work without fake activity. QA at port 4276 uses a separate persisted local database with explicitly synthetic sample participants. Neither is production or real Google authentication.
 
 ## Delivered behavior
