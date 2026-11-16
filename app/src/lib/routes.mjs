@@ -1,7 +1,7 @@
 import {cityContent,cityDescription} from './city-content.mjs';
 import {CITIES} from './world-clock.mjs';
 export const TOOLS=[
- {id:'clock',path:'/flip-clock',name:'Clock',title:'Free Online Flip Clock',sub:'A clear view of the time.',description:"Display your device's time with a free online flip clock. Choose 12- or 24-hour time, show seconds, and switch between light and dark themes."},
+ {id:'clock',path:'/flip-clock',name:'Clock',title:'Free Online Flip Clock',seoTitle:'Free Flip Clock with Seconds & Fullscreen',sub:'A clear view of the time.',description:'Use a free online flip clock with seconds, 12/24-hour format, themes and fullscreen. Turn your screen into a clear desk clock. No sign-up needed.'},
  {id:'study',path:'/',name:'Study',title:'Free Online Study Timer',sub:'Stay Focused. Track Your Progress.',description:'Start a free study timer without an account. Use Pomodoro, set a daily goal, and review study time saved in your browser.'},
  {id:'pomodoro',path:'/pomodoro-timer',name:'Pomodoro',title:'Free Pomodoro Timer',seoTitle:'Free Pomodoro Timer — Custom Study & Break Cycles',sub:'Time to study. Room to rest.',description:'Use a free Pomodoro timer with custom study and break periods, round progress, optional automatic starts and saved study records. Try 25/5, 50/10 or 15/3.'},
  {id:'stopwatch',path:'/stopwatch',name:'Stopwatch',title:'Free Online Stopwatch',seoTitle:'Online Stopwatch with Lap Times — Free',sub:'Measure time, one round at a time.',description:'Use a free online stopwatch with lap and split times. Start, pause and resume, compare completed laps, and copy or download results as CSV. No account required.'},
