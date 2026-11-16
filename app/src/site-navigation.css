@@ -2,9 +2,20 @@ body:has(.global-site-header){min-width:0}
 .site-header.global-site-header{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:24px;height:104px;padding:24px 3.85%;z-index:7}
 .global-site-header .wordmark{white-space:nowrap;color:var(--fg);text-decoration:none}
 .site-primary-nav{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0}
-.site-primary-nav>a,.site-primary-nav>.site-tools-trigger{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 13px;border-radius:10px;font-size:14px;line-height:1.4;text-decoration:none;color:var(--muted);white-space:nowrap;background:none;border:0;font-family:inherit;cursor:pointer}
-.site-primary-nav>a:hover,.site-primary-nav>.site-tools-trigger:hover{background:var(--surface);color:var(--fg)}
-.site-primary-nav>a[aria-current=page],.site-primary-nav>.site-tools-trigger[data-active=true]{color:var(--fg);text-decoration:underline;text-underline-offset:7px;text-decoration-thickness:2px}
+.site-primary-nav{position:relative}
+.site-tool-disclosure{display:flex;align-items:center}
+.site-tools-dropdown{position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);width:min(760px,calc(100vw - 48px));max-height:calc(100dvh - 110px);overflow:auto;padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--fg);box-shadow:0 16px 48px #0005;z-index:10;text-align:left}
+.site-tools-dropdown[hidden]{display:none}
+.site-tools-dropdown .site-tool-groups{gap:18px}
+.site-tools-dropdown .site-tool-groups a{font-size:14px;gap:8px}
+.site-tools-dropdown .site-tool-groups h3{font-size:11px;letter-spacing:1px}
+.site-tools-dropdown a:focus-visible{outline:2px solid var(--fg);outline-offset:-2px}
+.site-tools-trigger[aria-expanded=true]>svg{transform:rotate(180deg)}
+.app.standard-workspace-page>.workspace.management{padding-top:140px}
+@media(max-width:700px){.app.standard-workspace-page>.workspace.management{padding-top:112px}}
+.site-primary-nav>a,.site-primary-nav .site-tools-trigger{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:10px 13px;border-radius:10px;font-size:14px;line-height:1.4;text-decoration:none;color:var(--muted);white-space:nowrap;background:none;border:0;font-family:inherit;cursor:pointer}
+.site-primary-nav>a:hover,.site-primary-nav .site-tools-trigger:hover{background:var(--surface);color:var(--fg)}
+.site-primary-nav>a[aria-current=page],.site-primary-nav .site-tools-trigger[data-active=true]{color:var(--fg);text-decoration:underline;text-underline-offset:7px;text-decoration-thickness:2px}
 .global-site-header .header-actions{display:flex;gap:12px;align-items:center}
 .global-site-header .site-menu-toggle{display:none}
 .global-site-header a:focus-visible,.global-site-header button:focus-visible{outline:2px solid var(--fg);outline-offset:4px}
