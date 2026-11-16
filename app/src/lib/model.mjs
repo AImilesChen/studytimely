@@ -96,7 +96,7 @@ export function transition(previous,action,{now,owner,id}){
  if(action.type.startsWith('pomodoro-')&&state.timer?.mode==='pomodoro'&&state.timer.completedStudies>0&&state.timer.owner!==owner)fail('OTHER_TAB','Move this Pomodoro routine here before changing it.');
  if(action.timerId&&state.timer?.id!==action.timerId)fail('STALE','The timer changed. Review its current phase.');
  if(action.type.startsWith('reminder-')){try{event=reminderAction(state,action,{now,owner,id});}catch(e){fail(e.code||'INVALID',e.message);}state.revision++;return {state,event};}
- if(workspaceAction(state,action,{now,owner,id})){state.revision++;return{state,event:action.type==='workspace-start'?'task-started':'workspace-saved'};}
+ if(workspaceAction(state,action,{now,owner,id})){state.revision++;return{state,event:action.type==='workspace-start'?'task-started':action.type==='habit-prepare'?'habit-prepared':'workspace-saved'};}
  switch(action.type){
  case 'alarm-arm':{if(hasProgress(state.timer)&&state.timer.mode!=='alarm')fail('BUSY','Finish or reset the active timer first.');if(!Number.isFinite(action.at)||action.at<=now||action.at>now+MAX_RUN)fail('INVALID','Choose an alarm within the next 24 hours.');state.timer={...makeTimer('alarm',state.settings,id,now,owner),alarmAt:action.at,status:'running',since:now,startedAt:now};event='alarm-set';break;}
 

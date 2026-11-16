@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import fs from 'node:fs';
 import {createAccountsApi,MAX_SYNC_BYTES} from '../server/accounts.mjs';
-import {emptyState} from '../src/lib/model.mjs';
+import {emptyState,transition} from '../src/lib/model.mjs';
 import {backupOf} from '../src/lib/storage.mjs';
 function setup(options={}){
  const db=new DatabaseSync(':memory:');for(const name of fs.readdirSync(new URL('../migrations/',import.meta.url)).filter(n=>n.endsWith('.sql')).sort())db.exec(fs.readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8'));
@@ -28,6 +28,16 @@ test('cloud writes require a live session, same origin, CSRF and a matching vers
 });
 test('concurrent cloud CAS writers cannot lose an update; clear advances the version',async()=>{
  const s=setup();try{const a=await s.login(),document=backupOf(emptyState('e'));await s.call('/api/workspace','PUT',{version:0,document},a.cookie,a.csrf);const writes=await Promise.all([1,2].map(()=>s.call('/api/workspace','PUT',{version:1,document},a.cookie,a.csrf)));assert.deepEqual(writes.map(r=>r.status).sort(),[200,409]);const deleted=await s.call('/api/workspace','DELETE',{version:2},a.cookie,a.csrf);assert.equal(deleted.status,200);assert.equal((await(await s.call('/api/workspace','GET',undefined,a.cookie)).json()).version,3);assert.equal((await s.call('/api/workspace','PUT',{version:1,document},a.cookie,a.csrf)).status,409);}finally{s.close();}
+});
+
+test('older clients cannot strip new habit scopes or dated rules from a saved cloud workspace',async()=>{
+ const s=setup();try{const a=await s.login(),state=transition(emptyState('habit-sync'),{type:'habit-save',epoch:'habit-sync',title:'Maths days',kind:'days',period:'weekly',target:3,studyDays:[1,2,3,4,5],scope:'subject:Maths'},{now:Date.parse('2026-11-16T12:00:00Z'),owner:'local',id:'habit-sync-rule'}).state,document=backupOf(state);
+ assert.equal((await s.call('/api/workspace','PUT',{version:0,document},a.cookie,a.csrf)).status,200);
+ const old=structuredClone(document);delete old.workspace.habits[0].planVersion;delete old.workspace.habits[0].policies;delete old.workspace.habits[0].scope;
+ const rejected=await s.call('/api/workspace','PUT',{version:1,document:old},a.cookie,a.csrf);assert.equal(rejected.status,400);assert.equal((await rejected.json()).error.code,'UPDATE_REQUIRED');
+ const kept=await(await s.call('/api/workspace','GET',undefined,a.cookie)).json();assert.equal(kept.version,1);assert.equal(kept.document.workspace.habits[0].scope,'subject:Maths');assert.equal(kept.document.workspace.habits[0].planVersion,2);
+ assert.equal((await s.call('/api/workspace','PUT',{version:1,document},a.cookie,a.csrf)).status,200);
+ }finally{s.close();}
 });
 test('logout revokes the token, account deletion cascades cloud data and all sessions',async()=>{
  const s=setup();try{const a=await s.login();await s.call('/api/workspace','PUT',{version:0,document:backupOf(emptyState('e'))},a.cookie,a.csrf);assert.equal((await s.call('/api/account','DELETE',{confirm:'no'},a.cookie,a.csrf)).status,400);assert.equal((await s.call('/api/account','DELETE',{confirm:'DELETE'},a.cookie,a.csrf)).status,200);assert.equal(s.db.prepare('SELECT count(*) n FROM sessions').get().n,0);assert.equal(s.db.prepare('SELECT count(*) n FROM workspaces').get().n,0);assert.equal((await s.call('/api/workspace','GET',undefined,a.cookie)).status,401);const b=await s.login('logout@example.invalid');await s.call('/api/auth/logout','POST',{},b.cookie,b.csrf);assert.equal((await s.call('/api/workspace','GET',undefined,b.cookie)).status,401);}finally{s.close();}

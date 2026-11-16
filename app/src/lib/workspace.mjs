@@ -1,4 +1,5 @@
-import {DomainError,dayKey,dailyTotals,hasProgress,makeTimer} from './model.mjs';
+import {DomainError,dayKey,dailyTotals,hasProgress,makeTimer,validateSettings} from './model.mjs';
+import {validateHabit,habitSave,habitCheck,mergeHabit,habitSummary,habitPolicy} from './habits.mjs';
 import {BLOCK_KINDS,blockConflicts,conflictMessage,scheduleDraftDays} from './schedule.mjs';
 
 export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],weeklyGoal:0,deletedSessions:Object.create(null)});
@@ -16,14 +17,7 @@ export function validateWorkspace(input){
  if(input===undefined)return emptyWorkspace();
  if(!input||typeof input!=='object')invalid('Invalid workspace data.');
  const tasks=list(input.tasks||[],5000).map(x=>{if(!['low','normal','high'].includes(x.priority)||typeof x.done!=='boolean')invalid('Invalid task status.');return{...base(x),title:text(x.title),subject:text(x.subject||'',40,true),dueDate:date(x.dueDate||''),plannedDate:date(x.plannedDate||''),priority:x.priority,estimateMinutes:number(x.estimateMinutes||0,0,10080),done:x.done};});
- const habits=list(input.habits||[],100).map(x=>{
-  if(!['minutes','sessions','checkin'].includes(x.kind)||!['daily','weekly'].includes(x.period))invalid('Invalid habit goal.');
-  if(!Array.isArray(x.studyDays)||!x.studyDays.length||new Set(x.studyDays).size!==x.studyDays.length||x.studyDays.some(d=>!Number.isInteger(d)||d<1||d>7))invalid('Choose at least one study day.');
-  const checks={};if(!x.checks||typeof x.checks!=='object'||Object.keys(x.checks).length>20000)invalid('Invalid check-ins.');
-  for(const [k,v]of Object.entries(x.checks)){if(!validDay(k)||!v||typeof v.checked!=='boolean')invalid('Invalid check-in date.');checks[k]={checked:v.checked,updatedAt:stamp(v.updatedAt)};}
-  if(!validDay(x.startDate))invalid('Invalid habit start date.');
-  return{...base(x),title:text(x.title),kind:x.kind,period:x.period,target:number(x.target,1,x.kind==='minutes'?(x.period==='daily'?1440:10080):x.kind==='checkin'?(x.period==='daily'?1:7):1000),studyDays:[...x.studyDays],startDate:x.startDate,checks};
- });
+ const habits=list(input.habits||[],100).map(validateHabit);
  const plans=list(input.plans||[],100).map(x=>{
   const chapters=list(x.chapters||[],1000).map(c=>{if(typeof c.done!=='boolean')invalid('Invalid chapter status.');return{...base(c),title:text(c.title),subject:text(c.subject||'',40,true),parentId:c.parentId?identifier(c.parentId):'',targetDate:date(c.targetDate||''),done:c.done};});
   for(const c of chapters){if(c.parentId&&(!chapters.some(p=>p.id===c.parentId&&!p.parentId&&(!p.deletedAt||c.deletedAt))||c.parentId===c.id))invalid('Subchapters need a top-level parent.');}
@@ -42,7 +36,7 @@ export function mergeWorkspace(a,b){
  a=validateWorkspace(a);b=validateWorkspace(b);
  const result={
   tasks:mergeItems(a.tasks,b.tasks),blocks:mergeItems(a.blocks,b.blocks),
-  habits:mergeItems(a.habits,b.habits,(x,y)=>{const checks={...x.checks};for(const [day,v]of Object.entries(y.checks))checks[day]=choose(checks[day],v);return{...choose(x,y),checks};}),
+  habits:mergeItems(a.habits,b.habits,(x,y)=>mergeHabit(x,y,choose)),
   plans:mergeItems(a.plans,b.plans,(x,y)=>({...choose(x,y),chapters:mergeItems(x.chapters,y.chapters)})),
   weeklyGoal:b.goalUpdatedAt>a.goalUpdatedAt?b.weeklyGoal:a.weeklyGoal,goalUpdatedAt:Math.max(a.goalUpdatedAt,b.goalUpdatedAt),
   deletedSessions:{...a.deletedSessions}
@@ -56,11 +50,15 @@ export function workspaceAction(state,action,{id,now,owner}){
  const w=state.workspace=validateWorkspace(state.workspace),type=action.type;
  const upsert=(key,fields)=>{const old=action.itemId?w[key].find(x=>x.id===action.itemId&&!x.deletedAt):null;if(action.itemId&&!old)invalid('This item changed or was removed.');const entry={...old,...fields,id:old?.id||id,updatedAt:now,deletedAt:0};const candidate={...w,[key]:old?w[key].map(x=>x.id===old.id?entry:x):[...w[key],entry]};state.workspace=validateWorkspace(candidate);};
  if(type==='task-save')upsert('tasks',{title:action.title,subject:action.subject||'',dueDate:action.dueDate||'',plannedDate:action.plannedDate||'',priority:action.priority||'normal',estimateMinutes:action.estimateMinutes||0,done:!!action.done});
- else if(type==='habit-save')upsert('habits',{title:action.title,kind:action.kind,period:action.period,target:action.target,studyDays:action.studyDays,startDate:action.startDate||dayKey(now),checks:w.habits.find(x=>x.id===action.itemId)?.checks||{}});
- else if(type==='habit-check'){
-  const h=w.habits.find(x=>x.id===action.itemId&&!x.deletedAt);if(!h||h.kind!=='checkin')invalid('Choose a manual check-in habit.');
-  if(!validDay(action.day)||action.day>dayKey(now)||action.day<h.startDate)invalid('Choose a day between the habit start and today.');
-  h.checks[action.day]={checked:!!action.checked,updatedAt:now};h.updatedAt=now;
+ else if(type==='habit-save')habitSave(w,action,{id,now});
+ else if(type==='habit-check')habitCheck(w,action,now);
+ else if(type==='habit-prepare'){
+  if(hasProgress(state.timer))throw new DomainError('BUSY','Finish or reset your unfinished timer before preparing this habit. Your current session was kept.');
+  const h=alive(w.habits).find(h=>h.id===action.habitId),rule=h&&habitPolicy(h,dayKey(now));if(!rule||rule.kind==='checkin')invalid('Choose an automatic learning habit.');
+  const mode=action.mode||'focus';if(!['study','focus','pomodoro'].includes(mode))invalid('Choose a study timer.');
+  const minutes=number(action.minutes??25,1,240),subject=!rule.scope?state.settings.subject:rule.scope==='none'?'':rule.scope.slice(8);
+  state.settings=validateSettings({...state.settings,subject,...(mode==='focus'?{focusSeconds:minutes*60}:mode==='pomodoro'?{studyMinutes:minutes}:{})});
+  state.timer=makeTimer(mode,state.settings,id,now,owner);
  }
  else if(type==='plan-save')upsert('plans',{title:action.title,examDate:action.examDate||'',templateId:action.templateId||'',templateSource:action.templateSource||'',subjects:action.subjects||w.plans.find(x=>x.id===action.itemId)?.subjects||[],chapters:action.chapters||w.plans.find(x=>x.id===action.itemId)?.chapters||[]});
  else if(type==='chapter-save'){
@@ -93,31 +91,13 @@ export function workspaceAction(state,action,{id,now,owner}){
  }
  else return false;
  state.workspace=validateWorkspace(state.workspace);
- const subjects=[action.subject,...(action.subjects||[])].filter(Boolean);for(const subject of subjects)if(!state.subjects.some(s=>s.toLowerCase()===subject.toLowerCase()))state.subjects.push(subject);
+ const subjects=[action.subject,...(action.subjects||[]),...(type==='habit-save'&&action.scope?.startsWith('subject:')?[action.scope.slice(8)]:[])].filter(Boolean);for(const subject of subjects)if(!state.subjects.some(s=>s.toLowerCase()===subject.toLowerCase()))state.subjects.push(subject);
  return true;
 }
 export function targetSeconds(sessions,field,id){return sessions.filter(s=>s[field]===id).reduce((sum,s)=>sum+s.durationSeconds,0);}
 export function chapterProgress(plan){const chapters=alive(plan.chapters);const leaves=chapters.filter(c=>!chapters.some(x=>x.parentId===c.id));return{total:leaves.length,done:leaves.filter(c=>c.done).length};}
 export function examDays(date,now){if(!validDay(date))return null;return Math.round((Date.parse(date+'T12:00:00Z')-Date.parse(dayKey(now)+'T12:00:00Z'))/86400000);}
-const weekday=d=>new Date(d+'T12:00:00').getDay()||7;
-const shift=(d,n)=>{const date=new Date(d+'T12:00:00');date.setDate(date.getDate()+n);return dayKey(date);};
-export function habitSummary(h,sessions,now){
- const today=dayKey(now),days=dailyTotals(sessions),counts={};for(const s of sessions){const day=dayKey(s.endedAt);counts[day]=(counts[day]||0)+1;}
- const value=day=>h.kind==='minutes'?(days[day]||0)/60:h.kind==='sessions'?(counts[day]||0):h.checks[day]?.checked?1:0;
- const isRest=day=>!h.studyDays.includes(weekday(day));
- const monday=day=>shift(day,1-weekday(day));
- const weekValue=day=>Array.from({length:7},(_,i)=>shift(monday(day),i)).filter(d=>d>=h.startDate&&d<=today).reduce((sum,d)=>sum+value(d),0);
- const met=day=>h.period==='weekly'?weekValue(day)>=h.target:value(day)>=h.target;
- let best=0,run=0,current=0;
- if(h.period==='daily'){
-  for(let d=h.startDate;d<=today;d=shift(d,1)){if(isRest(d))continue;if(met(d)){run++;best=Math.max(best,run);}else if(d!==today)run=0;}
-  for(let d=today;d>=h.startDate;d=shift(d,-1)){if(isRest(d))continue;if(d===today&&!met(d))continue;if(!met(d))break;current++;}
- }else{
-  for(let d=monday(h.startDate);d<=today;d=shift(d,7)){if(weekValue(d)>=h.target){run++;best=Math.max(best,run);}else if(d!==monday(today))run=0;}
-  for(let d=monday(today);d>=monday(h.startDate);d=shift(d,-7)){if(d===monday(today)&&weekValue(d)<h.target)continue;if(weekValue(d)<h.target)break;current++;}
- }
- return{value:h.period==='weekly'?weekValue(today):value(today),met:met(today),rest:isRest(today),current,best,unit:h.period==='weekly'?'weeks':'study days',days:Array.from({length:7},(_,i)=>{const day=shift(monday(today),i);return{day,value:value(day),rest:isRest(day),future:day>today,met:met(day)};})};
-}
+export {habitSummary};
 
 export function sessionsCSV(sessions){
  const cell=value=>{let s=String(value??'');if(/^[\s]*[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';};
