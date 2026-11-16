@@ -1,5 +1,7 @@
 # Syllabus Tracker local delivery — 16 November 2026
 
+Publication update: this implementation is now included in V2.20.0. See [production release](StudyTimely-V2.20.0-Release.md) for the exact runtime and production verification limits. The local-only status below describes the earlier handoff.
+
 Status: implemented and verified locally; not committed, pushed or deployed in this task. Production remains unchanged by this work. Package version remains 2.19.0.
 
 Clean preview: http://127.0.0.1:4268/syllabus-tracker (noindex). Its in-app browser tab is retained at 1280 × 720, scroll zero, no dialog and no saved syllabus or learning activity. QA used the separate origin on port 4267: two explicitly named synthetic outlines and one saved 26-second Biology session. No production, account, community or cloud data was mutated.
