@@ -49,16 +49,16 @@ test('bundled table covers all supported identifiers with ordered, bounded trans
  for(const city of CITIES){const rows=TIME_ZONE_DATA.zones[city.zone];assert.ok(rows,city.slug);assert.equal(rows[0][0],TIME_ZONE_DATA.start);for(let i=0;i<rows.length;i++){assert.ok(Number.isInteger(rows[i][1]));assert.ok(rows[i][0]<TIME_ZONE_DATA.end);if(i)assert.ok(rows[i][0]>rows[i-1][0]);}assert.ok(zoneState(at('2100-12-31T00:00Z'),city.zone));}
  assert.equal(zoneState(at('2101-01-01T00:00Z'),'Asia/Shanghai'),null);
 });
-test('32 complete editorial records have city-specific sections, answers and valid comparison routes',()=>{
+test('all complete editorial records have city-specific sections, answers and valid comparison routes',()=>{
  assert.deepEqual(Object.keys(CITY_CONTENT).sort(),CITIES.map(c=>c.slug).sort());
  const overviews=new Set(),questions=new Set();
  for(const city of CITIES){const c=CITY_CONTENT[city.slug];overviews.add(c.overview);assert.equal(c.sections.length,2);assert.equal(c.faqs.length,3);assert.ok(c.study.length>100);assert.equal(new Set(c.compare).size,4);for(const other of c.compare){assert.ok(cityFor(other),other);assert.notEqual(other,city.slug);}for(const faq of c.faqs){assert.ok(faq.answer.length>65);questions.add(faq.question);}}
- assert.equal(overviews.size,32);assert.equal(questions.size,96);
+ assert.equal(overviews.size,CITIES.length);assert.equal(questions.size,CITIES.length*3);
 });
 test('city metadata has a unique title, canonical and visible navigation breadcrumb',()=>{
  const config={origin:'https://studytimely.com',indexable:true},titles=new Set();
  for(const city of CITIES){const m=metadata('/time/'+city.slug,config);titles.add(m.title);assert.equal(m.canonical,config.origin+'/time/'+city.slug);assert.equal(m.breadcrumb['@type'],'BreadcrumbList');assert.equal(m.breadcrumb.itemListElement[2].name,city.name);assert.equal(m.breadcrumb.itemListElement[2].item,m.canonical);assert.equal(m.schema['@type'],'WebApplication');}
- assert.equal(titles.size,32);assert.equal(metadata('/',config).breadcrumb,null);
+ assert.equal(titles.size,CITIES.length);assert.equal(metadata('/',config).breadcrumb,null);
 });
 test('built city HTML contains complete readable content, closed FAQ answers and related anchors before JS',async()=>{
  for(const city of CITIES){const html=await fs.readFile(new URL(`../dist/client/time/${city.slug}/index.html`,import.meta.url),'utf8'),c=CITY_CONTENT[city.slug];

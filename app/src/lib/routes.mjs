@@ -23,7 +23,7 @@ export const MANAGEMENT_ROUTES=[
  {id:'account',path:'/account',title:'Account and Cloud Sync',h1:'Your study workspace, across devices',description:'Optional email sign-in and manual cloud sync. Anonymous tools remain free. Review what you upload and manage account data.',indexable:false},
  {id:'app',path:'/app',title:'StudyTimely App',h1:'Opening your workspace',description:'Open the last timing tool used in your StudyTimely app.',indexable:false}
 ];
-export const WORLD_CLOCK_ROUTES=[{id:'world-clock',path:'/time',title:'World Clock',h1:'World clock',description:'Find the current time in 32 cities. Compare time zones, search cities and keep your favourite clocks on this device. Free and no account required.',worldClock:true},...CITIES.map(c=>({id:'time-'+c.slug,path:'/time/'+c.slug,title:cityContent(c.slug).title,h1:'Time in '+c.name,description:cityDescription(c),worldClock:true}))];
+export const WORLD_CLOCK_ROUTES=[{id:'world-clock',path:'/time',title:'World Clock',seoTitle:'World Clock — Current Local Times Around the World',h1:'World Clock',description:`Check current local times in ${CITIES.length} cities worldwide. Search by city or time zone, save favourite clocks, and understand date differences and daylight saving time.`,worldClock:true},...CITIES.map(c=>({id:'time-'+c.slug,path:'/time/'+c.slug,title:cityContent(c.slug).title,h1:'Time in '+c.name,description:cityDescription(c),worldClock:true}))];
 ROUTES.push(...MANAGEMENT_ROUTES,...WORLD_CLOCK_ROUTES);
 export const routeFor=path=>ROUTES.find(r=>r.path===path);
 export const toolFor=mode=>ROUTES.find(t=>t.id===mode)||TOOLS[1];

@@ -1,0 +1,89 @@
+.world-clock-app .world-clock-feature .directory{width:min(1120px,90%);padding-top:112px;padding-bottom:64px}
+.world-clock-app .world-clock-feature .directory .breadcrumbs{margin-bottom:22px;font-size:13px}
+.world-clock-app .world-clock-feature .directory-heading{margin-bottom:24px;align-items:center}
+.world-clock-app .world-clock-feature .directory-heading h1{font-size:40px;margin-bottom:12px}
+.world-clock-app .world-clock-feature .directory-heading p{font-size:18px;line-height:1.65;max-width:620px}
+.world-clock-app .world-clock-feature .directory .your-time{flex:none;gap:4px;padding-top:0}
+.world-clock-app .world-clock-feature .directory .your-time strong{font-size:32px;line-height:1.3}
+.world-clock-app .world-clock-feature .directory .your-time span{font-size:13px;max-width:none}
+.world-clock-app .world-clock-feature .directory .your-time .local-date{font-size:14px;color:var(--fg)}
+.world-clock-app .world-clock-feature .directory .search-field{height:56px;margin-bottom:12px}
+.world-clock-app .world-clock-feature .directory .search-field input{font-size:16px}
+.world-clock-app .world-clock-feature .directory .region-tabs{gap:6px}
+.world-clock-app .world-clock-feature .directory .region-tabs button{font-size:14px;padding:9px 16px;min-height:44px}
+.world-clock-app .world-clock-feature .directory .city-discovery{margin-bottom:20px}
+.world-clock-app .world-clock-feature .directory .section-title{margin-bottom:18px}
+.world-clock-app .world-clock-feature .directory .section-title h2{font-size:25px}
+.world-clock-app .world-clock-feature .directory :is(.help-inline,.count){font-size:13px}
+.world-clock-app .world-clock-feature .directory .my-clocks{margin-bottom:32px}
+.world-clock-app .world-clock-feature .directory .my-clocks .help-inline{max-width:440px;text-align:right;line-height:1.6}
+.world-clock-app .world-clock-feature .directory .empty-clocks-inline{display:flex;gap:9px;align-items:flex-start;margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.65}
+.world-clock-app .world-clock-feature .directory .empty-clocks-inline svg{flex:none;margin-top:3px}
+.world-clock-app .world-clock-feature .directory .city-name{font-size:18px;line-height:1.4}
+.world-clock-app .world-clock-feature .directory .city-card-top{padding-right:38px}
+.world-clock-app .world-clock-feature .directory .city-card-clock{margin:16px 0 8px;min-height:48px;gap:8px}
+.world-clock-app .world-clock-feature .directory .city-card-clock time{font-size:36px;letter-spacing:-1px}
+.world-clock-app .world-clock-feature .directory .city-date{display:block;font-size:14px;line-height:1.6;color:var(--muted);margin-bottom:12px}
+.world-clock-app .world-clock-feature .directory .city-card-meta{font-size:13px;line-height:1.6}
+.world-clock-app .world-clock-feature .directory .city-relative{margin:12px 0 0;border-top:1px solid var(--line);padding-top:12px;font-size:14px;line-height:1.6;color:var(--fg)}
+.world-clock-app .world-clock-feature .directory .day-tag{font-size:11px;line-height:1.4}
+.world-clock-app .world-clock-feature .directory .directory-method{font-size:13px;line-height:1.8;color:var(--muted);margin:22px 0 0;max-width:920px}
+.world-clock-app .world-clock-feature .world-directory-guide{margin-top:56px}
+.world-clock-app .world-clock-feature .world-directory-guide>section{border-top:1px solid var(--line);padding-top:34px;margin-top:40px;scroll-margin-top:95px}
+.world-clock-app .world-clock-feature .world-directory-guide h2{font-size:28px;line-height:1.4;margin:0 0 22px;letter-spacing:-.6px}
+.world-clock-app .world-clock-feature .world-directory-guide h3{font-size:21px;line-height:1.5;margin:0 0 14px}
+.world-clock-app .world-clock-feature .world-directory-guide :is(p,li){font-size:18px;line-height:1.85;color:var(--muted)}
+.world-clock-app .world-clock-feature .world-directory-guide p{margin:0 0 22px;max-width:920px}
+.world-clock-app .world-clock-feature .world-directory-guide :is(ol,ul){max-width:920px;padding-left:24px;margin:0 0 24px}
+.world-clock-app .world-clock-feature .world-directory-guide li{padding-left:4px;margin-bottom:16px}
+.world-clock-app .world-clock-feature .world-directory-guide strong{color:var(--fg);font-weight:600}
+.world-clock-app .world-clock-feature .world-directory-guide a{text-decoration:underline;text-underline-offset:5px}
+.world-clock-app .world-clock-feature .world-directory-guide nav{display:flex;flex-wrap:wrap;gap:10px 28px;margin:24px 0}
+.world-clock-app .world-clock-feature .world-directory-guide nav a{display:inline-flex;align-items:center;min-height:44px;font-size:15px}
+.world-clock-app .world-clock-feature .directory-example{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;margin:26px 0}
+.world-clock-app .world-clock-feature .directory-example p:last-child{margin-bottom:0}
+.world-clock-app .world-clock-feature .directory-region-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 32px}
+.world-clock-app .world-clock-feature .directory-region-links ul{list-style:none;padding:0;margin:0}
+.world-clock-app .world-clock-feature .directory-region-links li{margin:0;padding:0}
+.world-clock-app .world-clock-feature .directory-region-links a{display:inline-flex;align-items:center;min-height:44px;font-size:16px}
+.world-clock-app .world-clock-feature .world-directory-guide details{border-bottom:1px solid var(--line)}
+.world-clock-app .world-clock-feature .world-directory-guide summary{display:flex;justify-content:space-between;gap:24px;padding:22px 0;font-size:18px;line-height:1.7;cursor:pointer;list-style:none}
+.world-clock-app .world-clock-feature .world-directory-guide summary::-webkit-details-marker{display:none}
+.world-clock-app .world-clock-feature .world-directory-guide summary::after{content:'+';font-size:22px;flex:none}
+.world-clock-app .world-clock-feature .world-directory-guide details[open]>summary::after{content:'−'}
+@media(max-width:760px){
+ .world-clock-app .world-clock-feature .directory{padding-top:92px;width:calc(100% - 36px)}
+ .world-clock-app .world-clock-feature .directory-heading{flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:20px}
+ .world-clock-app .world-clock-feature .directory-heading h1{font-size:32px;margin-bottom:10px}
+ .world-clock-app .world-clock-feature .directory-heading p{font-size:16px;max-width:none}
+ .world-clock-app .world-clock-feature .directory .your-time{display:grid;grid-template-columns:auto auto;gap:3px 18px;align-items:center;width:100%;padding:10px 14px;border:1px solid var(--line);border-radius:12px}
+ .world-clock-app .world-clock-feature .directory .your-time strong{grid-column:2;grid-row:1/3;justify-self:end;font-size:28px}
+ .world-clock-app .world-clock-feature .directory .your-time span{font-size:12px;text-align:left;max-width:none;overflow-wrap:anywhere}
+ .world-clock-app .world-clock-feature .directory .your-time .local-date{font-size:13px}
+ .world-clock-app .world-clock-feature .directory .your-time .local-zone{grid-column:1/-1;font-size:12px}
+ .world-clock-app .world-clock-feature .directory .region-tabs{display:flex;flex-wrap:wrap;gap:4px}
+ .world-clock-app .world-clock-feature .directory .region-tabs button{width:auto;padding-inline:12px;font-size:14px}
+ .world-clock-app .world-clock-feature .directory .section-title{align-items:center;gap:12px}
+ .world-clock-app .world-clock-feature .directory .section-title h2{font-size:22px}
+ .world-clock-app .world-clock-feature .directory .my-clocks .section-title{align-items:flex-start;flex-direction:column;gap:8px}
+ .world-clock-app .world-clock-feature .directory .my-clocks .help-inline{text-align:left;font-size:12px;max-width:none}
+ .world-clock-app .world-clock-feature .directory .empty-clocks-inline{font-size:13px;margin-bottom:16px}
+ .world-clock-app .world-clock-feature .directory .city-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .world-clock-app .world-clock-feature .directory .city-card-link{padding:16px 14px}
+ .world-clock-app .world-clock-feature .directory .city-name{font-size:16px}
+ .world-clock-app .world-clock-feature .directory .city-card-top{padding-right:30px}
+ .world-clock-app .world-clock-feature .directory .city-card-clock time{font-size:28px}
+ .world-clock-app .world-clock-feature .directory .city-date{font-size:12px}
+ .world-clock-app .world-clock-feature .directory .city-card-meta{font-size:12px;flex-direction:column;gap:3px}
+ .world-clock-app .world-clock-feature .directory .city-relative{font-size:12px}
+ .world-clock-app .world-clock-feature .world-directory-guide{margin-top:40px}
+ .world-clock-app .world-clock-feature .world-directory-guide>section{margin-top:32px;padding-top:28px}
+ .world-clock-app .world-clock-feature .world-directory-guide h2{font-size:24px}
+ .world-clock-app .world-clock-feature .world-directory-guide h3{font-size:20px}
+ .world-clock-app .world-clock-feature .world-directory-guide :is(p,li){font-size:16px;line-height:1.85}
+ .world-clock-app .world-clock-feature .world-directory-guide nav{gap:8px 22px}
+ .world-clock-app .world-clock-feature .directory-example{padding:18px}
+ .world-clock-app .world-clock-feature .directory-region-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+ .world-clock-app .world-clock-feature .world-directory-guide summary{font-size:17px}
+}
+@media(max-width:380px){.world-clock-app .world-clock-feature .directory .city-grid{grid-template-columns:1fr}.world-clock-app .world-clock-feature .directory .city-card-top .time-icon{display:block}.world-clock-app .world-clock-feature .directory .city-card-clock time{font-size:32px}.world-clock-app .world-clock-feature .directory .city-card-meta{flex-direction:row}.world-clock-app .world-clock-feature .directory-region-links{grid-template-columns:1fr}}

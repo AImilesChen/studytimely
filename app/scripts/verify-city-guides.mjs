@@ -18,8 +18,8 @@ for(const city of CITIES){
  checks.push({city:city.slug,status:r.status,initialHtmlGuide:true,faqAnswers:3,breadcrumb:true,internalLinksValid:true,guideWords:article.replace(/<[^>]+>/g,' ').split(/\s+/).filter(Boolean).length});
 }
 const license=await fetch(base+'/time-zone-data-license.txt');assert.equal(license.status,200);assert.match(await license.text(),/Apache License/);
-const directory=await(await fetch(base+'/time')).text();assert.ok(directory.includes('Compare cities, not just UTC offsets'));
+const directory=await(await fetch(base+'/time')).text();assert.ok(directory.includes('world-directory-guide'));
 assert.equal(await(await fetch(base+'/robots.txt')).text(),'User-agent: *\nDisallow: /\n');
-const report={base,environment:'local noindex preview',checkedAt:new Date().toISOString(),cityPages:32,faqAnswers:96,license:true,directory:true,checks};
+const report={base,environment:'local noindex preview',checkedAt:new Date().toISOString(),cityPages:CITIES.length,faqAnswers:CITIES.length*3,license:true,directory:true,checks};
 const folder=new URL('../../docs/development/evidence/city-guides-2026-11-14/',import.meta.url);await fs.mkdir(folder,{recursive:true});await fs.writeFile(new URL('city-http.json',folder),JSON.stringify(report,null,2));
-console.log(JSON.stringify({passed:true,cities:checks.length,faqAnswers:96,minimumGuideWords:Math.min(...checks.map(c=>c.guideWords)),maximumGuideWords:Math.max(...checks.map(c=>c.guideWords))}));
+console.log(JSON.stringify({passed:true,cities:checks.length,faqAnswers:CITIES.length*3,minimumGuideWords:Math.min(...checks.map(c=>c.guideWords)),maximumGuideWords:Math.max(...checks.map(c=>c.guideWords))}));

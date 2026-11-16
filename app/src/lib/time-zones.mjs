@@ -26,6 +26,7 @@ export function zonedFormatter(zone,options){
  return{format:at=>f.format(shift(at)),formatToParts:at=>f.formatToParts(shift(at))};
 }
 const names={
+ 'Pacific/Honolulu':['Hawaii Standard Time','Hawaii Standard Time'],
  'America/New_York':['Eastern Standard Time','Eastern Daylight Time'], 'America/Toronto':['Eastern Standard Time','Eastern Daylight Time'],
  'America/Los_Angeles':['Pacific Standard Time','Pacific Daylight Time'], 'America/Chicago':['Central Standard Time','Central Daylight Time'],
  'America/Vancouver':['Pacific Time','Pacific Time'], 'America/Mexico_City':['Central Standard Time','Central Daylight Time'], 'America/Sao_Paulo':['Brasília Time','Brasília Summer Time'],

@@ -25,7 +25,7 @@ archive = zipfile.ZipFile(io.BytesIO(payload))
 assert archive.read('tzdata/zoneinfo/tzdata.zi').startswith(b'# version 2026f\n')
 source = (ROOT / 'src/lib/world-clock.mjs').read_text(encoding='utf-8')
 zones = sorted(set(re.findall(r"\['[a-z-]+','[^']+','[^']+','([A-Za-z_]+/[A-Za-z_]+)'", source)))
-assert len(zones) == 31, 'Expected 32 cities sharing 31 IANA zones'
+assert zones, 'No supported IANA zones found in the city source'
 start = int(dt.datetime(1970, 1, 1, tzinfo=dt.timezone.utc).timestamp())
 end = int(dt.datetime(2101, 1, 1, tzinfo=dt.timezone.utc).timestamp())
 result = {'version': '2026f', 'start': start, 'end': end,
