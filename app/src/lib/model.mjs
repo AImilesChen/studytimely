@@ -176,13 +176,22 @@ export function transition(previous,action,{now,owner,id}){
    state.settings=next;if(label&&!existing)state.subjects.push(label);if(PREFERENCE_KEYS.some(k=>JSON.stringify(next[k])!==JSON.stringify(previous.settings[k])))state.preferencesUpdatedAt=now;
    if(t?.mode==='pomodoro'&&changed){nextPomodoro(state,t,now,t.phase);state.timer.subject=next.subject;state.timer.owner=owner;}event='pomodoro-settings';break;
  }
+ case 'focus-settings':
  case 'settings':{
-   const next=validateSettings({...state.settings,...action.patch});
+   const focusSettings=action.type==='focus-settings';
+   if(focusSettings&&hasProgress(state.timer))fail('BUSY','Finish or reset the session before changing its timing or subject.');
+   const label=focusSettings?String(action.newSubject||'').trim():'';
+   if(label.length>40)fail('INVALID','Use a subject label of up to 40 characters.');
+   if(focusSettings&&Object.keys(action.patch||{}).some(k=>!['focusSeconds','subject'].includes(k)))fail('INVALID','Only focus duration and subject can be changed here.');
+   const existing=label&&state.subjects.find(x=>x.toLowerCase()===label.toLowerCase());
+   const patch={...action.patch,...(label?{subject:existing||label}:{})};
+   const next=validateSettings({...state.settings,...patch});
    const timedKeys=['studyMinutes','shortBreak','longBreak','longEvery','cycleLimit','focusSeconds','countdownSeconds','subject'];
    if(hasProgress(state.timer)&&timedKeys.some(k=>next[k]!==state.settings[k]))fail('BUSY','Finish or reset the session before changing its timing or subject.');
    const timingChanged=timedKeys.some(k=>next[k]!==state.settings[k]);state.settings=next;if(PREFERENCE_KEYS.some(k=>JSON.stringify(next[k])!==JSON.stringify(previous.settings[k])))state.preferencesUpdatedAt=now;
    if(state.timer&&!hasProgress(state.timer)&&timingChanged){const previous=state.timer;state.timer=makeTimer(previous.mode,next,id,now,owner);if(previous.status==='ready'){state.timer.phase=previous.phase;state.timer.completedStudies=previous.completedStudies;state.timer.durationSeconds=durationFor(previous.mode,previous.phase,next);}}
-   event='settings';break;
+   if(label&&!existing)state.subjects.push(label);
+   event=focusSettings?'focus-settings':'settings';break;
  }
  case 'subject':{
    const label=String(action.label||'').trim();if(!label||label.length>40)fail('INVALID','Enter a subject label from 1 to 40 characters.');
