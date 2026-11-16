@@ -1,0 +1,47 @@
+/* Shared page edges. Keep timer heroes and presentation mode independent. */
+@media screen {
+  :root {
+    --page-content-max: 1280px;
+    --page-gutter: 32px;
+  }
+
+  .app:not(.presentation-view) :is(
+    main.workspace,
+    main.alarm-page,
+    main.calculator-page,
+    main.habits-page,
+    main.legal-page,
+    .below-fold,
+    .focus-below,
+    .pomodoro-below,
+    .stopwatch-below,
+    .countdown-below,
+    .world-clock-feature .content
+  ),
+  .app:not(.presentation-view) > footer {
+    width: min(var(--page-content-max), calc(100% - var(--page-gutter) - var(--page-gutter)));
+    max-width: var(--page-content-max);
+    min-width: 0;
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  /* Guides share their tool's edges; text inside may retain a reading measure. */
+  .app:not(.presentation-view) .calculator-guide {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .app:not(.presentation-view) .legal-page > :is(p, ul, ol, blockquote) {
+    max-width: 80ch;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  :root { --page-gutter: 24px; }
+}
+
+@media screen and (max-width: 650px) {
+  :root { --page-gutter: 16px; }
+}

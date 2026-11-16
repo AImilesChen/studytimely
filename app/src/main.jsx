@@ -14,3 +14,4 @@ const app=<App initialPath={location.pathname} initialNow={Number(root.dataset.r
 if(root.hasChildNodes())hydrateRoot(root,app);else createRoot(root).render(app);
 
 import './timer-presentation.css';
+import './page-layout.css';
