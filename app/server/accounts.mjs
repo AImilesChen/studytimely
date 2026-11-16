@@ -1,4 +1,5 @@
 import {validateBackup} from '../src/lib/model.mjs';
+import {losesSyllabusHistory} from '../src/lib/syllabus.mjs';
 import {losesHabitHistory} from '../src/lib/habits.mjs';
 import {ApiError,fail,digest,hmac,equal,randomToken,result,cookie,readCookie,body} from './auth-shared.mjs';
 export const MAX_SYNC_BYTES=1024*1024;
@@ -69,7 +70,7 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
     let document=null;
     if(method==='PUT'){
      let valid;try{valid=validateBackup(input.document);}catch(e){fail(400,'INVALID',e.message);}
-     if(input.version>0){const previous=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();if(previous?.version===input.version&&previous.document&&losesHabitHistory(JSON.parse(previous.document),input.document))fail(400,'UPDATE_REQUIRED','This workspace contains updated study habits. Refresh all StudyTimely tabs before syncing; your cloud data was kept.');}
+     if(input.version>0){const previous=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();if(previous?.version===input.version&&previous.document&&(losesHabitHistory(JSON.parse(previous.document),input.document)||losesSyllabusHistory(JSON.parse(previous.document),input.document)))fail(400,'UPDATE_REQUIRED','This workspace contains updated study habits or syllabuses. Refresh all StudyTimely tabs before syncing; your cloud data was kept.');}
      document=JSON.stringify({app:'StudyTimely',schema:1,...valid});if(encoder.encode(document).length>MAX_SYNC_BYTES)fail(413,'SYNC_LIMIT','Cloud sync supports up to 1 MiB per workspace. Export a local JSON backup for larger histories.');
     }
     const row=input.version===0?await query('INSERT INTO workspaces(account_id,version,document,updated_at) VALUES(?,1,?,?) ON CONFLICT(account_id) DO NOTHING RETURNING version',identity.id,document,at).first():await query('UPDATE workspaces SET version=version+1,document=?,updated_at=? WHERE account_id=? AND version=? RETURNING version',document,at,identity.id,input.version).first();

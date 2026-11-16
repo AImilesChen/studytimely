@@ -1,5 +1,6 @@
 import {DomainError,dayKey,dailyTotals,hasProgress,makeTimer,validateSettings} from './model.mjs';
 import {validateHabit,habitSave,habitCheck,mergeHabit,habitSummary,habitPolicy} from './habits.mjs';
+import {parseSyllabusOutline,materialiseOutline,syllabusLeaves} from './syllabus.mjs';
 import {BLOCK_KINDS,blockConflicts,conflictMessage,scheduleDraftDays} from './schedule.mjs';
 
 export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],weeklyGoal:0,deletedSessions:Object.create(null)});
@@ -19,10 +20,11 @@ export function validateWorkspace(input){
  const tasks=list(input.tasks||[],5000).map(x=>{if(!['low','normal','high'].includes(x.priority)||typeof x.done!=='boolean')invalid('Invalid task status.');return{...base(x),title:text(x.title),subject:text(x.subject||'',40,true),dueDate:date(x.dueDate||''),plannedDate:date(x.plannedDate||''),priority:x.priority,estimateMinutes:number(x.estimateMinutes||0,0,10080),done:x.done};});
  const habits=list(input.habits||[],100).map(validateHabit);
  const plans=list(input.plans||[],100).map(x=>{
-  const chapters=list(x.chapters||[],1000).map(c=>{if(typeof c.done!=='boolean')invalid('Invalid chapter status.');return{...base(c),title:text(c.title),subject:text(c.subject||'',40,true),parentId:c.parentId?identifier(c.parentId):'',targetDate:date(c.targetDate||''),done:c.done};});
+  if(x.syllabusVersion!==undefined&&![1,2].includes(x.syllabusVersion))invalid('Update StudyTimely to read this syllabus format.');
+  const chapters=list(x.chapters||[],1000).map(c=>{if(typeof c.done!=='boolean')invalid('Invalid chapter status.');return{...base(c),title:text(c.title),subject:text(c.subject||'',40,true),parentId:c.parentId?identifier(c.parentId):'',targetDate:date(c.targetDate||''),done:c.done,needsReview:c.needsReview===undefined?false:typeof c.needsReview==='boolean'?c.needsReview:invalid('Invalid review status.')};});
   for(const c of chapters){if(c.parentId&&(!chapters.some(p=>p.id===c.parentId&&!p.parentId&&(!p.deletedAt||c.deletedAt))||c.parentId===c.id))invalid('Subchapters need a top-level parent.');}
   if(!Array.isArray(x.subjects||[])||(x.subjects||[]).length>100)invalid('Invalid exam subjects.');
-  return{...base(x),title:text(x.title),examDate:date(x.examDate||''),templateId:text(x.templateId||'',100,true),templateSource:text(x.templateSource||'',500,true),subjects:(x.subjects||[]).map(s=>text(s,40)),chapters};
+  return{...base(x),title:text(x.title),examDate:date(x.examDate||''),templateId:text(x.templateId||'',100,true),templateSource:text(x.templateSource||'',500,true),subjects:(x.subjects||[]).map(s=>text(s,40)),chapters,...(x.syllabusVersion===2?{syllabusVersion:2,nextChapterId:x.nextChapterId?identifier(x.nextChapterId):''}:{})};
  });
  const blocks=list(input.blocks||[],1000).map(x=>{const start=number(x.start,0,1439),end=number(x.end,1,1440),kind=x.kind||'study';if(!Object.hasOwn(BLOCK_KINDS,kind))invalid('Choose a supported block type.');if(start>=end)invalid('End time must be after start time.');return{...base(x),title:text(x.title),subject:text(x.subject||'',40,true),kind,weekday:number(x.weekday,1,7),start,end};});
  const deletedSessions=Object.create(null);if(!input.deletedSessions||typeof input.deletedSessions!=='object')input={...input,deletedSessions:{}};
@@ -37,7 +39,7 @@ export function mergeWorkspace(a,b){
  const result={
   tasks:mergeItems(a.tasks,b.tasks),blocks:mergeItems(a.blocks,b.blocks),
   habits:mergeItems(a.habits,b.habits,(x,y)=>mergeHabit(x,y,choose)),
-  plans:mergeItems(a.plans,b.plans,(x,y)=>({...choose(x,y),chapters:mergeItems(x.chapters,y.chapters)})),
+  plans:mergeItems(a.plans,b.plans,(x,y)=>{const winner=choose(x,y),modern=x.syllabusVersion===2||y.syllabusVersion===2;return {...winner,...(modern?{syllabusVersion:2,nextChapterId:winner.syllabusVersion===2?winner.nextChapterId:(x.syllabusVersion===2?x:y).nextChapterId}:{}),chapters:mergeItems(x.chapters,y.chapters,(c,d)=>{const chosen=choose(c,d);return {...chosen,needsReview:winner.syllabusVersion!==2&&modern?(x.syllabusVersion===2?c:d).needsReview:chosen.needsReview};})};}),
   weeklyGoal:b.goalUpdatedAt>a.goalUpdatedAt?b.weeklyGoal:a.weeklyGoal,goalUpdatedAt:Math.max(a.goalUpdatedAt,b.goalUpdatedAt),
   deletedSessions:{...a.deletedSessions}
  };
@@ -48,7 +50,7 @@ export function mergeWorkspace(a,b){
 }
 export function workspaceAction(state,action,{id,now,owner}){
  const w=state.workspace=validateWorkspace(state.workspace),type=action.type;
- const upsert=(key,fields)=>{const old=action.itemId?w[key].find(x=>x.id===action.itemId&&!x.deletedAt):null;if(action.itemId&&!old)invalid('This item changed or was removed.');const entry={...old,...fields,id:old?.id||id,updatedAt:now,deletedAt:0};const candidate={...w,[key]:old?w[key].map(x=>x.id===old.id?entry:x):[...w[key],entry]};state.workspace=validateWorkspace(candidate);};
+ const upsert=(key,fields)=>{const old=action.itemId?w[key].find(x=>x.id===action.itemId&&!x.deletedAt):null;if(action.itemId&&!old)invalid('This item changed or was removed.');if(old&&action.expectedUpdatedAt!==undefined&&action.expectedUpdatedAt!==old.updatedAt)invalid('This item changed in another tab. Reopen it before saving.');const entry={...old,...fields,id:old?.id||id,updatedAt:now,deletedAt:0};const candidate={...w,[key]:old?w[key].map(x=>x.id===old.id?entry:x):[...w[key],entry]};state.workspace=validateWorkspace(candidate);};
  if(type==='task-save')upsert('tasks',{title:action.title,subject:action.subject||'',dueDate:action.dueDate||'',plannedDate:action.plannedDate||'',priority:action.priority||'normal',estimateMinutes:action.estimateMinutes||0,done:!!action.done});
  else if(type==='habit-save')habitSave(w,action,{id,now});
  else if(type==='habit-check')habitCheck(w,action,now);
@@ -60,18 +62,43 @@ export function workspaceAction(state,action,{id,now,owner}){
   state.settings=validateSettings({...state.settings,subject,...(mode==='focus'?{focusSeconds:minutes*60}:mode==='pomodoro'?{studyMinutes:minutes}:{})});
   state.timer=makeTimer(mode,state.settings,id,now,owner);
  }
- else if(type==='plan-save')upsert('plans',{title:action.title,examDate:action.examDate||'',templateId:action.templateId||'',templateSource:action.templateSource||'',subjects:action.subjects||w.plans.find(x=>x.id===action.itemId)?.subjects||[],chapters:action.chapters||w.plans.find(x=>x.id===action.itemId)?.chapters||[]});
+ else if(type==='plan-save')upsert('plans',{title:action.title,examDate:action.examDate||'',templateId:action.templateId||'',templateSource:action.templateSource||'',syllabusVersion:2,nextChapterId:w.plans.find(x=>x.id===action.itemId)?.nextChapterId||'',subjects:action.subjects||w.plans.find(x=>x.id===action.itemId)?.subjects||[],chapters:action.chapters||w.plans.find(x=>x.id===action.itemId)?.chapters||[]});
  else if(type==='chapter-save'){
   const plan=w.plans.find(x=>x.id===action.planId&&!x.deletedAt);if(!plan)invalid('Choose an exam plan.');
   const old=action.itemId?plan.chapters.find(c=>c.id===action.itemId&&!c.deletedAt):null;if(action.itemId&&!old)invalid('That chapter no longer exists.');
-  const c={id:old?.id||id,title:action.title,subject:action.subject||'',parentId:action.parentId||'',targetDate:action.targetDate||'',done:!!action.done,updatedAt:now,deletedAt:0};
-  plan.chapters=old?plan.chapters.map(x=>x.id===old.id?c:x):[...plan.chapters,c];plan.updatedAt=now;
+  if(old&&action.expectedUpdatedAt!==undefined&&action.expectedUpdatedAt!==old.updatedAt)invalid('This topic changed in another tab. Reopen it before saving.');
+  const c={id:old?.id||id,title:action.title,subject:action.subject||'',parentId:action.parentId||'',targetDate:action.targetDate||'',done:!!action.done,needsReview:action.needsReview===undefined?(old?.needsReview||false):action.needsReview,updatedAt:now,deletedAt:0};
+  if(plan.nextChapterId===c.id&&c.done&&!c.needsReview)plan.nextChapterId='';
+  plan.syllabusVersion=2;plan.chapters=old?plan.chapters.map(x=>x.id===old.id?c:x):[...plan.chapters,c];plan.updatedAt=now;
+ }
+ else if(type==='chapter-import'){
+  const plan=alive(w.plans).find(p=>p.id===action.planId);if(!plan)invalid('Choose a syllabus.');
+  if(action.expectedUpdatedAt!==plan.updatedAt)invalid('This syllabus changed in another tab. Preview your import again.');
+  let parsed;try{parsed=parseSyllabusOutline(action.outline);}catch(e){invalid(e.message);}
+  if(!parsed.rows.length)invalid('Paste at least one topic.');
+  const rows=action.rows||parsed.rows;
+  // Reviewed edits can adjust titles and parents, never inject record fields.
+  if(!Array.isArray(rows)||rows.length!==parsed.rows.length)invalid('Preview the outline again.');
+  rows.forEach((r,i)=>{text(r.title);if(r.parentIndex!==null&&(!Number.isInteger(r.parentIndex)||r.parentIndex<0||r.parentIndex>=i||rows[r.parentIndex].parentIndex!==null))invalid('Choose an earlier top-level parent.');});
+  const selected=rows.map((r,i)=>({...r,original:i})).filter(r=>!r.skip);
+  const remap=new Map(selected.map((r,i)=>[r.original,i]));
+  if(!selected.length)invalid('Keep at least one topic to import.');
+  const fixed=selected.map(r=>({title:r.title,parentIndex:r.parentIndex===null?null:remap.get(r.parentIndex)}));
+  if(fixed.some(r=>r.parentIndex===undefined))invalid('Keep the parent chapter or make its children top-level.');
+  let n=0;const subject=text(action.subject||'',40,true),entries=materialiseOutline(fixed,subject,()=>id+':'+(++n),now);
+  plan.chapters.push(...entries);if(subject&&!plan.subjects.includes(subject))plan.subjects.push(subject);plan.syllabusVersion=2;plan.updatedAt=now;
+ }
+ else if(type==='syllabus-next'){
+  const plan=alive(w.plans).find(p=>p.id===action.planId);if(!plan)invalid('Choose a syllabus.');
+  if(action.chapterId&&!syllabusLeaves(plan).some(c=>c.id===action.chapterId))invalid('Choose a current leaf topic.');
+  plan.nextChapterId=action.chapterId||'';plan.syllabusVersion=2;plan.updatedAt=now;
  }
  else if(type==='workspace-delete'){
   if(!['tasks','habits','plans','blocks','chapters'].includes(action.collection))invalid('Choose a supported item.');
   const list=action.collection==='chapters'?w.plans.find(p=>p.id===action.planId)?.chapters:w[action.collection];
   const item=list?.find(x=>x.id===action.itemId&&!x.deletedAt);if(!item)invalid('That item no longer exists.');
   item.deletedAt=now;item.updatedAt=now;
+  if(action.collection==='chapters'){const plan=w.plans.find(p=>p.id===action.planId);if(plan)plan.updatedAt=now;}
   if(action.collection==='chapters')for(const child of list.filter(c=>c.parentId===item.id)){child.deletedAt=now;child.updatedAt=now;}
  }
  else if(type==='block-save'||type==='blocks-save'){

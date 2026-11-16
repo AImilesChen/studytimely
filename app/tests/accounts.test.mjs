@@ -14,6 +14,16 @@ function setup(options={}){
  const login=async(address='qa@example.invalid')=>{assert.equal((await call('/api/auth/request-code','POST',{email:address,accepted:true})).status,202);const r=await call('/api/auth/verify-code','POST',{email:address,code:'123456'});assert.equal(r.status,200);return{cookie:r.headers.get('set-cookie').split(';')[0],csrf:(await r.json()).csrf};};
  return{db,env,sent,call,login,advance:n=>at+=n,close:()=>db.close()};
 }
+test('older clients cannot strip syllabus review flags or next-topic metadata from cloud data',async()=>{
+ const s=setup();try{const a=await s.login();let state=transition(emptyState('sy'),{type:'plan-save',epoch:'sy',title:'QA syllabus'},{now:Date.now(),id:'plan',owner:'qa'}).state;
+ state=transition(state,{type:'chapter-save',epoch:'sy',planId:'plan',title:'Topic',needsReview:true},{now:Date.now(),id:'topic',owner:'qa'}).state;
+ const current=backupOf(state);assert.equal((await s.call('/api/workspace','PUT',{version:0,document:current},a.cookie,a.csrf)).status,200);
+ const old=structuredClone(current);delete old.workspace.plans[0].syllabusVersion;delete old.workspace.plans[0].nextChapterId;delete old.workspace.plans[0].chapters[0].needsReview;
+ const denied=await s.call('/api/workspace','PUT',{version:1,document:old},a.cookie,a.csrf);assert.equal(denied.status,400);assert.equal((await denied.json()).error.code,'UPDATE_REQUIRED');
+ const kept=await(await s.call('/api/workspace','GET',undefined,a.cookie)).json();assert.equal(kept.version,1);assert.equal(kept.document.workspace.plans[0].chapters[0].needsReview,true);
+ assert.equal((await s.call('/api/workspace','PUT',{version:1,document:current},a.cookie,a.csrf)).status,200);
+ }finally{s.close();}
+});
 test('OTP is one-use, expires, and session tokens are only hashed in SQL',async()=>{
  const s=setup();try{const auth=await s.login();assert.ok(auth.cookie.startsWith('__Host-'));assert.equal((await s.call('/api/auth/verify-code','POST',{email:'qa@example.invalid',code:'123456'})).status,400);const raw=auth.cookie.split('=')[1];assert.notEqual(s.db.prepare('SELECT token_hash FROM sessions').get().token_hash,raw);const me=await(await s.call('/api/auth/me','GET',undefined,auth.cookie)).json();assert.equal(me.user.email,'qa@example.invalid');s.advance(31*86400000);assert.equal((await(await s.call('/api/auth/me','GET',undefined,auth.cookie)).json()).user,null);}finally{s.close();}
 });

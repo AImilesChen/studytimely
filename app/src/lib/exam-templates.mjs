@@ -14,5 +14,5 @@ export function chaptersFromTemplate(template,makeId,now){return template.subjec
 // Reuse a personal outline without reusing record IDs, dates or exam progress.
 export function cloneOutline(plan,makeId,now){
  const active=plan.chapters.filter(c=>!c.deletedAt),ids=new Map(active.map(c=>[c.id,makeId()]));
- return active.map(c=>({...c,id:ids.get(c.id),parentId:c.parentId?ids.get(c.parentId)||'':'',done:false,targetDate:'',updatedAt:now,deletedAt:0}));
+ return active.map(c=>({...c,id:ids.get(c.id),parentId:c.parentId?ids.get(c.parentId)||'':'',done:false,needsReview:false,targetDate:'',updatedAt:now,deletedAt:0}));
 }

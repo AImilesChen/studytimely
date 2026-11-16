@@ -1,3 +1,4 @@
+import {SyllabusPage} from './SyllabusPage.jsx';
 import {useEffect,useMemo,useState} from 'react';
 import {Plus,Play,Trash,PencilSimple,BookOpen,ArrowLeft,ArrowRight} from '@phosphor-icons/react';
 import {Dialog} from './Dialog.jsx';
@@ -46,7 +47,8 @@ export {Planner} from './Planner.jsx';
 
 export {Habits} from './HabitsPage.jsx';
 
-export function Syllabus({store,now,onStart,confirm,countdownOnly=false}){
+export function Syllabus(props){return props.countdownOnly?<ExamCountdown {...props}/>:<SyllabusPage {...props}/>;}
+function ExamCountdown({store,now,onStart,confirm,countdownOnly=true}){
  const editor=useEditor(store),plans=alive(store.data.workspace?.plans),[selected,setSelected]=useState(''),[timer,setTimer]=useState('study');const plan=plans.find(p=>p.id===selected)||plans[0];
  const progress=plan?chapterProgress(plan):{total:0,done:0},template=EXAM_TEMPLATES.find(t=>t.id===plan?.templateId);
  const chapters=alive(plan?.chapters),ordered=chapters.filter(c=>!c.parentId).flatMap(c=>[c,...chapters.filter(x=>x.parentId===c.id)]);
