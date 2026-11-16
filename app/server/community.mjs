@@ -1,6 +1,7 @@
 import {ApiError,fail,result,body,identity,rateLimit,randomToken} from './auth-shared.mjs';
-import {COMMUNITY,utcDay,weekStart,nickname,cleanText,roomInput,creditWindow,communityRules} from '../src/lib/community-model.mjs';
+import {COMMUNITY,utcDay,nickname,cleanText,roomInput,creditWindow,communityRules} from '../src/lib/community-model.mjs';
 import {reviewConfiguration,enforceLocalContent,reviewChat} from './chat-review.mjs';
+import {publicRanking,personalRanking} from './leaderboard.mjs';
 const uuid=value=>typeof value==='string'&&/^[a-f0-9-]{36}$/.test(value);
 const admins=env=>(env.COMMUNITY_ADMIN_EMAILS||'').toLowerCase().split(/[\s,;]+/).filter(Boolean);
 const q=(env,sql,...args)=>env.DB.prepare(sql).bind(...args);
@@ -171,12 +172,10 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
     if(input.action==='remove'&&report.subject_id===report.owner_id){statements.push(q(env,'UPDATE community_rooms SET closed_at=?,invitations_open=0,round_ends_at=0,version=version+1 WHERE id=?',at,report.room_id),q(env,"UPDATE community_timers SET status='paused' WHERE room_id=?",report.room_id));}
     await env.DB.batch(statements);await signal(report.room_id);return result({reviewed:true});
    }
-   if(path==='/leaderboard'&&method==='GET'){
-    const period=['today','week','streak'].includes(url.searchParams.get('period'))?url.searchParams.get('period'):'today';let list;
-    if(period==='streak')list=await rows(q(env,`WITH days AS (SELECT d.profile_id,CAST(julianday(?)-julianday(d.day) AS INTEGER) AS gap,ROW_NUMBER() OVER(PARTITION BY d.profile_id ORDER BY d.day DESC)-1 AS idx FROM community_daily d JOIN community_profiles p ON p.id=d.profile_id WHERE p.public_ranking=1 AND d.seconds>=60 AND d.day<=?),groups AS (SELECT *,MIN(gap) OVER(PARTITION BY profile_id) AS base FROM days),counts AS (SELECT profile_id,count(*) AS score FROM groups WHERE base<=1 AND gap-idx=base GROUP BY profile_id) SELECT p.id,p.nickname,c.score FROM counts c JOIN community_profiles p ON p.id=c.profile_id ORDER BY c.score DESC,p.id LIMIT 100`,day,day));
-    else list=await rows(q(env,`SELECT p.id,p.nickname,SUM(d.seconds) AS score FROM community_daily d JOIN community_profiles p ON p.id=d.profile_id WHERE p.public_ranking=1 AND d.day>=? AND d.day<=? GROUP BY p.id,p.nickname HAVING score>0 ORDER BY score DESC,p.id LIMIT 100`,period==='week'?weekStart(at):day,day));
-    let rank=0,last=null;return result({period,rows:list.map((r,i)=>{if(r.score!==last)rank=i+1;last=r.score;return {...r,rank};}),rules:communityRules(),day});
+   if(path==='/leaderboard/me'&&method==='GET'){
+    requireUser();return result(await personalRanking(env,url.searchParams.get('period'),at,profile));
    }
+   if(path==='/leaderboard'&&method==='GET')return result({...await publicRanking(env,url.searchParams.get('period'),at),rules:communityRules()});
    if(path.startsWith('/timer')&&method==='POST'){
     requireProfile();const input=await body(request);await rateLimit(env,'timer',profile.id,400,3600000,at);
     if(path==='/timer/start'){

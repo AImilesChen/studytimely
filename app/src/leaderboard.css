@@ -1,0 +1,172 @@
+.leaderboard-page{padding-top:120px;padding-bottom:64px;min-width:0}
+.lb-breadcrumb{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:13px;margin-bottom:28px}
+.lb-heading{display:flex;align-items:center;justify-content:space-between;gap:32px;margin-bottom:32px}
+.lb-heading h1{font-size:clamp(34px,3.4vw,48px);line-height:1.15;letter-spacing:-.045em;margin:14px 0 16px}
+.lb-heading p{font-size:18px;line-height:1.65;color:var(--muted);max-width:60ch;margin:0}
+.lb-heading>.button{flex-shrink:0;min-height:48px}
+.lb-personal,.lb-board,.lb-history{border:1px solid var(--line);border-radius:22px;padding:28px;margin:0 0 24px;min-width:0}
+.lb-personal{display:grid;grid-template-columns:minmax(0,1.5fr) auto;gap:22px 32px;background:var(--surface)}
+.lb-personal:has(.lb-personal-stats){grid-template-columns:minmax(0,1.2fr) minmax(230px,.8fr) auto}
+.lb-personal-intro{display:flex;align-items:flex-start;gap:16px;min-width:0}
+.lb-icon{display:flex;border:1px solid var(--line);border-radius:50%;padding:11px;flex-shrink:0}
+.lb-personal h2,.lb-section-head h2{font-size:22px;line-height:1.3;margin:0 0 10px;letter-spacing:-.025em}
+.lb-personal p,.lb-history>p{font-size:16px;line-height:1.7;color:var(--muted);margin:0;max-width:72ch}
+.lb-personal strong{color:var(--fg)}
+.lb-personal-actions{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:14px}
+.lb-personal-actions>a:not(.button){display:inline-flex;gap:7px;align-items:center;font-size:14px}
+.lb-personal-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:0;align-self:center}
+.lb-personal-stats dt{font-size:13px;color:var(--muted);margin-bottom:9px}
+.lb-personal-stats dd{font-size:clamp(22px,2vw,30px);line-height:1.2;letter-spacing:-.035em;margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.lb-personal>.lb-footnote{grid-column:1/-1;border-top:1px solid var(--line);padding-top:16px;max-width:none}
+.lb-section-head{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:24px}
+.lb-section-head p{font-size:14px;line-height:1.6;color:var(--muted);margin:0}
+.lb-board-actions{display:flex;align-items:center;gap:20px;font-size:14px;flex-shrink:0}
+.lb-board-actions .button{gap:8px;min-height:44px}
+.lb-periods{display:flex;gap:6px;border:1px solid var(--line);border-radius:14px;padding:5px;width:fit-content;max-width:100%;margin-bottom:18px}
+.lb-periods button{border:0;border-radius:10px;padding:12px 22px;min-height:44px;background:transparent;color:var(--muted);font:inherit;cursor:pointer}
+.lb-periods button[aria-selected=true]{background:var(--button);color:var(--button-text);font-weight:600}
+.lb-period-meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.lb-period-meta p,.lb-reset{font-size:13px;line-height:1.7;color:var(--muted);margin:0}
+.lb-reset{margin-bottom:24px}.lb-reset span{display:block}
+.lb-empty{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:38px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;min-height:235px}
+.lb-empty h3{font-size:22px;margin:0;letter-spacing:-.025em}
+.lb-empty p{font-size:16px;line-height:1.75;color:var(--muted);max-width:62ch;margin:0}
+.lb-empty>a:not(.button){font-size:14px}
+.lb-search-row{display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid var(--line);padding:20px 0}
+.lb-search{display:flex;align-items:center;gap:10px;min-width:0;max-width:390px;width:100%;border:1px solid var(--line);border-radius:10px;padding:0 14px}
+.lb-search input{font:inherit;font-size:15px;width:100%;min-width:0;padding:13px 0;border:0;background:transparent;color:var(--fg)}
+.lb-search:focus-within{outline:2px solid var(--fg);outline-offset:3px}.lb-search input:focus{outline:none}
+.lb-search-row p{font-size:13px;color:var(--muted);line-height:1.7;margin:0}
+.community .lb-table{width:100%;table-layout:fixed}
+.community .lb-table :is(td,th){padding:18px 14px;font-size:16px}
+.lb-table th:first-child,.lb-table td:first-child{width:100px}
+.community .lb-table thead th{font-size:13px;color:var(--muted);font-weight:500}
+.lb-table th:last-child,.lb-table td:last-child{width:220px;text-align:right;font-variant-numeric:tabular-nums}
+.lb-table tbody th{font-weight:500;overflow-wrap:anywhere}
+.lb-rank-medal{display:inline-flex;align-items:center;gap:8px}
+.lb-your-row{background:var(--surface)}
+.lb-you{font-size:12px;border:1px solid var(--line);padding:3px 7px;border-radius:6px;margin-left:10px;white-space:nowrap}
+.lb-pagination{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:24px;font-size:14px}
+.lb-footnote{font-size:13px;line-height:1.75;color:var(--muted);margin:20px 0 0}
+.lb-history>p+.lb-footnote{margin-top:16px;font-size:13px}
+.lb-history-list summary{padding:12px 0;cursor:pointer;font-size:16px;font-weight:600}
+.lb-history-list th{font-weight:500}
+.lb-notice{font-size:15px;line-height:1.7;padding:18px;border:1px solid var(--line);border-radius:12px;overflow-wrap:anywhere}
+.lb-profile-dialog{width:min(580px,calc(100% - 32px))}
+.lb-profile-form{display:grid;gap:18px;min-width:0}
+.lb-profile-form p{font-size:14px;line-height:1.75;color:var(--muted);margin:0}
+.lb-choice{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.7}
+.lb-choice input{width:18px;height:18px;flex-shrink:0;margin:4px 0 0;accent-color:var(--button)}
+.lb-dialog-actions{display:flex;justify-content:flex-end;gap:12px;border-top:1px solid var(--line);padding-top:20px}
+.lb-guide{margin-top:64px;border-top:1px solid var(--line);padding-top:44px;font-size:18px;line-height:1.85;min-width:0}
+.lb-guide h2{font-size:clamp(25px,2.4vw,32px);line-height:1.3;letter-spacing:-.03em;margin:0 0 24px}
+.lb-guide h3{font-size:20px;line-height:1.5;margin:0 0 12px}
+.lb-guide p{max-width:80ch;margin:0 0 20px;color:var(--muted)}
+.lb-guide section{margin-top:56px;scroll-margin-top:35px}
+.lb-guide li{max-width:80ch;margin-bottom:18px;color:var(--muted);padding-left:8px}
+.lb-guide strong{color:var(--fg)}
+.lb-steps{padding-left:24px;margin:0 0 24px}
+.lb-guide-contents{display:flex;flex-wrap:wrap;gap:14px 24px;border-block:1px solid var(--line);padding:22px 0;margin-top:28px;font-size:14px;line-height:1.6}
+.lb-guide-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+.lb-comparison{overflow:auto;margin:24px 0 28px}
+.lb-comparison table{font-size:16px;line-height:1.75}
+.lb-comparison caption{text-align:left;font-weight:600;margin-bottom:15px}
+.lb-comparison th{font-weight:500;width:38%}.lb-comparison th,.lb-comparison td{vertical-align:top}
+.lb-faq details{border-bottom:1px solid var(--line);padding:0}
+.community .lb-faq summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:18px;line-height:1.5;padding:24px 0;cursor:pointer}
+.lb-faq summary::-webkit-details-marker{display:none}.lb-faq summary span{font-size:24px;font-weight:400;flex-shrink:0}.lb-faq details[open] summary span{transform:rotate(45deg)}
+.lb-faq details p{margin:0 0 24px}
+.lb-related{display:flex;flex-wrap:wrap;gap:20px 32px;border-top:1px solid var(--line);margin-top:48px;padding-top:28px;font-size:15px}
+.lb-related a{display:inline-flex;align-items:center;gap:10px}
+.leaderboard-page :is(button,a,input,summary,[role=tabpanel]):focus-visible{outline:2px solid var(--fg);outline-offset:4px}
+@media(max-width:1050px){.lb-personal:has(.lb-personal-stats){grid-template-columns:minmax(0,1.3fr) minmax(220px,1fr)}.lb-personal:has(.lb-personal-stats) .lb-personal-actions{grid-column:1/-1;flex-direction:row;align-items:center}.lb-guide-columns{gap:24px}}
+@media(max-width:650px){
+ .leaderboard-page{padding-top:104px;padding-bottom:44px}
+ .lb-breadcrumb{margin-bottom:22px}.lb-heading{display:block;margin-bottom:28px}.lb-heading h1{font-size:34px}.lb-heading p{font-size:16px}.lb-heading>.button{margin-top:22px}
+ .lb-personal,.lb-board,.lb-history{border-radius:16px;padding:20px;margin-bottom:20px}
+ .lb-personal,.lb-personal:has(.lb-personal-stats){grid-template-columns:minmax(0,1fr);gap:22px}
+ .lb-personal-intro{gap:12px}.lb-icon{padding:9px}.lb-personal h2,.lb-section-head h2{font-size:21px}
+ .lb-personal-actions,.lb-personal:has(.lb-personal-stats) .lb-personal-actions{flex-direction:column;align-items:flex-start;gap:16px}
+ .lb-personal-stats{padding-block:18px;border-block:1px solid var(--line);gap:16px}
+ .lb-personal-stats dd{font-size:26px}.lb-personal p{font-size:15px}.lb-personal>.lb-footnote{font-size:13px}
+ .lb-section-head{align-items:flex-start;flex-direction:column;gap:18px}.lb-board-actions{justify-content:space-between;width:100%}
+ .lb-periods{width:100%;gap:2px;padding:4px}.lb-periods button{padding:11px 6px;flex:1;font-size:13px}
+ .lb-period-meta{display:block}.lb-period-meta p+p{margin-top:5px}.lb-reset{margin-bottom:20px;font-size:12px}
+ .lb-empty{padding:30px 0}.lb-empty h3{font-size:21px}.lb-empty p{font-size:15px}
+ .lb-search-row{flex-direction:column;align-items:flex-start;gap:12px}.lb-search{box-sizing:border-box}
+ .community .lb-table :is(td,th){padding:16px 6px;font-size:14px}.lb-table th:first-child,.lb-table td:first-child{width:43px}.lb-table th:last-child,.lb-table td:last-child{width:90px}.lb-rank-medal{gap:3px}.lb-rank-medal svg{width:13px}.lb-you{display:table;margin:5px 0 0}
+ .lb-pagination{gap:12px}.lb-pagination .button{padding:10px 12px;min-height:44px}
+ .lb-guide{font-size:16px;margin-top:44px;padding-top:32px}.lb-guide h2{font-size:25px}.lb-guide h3{font-size:20px}.lb-guide section{margin-top:40px}.lb-guide-columns{grid-template-columns:1fr;gap:8px}.lb-guide-contents{gap:14px 20px}
+ .lb-comparison table{font-size:14px;line-height:1.7}.community .lb-comparison :is(th,td){padding:14px 8px}.lb-comparison th{width:40%}
+ .community .lb-faq summary{font-size:16px;padding:22px 0}.lb-related{gap:20px;font-size:14px}
+}
+
+/* Outrank the shared management defaults without changing other tools. */
+.app .workspace.management.leaderboard-page{padding-top:110px;padding-bottom:64px}
+.leaderboard-page .lb-breadcrumb{margin-bottom:20px}
+.leaderboard-page .lb-heading{margin-bottom:26px}
+.leaderboard-page .lb-heading h1{font-size:40px;line-height:1.2;margin:0 0 12px;max-width:none}
+.leaderboard-page .lb-heading p{font-size:18px;max-width:64ch}
+.leaderboard-page .lb-personal{padding:22px 26px}
+.leaderboard-page .lb-personal h2,.leaderboard-page .lb-section-head h2{font-size:22px;line-height:1.3;margin:0 0 10px}
+.leaderboard-page .lb-guide h2{font-size:clamp(25px,2.4vw,32px);line-height:1.3;margin:0 0 24px}
+.leaderboard-page .lb-guide h3{font-size:20px;line-height:1.5;margin:0 0 12px}
+@media(max-width:650px){.app .workspace.management.leaderboard-page{padding-top:104px;padding-bottom:44px}.leaderboard-page .lb-heading h1{font-size:34px}.leaderboard-page .lb-heading p{font-size:16px}.leaderboard-page .lb-personal{padding:20px}.leaderboard-page .lb-personal h2,.leaderboard-page .lb-section-head h2{font-size:21px}.leaderboard-page .lb-guide h2{font-size:25px}}
+
+/* Keep the standings visible before account setup and long explanations. */
+.leaderboard-page .lb-breadcrumb{margin-bottom:12px}
+.leaderboard-page .lb-heading{margin-bottom:20px}
+.leaderboard-page .lb-heading h1{font-size:38px;line-height:1.2;margin-bottom:10px}
+.leaderboard-page .lb-heading p{font-size:16px}
+.lb-preview-note{font-size:12px;line-height:1.6;color:var(--muted);margin:0 0 12px;padding-left:10px;border-left:2px solid var(--line)}
+.leaderboard-page .lb-board{padding:22px 26px}
+.lb-board .lb-section-head{margin-bottom:16px}
+.lb-board .lb-periods{margin-bottom:12px}
+.lb-board .lb-period-meta{margin-bottom:16px}
+.lb-podium{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:18px;align-items:end;max-width:860px;margin:0 auto 24px;padding:0;list-style:none}
+.lb-podium-place{--medal:#a8afb9;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;min-width:0;min-height:164px;padding:16px 18px;border:1px solid color-mix(in srgb,var(--medal) 33%,var(--line));border-radius:18px;background:linear-gradient(160deg,color-mix(in srgb,var(--medal) 6%,var(--surface)),var(--surface))}
+.lb-podium-place-1{--medal:#c4a65d;order:2;min-height:190px;border-color:color-mix(in srgb,var(--medal) 62%,var(--line));background:linear-gradient(160deg,color-mix(in srgb,var(--medal) 12%,var(--surface)),var(--surface))}
+.lb-podium-place-2{order:1}.lb-podium-place-3{--medal:#b98d73;order:3}
+.lb-place-label{font-size:12px;font-weight:600;letter-spacing:.035em;color:var(--muted)}
+.lb-podium-emblem{display:block;width:104px;height:104px;flex-shrink:0;object-fit:contain}
+.lb-podium-place-1 .lb-podium-emblem{width:124px;height:124px}
+.lb-rank-number{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;border:1px solid var(--line);border-radius:7px;background:var(--surface);font-weight:600;font-variant-numeric:tabular-nums}
+.lb-podium-name{display:block;font-size:18px;line-height:1.3;max-width:100%;overflow-wrap:anywhere}
+.lb-podium-score{font-size:25px;line-height:1.15;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.025em;overflow-wrap:anywhere}
+.lb-podium-open .lb-podium-name{font-size:17px;font-weight:500;color:var(--muted)}
+.lb-podium-open .lb-podium-score{color:var(--muted);font-weight:400}
+.lb-board-message{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:14px;line-height:1.7;color:var(--muted);margin:12px 0 20px}
+.lb-board-message p{margin:0;flex-basis:100%}
+.lb-table{border-top:1px solid var(--line)}
+.community .lb-table :is(td,th){padding-block:14px}
+.community .lb-table .lb-table-status{padding:22px 14px;font-size:14px;text-align:left;color:var(--muted)}
+.lb-vacancy-note{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 22px;border-top:1px solid var(--line);padding-top:22px;font-size:14px;line-height:1.7;color:var(--muted);margin:18px 0 0;text-align:center}
+.lb-vacancy-note p{margin:0}.lb-vacancy-note a{display:inline-flex;align-items:center;gap:8px}
+.leaderboard-page .lb-reset{font-size:13px;margin:18px 0 0;color:var(--muted)}
+.leaderboard-page .lb-reset summary{font-size:13px;font-weight:500;padding:8px 0;cursor:pointer;width:fit-content}
+.lb-reset p{font-size:13px;line-height:1.7;margin:6px 0 0}
+.lb-board .lb-footnote{margin-top:12px}
+@media(max-width:650px){
+ .leaderboard-page .lb-heading h1{font-size:32px}.leaderboard-page .lb-heading>.button{display:none}
+ .leaderboard-page .lb-board{padding:18px 16px}
+ .lb-board .lb-section-head{flex-direction:row;align-items:center;gap:10px;margin-bottom:14px}
+ .lb-board .lb-section-head h2{font-size:18px;margin:0}.lb-board .lb-section-head p{display:none}
+ .lb-board .lb-board-actions{width:auto;gap:0}.lb-board .lb-board-actions>a{display:none}.lb-board .lb-board-actions .button{padding:10px;font-size:13px}
+ .lb-board .lb-period-meta{font-size:12px;margin-bottom:16px}.lb-board .lb-period-meta p{font-size:12px}
+ .lb-podium{gap:7px;margin-bottom:20px;grid-template-columns:1fr 1.1fr 1fr}
+ .lb-podium-place{min-height:135px;padding:12px 7px;gap:8px;border-radius:12px}.lb-podium-place-1{min-height:153px}
+ .lb-place-label{font-size:11px;letter-spacing:0}.lb-podium .lb-podium-emblem{width:64px;height:64px}.lb-podium .lb-podium-place-1 .lb-podium-emblem{width:76px;height:76px}
+ .lb-podium-name,.lb-podium-open .lb-podium-name{font-size:14px;line-height:1.3}.lb-podium-score{font-size:18px}
+ .community .lb-table :is(td,th){padding-block:12px}
+ .lb-vacancy-note{font-size:13px}.lb-board .lb-footnote{font-size:12px}
+}
+
+@media(min-width:651px) and (max-height:600px){
+ .app .workspace.management.leaderboard-page{padding-top:90px}
+ .leaderboard-page .lb-breadcrumb{display:none}
+ .leaderboard-page .lb-heading{margin-bottom:16px}.leaderboard-page .lb-heading h1{font-size:32px;margin-bottom:6px}.leaderboard-page .lb-heading p{font-size:14px}
+ .leaderboard-page .lb-board{padding:16px 20px}.lb-board .lb-section-head{margin-bottom:12px}.lb-board .lb-section-head h2{margin:0}.lb-board .lb-section-head p{display:none}
+ .lb-board .lb-periods{margin-bottom:10px}.lb-periods button{padding:9px 18px;min-height:40px}.lb-board .lb-period-meta{margin-bottom:10px}
+ .lb-podium{max-width:700px;margin-bottom:16px}.lb-podium-place{min-height:112px;padding:10px 14px;gap:5px}.lb-podium-place-1{min-height:132px}
+ .lb-podium .lb-podium-emblem{width:60px;height:60px}.lb-podium .lb-podium-place-1 .lb-podium-emblem{width:70px;height:70px}.lb-podium-name,.lb-podium-open .lb-podium-name{font-size:15px}.lb-podium-score{font-size:21px}
+}
