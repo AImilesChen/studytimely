@@ -1,7 +1,7 @@
 import {validateBackup} from './model.mjs';
 import {mergeWorkspace} from './workspace.mjs';
 export function mergeBackups(local,cloud){
- const a=validateBackup(local),b=validateBackup(cloud),workspace=mergeWorkspace(a.workspace,b.workspace);
+ const a=validateBackup(local),b=validateBackup(cloud),workspace=mergeWorkspace(local.workspace,cloud.workspace);
  const records=new Map(b.sessions.map(s=>[s.id,s]));for(const s of a.sessions)records.set(s.id,s);
  const preference=!a.preferences?b.preferences:!b.preferences?a.preferences:a.preferences.updatedAt>=b.preferences.updatedAt?a.preferences:b.preferences;
  const subjects=[...a.subjects];for(const s of b.subjects)if(!subjects.some(v=>v.toLowerCase()===s.toLowerCase()))subjects.push(s);

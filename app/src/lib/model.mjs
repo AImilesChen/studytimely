@@ -202,7 +202,7 @@ export function transition(previous,action,{now,owner,id}){
  case 'delete':state.sessions=state.sessions.filter(s=>s.id!==action.recordId);state.workspace.deletedSessions[action.recordId]=now;event='deleted';break;
  case 'import':{
    if(hasProgress(state.timer))fail('BUSY','Finish or reset the current timer before importing.');
-   const data=validateBackup(action.backup);if(action.applyPreferences&&data.preferences){state.settings=validateSettings({...state.settings,...data.preferences.values});state.preferencesUpdatedAt=data.preferences.updatedAt;}state.workspace=mergeWorkspace(state.workspace,data.workspace);const seen=new Set(state.sessions.map(s=>s.id));
+   const data=validateBackup(action.backup);if(action.applyPreferences&&data.preferences){state.settings=validateSettings({...state.settings,...data.preferences.values});state.preferencesUpdatedAt=data.preferences.updatedAt;}state.workspace=mergeWorkspace(state.workspace,action.backup.workspace);const seen=new Set(state.sessions.map(s=>s.id));
    state.sessions.push(...data.sessions.filter(s=>!seen.has(s.id)));
    state.sessions=state.sessions.filter(s=>!Object.hasOwn(state.workspace.deletedSessions,s.id));
    state.sessions.sort((a,b)=>b.endedAt-a.endedAt);

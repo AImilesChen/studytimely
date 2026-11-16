@@ -2,8 +2,9 @@ import {DomainError,dayKey,dailyTotals,hasProgress,makeTimer,validateSettings} f
 import {validateHabit,habitSave,habitCheck,mergeHabit,habitSummary,habitPolicy} from './habits.mjs';
 import {parseSyllabusOutline,materialiseOutline,syllabusLeaves} from './syllabus.mjs';
 import {BLOCK_KINDS,blockConflicts,conflictMessage,scheduleDraftDays} from './schedule.mjs';
+import {migrateExams,validateExam} from './exams.mjs';
 
-export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],weeklyGoal:0,deletedSessions:Object.create(null)});
+export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],examVersion:1,exams:[],weeklyGoal:0,deletedSessions:Object.create(null)});
 const invalid=message=>{throw new DomainError('INVALID',message);};
 export const alive=items=>(items||[]).filter(x=>!x.deletedAt);
 const text=(v,max=140,optional=false)=>{if(typeof v!=='string'||v.length>max||(!optional&&!v.trim()))invalid(`Enter text from ${optional?0:1} to ${max} characters.`);return v.trim();};
@@ -30,14 +31,16 @@ export function validateWorkspace(input){
  const deletedSessions=Object.create(null);if(!input.deletedSessions||typeof input.deletedSessions!=='object')input={...input,deletedSessions:{}};
  if(Object.keys(input.deletedSessions).length>50000)invalid('Too many deletion markers.');
  for(const [id,t]of Object.entries(input.deletedSessions)){identifier(id);deletedSessions[id]=stamp(t);}
- return{tasks,habits,plans,blocks,weeklyGoal:number(input.weeklyGoal||0,0,10080),goalUpdatedAt:input.goalUpdatedAt?stamp(input.goalUpdatedAt):0,deletedSessions};
+ let exams;try{exams=migrateExams(input,plans);}catch(e){invalid(e.message);}
+ return{tasks,habits,plans,blocks,examVersion:1,exams,weeklyGoal:number(input.weeklyGoal||0,0,10080),goalUpdatedAt:input.goalUpdatedAt?stamp(input.goalUpdatedAt):0,deletedSessions};
 }
 function choose(a,b){if(!a)return b;if(!b)return a;const at=Math.max(a.updatedAt,a.deletedAt||0),bt=Math.max(b.updatedAt,b.deletedAt||0);return bt>at?b:bt<at?a:JSON.stringify(a)>JSON.stringify(b)?a:b;}
 function mergeItems(a,b,extra){const map=new Map(a.map(x=>[x.id,x]));for(const item of b){const previous=map.get(item.id);map.set(item.id,extra&&previous?extra(previous,item):choose(previous,item));}return[...map.values()];}
 export function mergeWorkspace(a,b){
+ const modernA=a?.examVersion===1,modernB=b?.examVersion===1;
  a=validateWorkspace(a);b=validateWorkspace(b);
  const result={
-  tasks:mergeItems(a.tasks,b.tasks),blocks:mergeItems(a.blocks,b.blocks),
+  tasks:mergeItems(a.tasks,b.tasks),blocks:mergeItems(a.blocks,b.blocks),examVersion:1,exams:mergeItems(a.exams,b.exams,(x,y)=>modernA&&!modernB?x:modernB&&!modernA?y:choose(x,y)),
   habits:mergeItems(a.habits,b.habits,(x,y)=>mergeHabit(x,y,choose)),
   plans:mergeItems(a.plans,b.plans,(x,y)=>{const winner=choose(x,y),modern=x.syllabusVersion===2||y.syllabusVersion===2;return {...winner,...(modern?{syllabusVersion:2,nextChapterId:winner.syllabusVersion===2?winner.nextChapterId:(x.syllabusVersion===2?x:y).nextChapterId}:{}),chapters:mergeItems(x.chapters,y.chapters,(c,d)=>{const chosen=choose(c,d);return {...chosen,needsReview:winner.syllabusVersion!==2&&modern?(x.syllabusVersion===2?c:d).needsReview:chosen.needsReview};})};}),
   weeklyGoal:b.goalUpdatedAt>a.goalUpdatedAt?b.weeklyGoal:a.weeklyGoal,goalUpdatedAt:Math.max(a.goalUpdatedAt,b.goalUpdatedAt),
@@ -62,7 +65,32 @@ export function workspaceAction(state,action,{id,now,owner}){
   state.settings=validateSettings({...state.settings,subject,...(mode==='focus'?{focusSeconds:minutes*60}:mode==='pomodoro'?{studyMinutes:minutes}:{})});
   state.timer=makeTimer(mode,state.settings,id,now,owner);
  }
- else if(type==='plan-save')upsert('plans',{title:action.title,examDate:action.examDate||'',templateId:action.templateId||'',templateSource:action.templateSource||'',syllabusVersion:2,nextChapterId:w.plans.find(x=>x.id===action.itemId)?.nextChapterId||'',subjects:action.subjects||w.plans.find(x=>x.id===action.itemId)?.subjects||[],chapters:action.chapters||w.plans.find(x=>x.id===action.itemId)?.chapters||[]});
+ else if(type==='exam-save'){
+  const old=action.itemId?w.exams.find(x=>x.id===action.itemId&&!x.deletedAt):null;
+  if(action.planId&&!alive(w.plans).some(p=>p.id===action.planId)&&action.planId!==old?.planId)invalid('Choose a current syllabus.');
+  if(action.scope==='selected'){
+   const p=alive(w.plans).find(p=>p.id===action.planId),chapters=alive(p?.chapters);
+   if(!p||!(action.topicIds||[]).every(topic=>chapters.some(c=>c.id===topic)||(old?.planId===p.id&&old.topicIds.includes(topic))))invalid('Choose current chapters or topics.');
+  }
+  upsert('exams',{title:action.title,date:action.date,subject:action.subject||'',planId:action.planId||'',scope:action.scope||'all',topicIds:action.topicIds||[],time:action.time||'',zone:action.time?action.zone:'',fold:action.time?action.fold||'':'',location:action.location||'',notes:action.notes||'',status:old?.status||'upcoming',archived:old?.archived||false});
+  const e=state.workspace.exams.find(e=>e.id===(old?.id||id));
+  // The old syllabus date is a compatibility mirror of its one migrated event only.
+  if(e.id==='legacy:'+e.planId){const p=state.workspace.plans.find(p=>p.id===e.planId);if(p){p.examDate=e.date;p.updatedAt=now;}}
+ }
+ else if(type==='exam-status'){
+  const e=w.exams.find(e=>e.id===action.itemId&&!e.deletedAt);if(!e)invalid('This exam no longer exists.');
+  if(action.expectedUpdatedAt!==e.updatedAt)invalid('This exam changed in another tab. Reopen it before saving.');
+  if(action.status!==undefined)e.status=action.status;if(action.archived!==undefined)e.archived=action.archived;e.updatedAt=now;
+ }
+ else if(type==='plan-save'){
+  const previous=w.plans.find(x=>x.id===action.itemId),examDate=action.examDate===undefined?(previous?.examDate||''):action.examDate;
+  upsert('plans',{title:action.title,examDate,templateId:action.templateId||'',templateSource:action.templateSource||'',syllabusVersion:2,nextChapterId:previous?.nextChapterId||'',subjects:action.subjects||previous?.subjects||[],chapters:action.chapters||previous?.chapters||[]});
+  if(examDate!==(previous?.examDate||'')){
+   const plan=state.workspace.plans.find(p=>p.id===(action.itemId||id)),legacyId='legacy:'+plan.id,old=state.workspace.exams.find(e=>e.id===legacyId);
+   if(examDate){const event=validateExam({...old,id:legacyId,title:old?.title||plan.title,date:examDate,planId:plan.id,subject:old?.subject||(plan.subjects.length===1?plan.subjects[0]:''),updatedAt:now,deletedAt:0});state.workspace.exams=old?state.workspace.exams.map(e=>e.id===legacyId?event:e):[...state.workspace.exams,event];}
+   else if(old){old.updatedAt=now;old.deletedAt=now;}
+  }
+ }
  else if(type==='chapter-save'){
   const plan=w.plans.find(x=>x.id===action.planId&&!x.deletedAt);if(!plan)invalid('Choose an exam plan.');
   const old=action.itemId?plan.chapters.find(c=>c.id===action.itemId&&!c.deletedAt):null;if(action.itemId&&!old)invalid('That chapter no longer exists.');
@@ -94,10 +122,12 @@ export function workspaceAction(state,action,{id,now,owner}){
   plan.nextChapterId=action.chapterId||'';plan.syllabusVersion=2;plan.updatedAt=now;
  }
  else if(type==='workspace-delete'){
-  if(!['tasks','habits','plans','blocks','chapters'].includes(action.collection))invalid('Choose a supported item.');
+  if(!['tasks','habits','plans','blocks','chapters','exams'].includes(action.collection))invalid('Choose a supported item.');
   const list=action.collection==='chapters'?w.plans.find(p=>p.id===action.planId)?.chapters:w[action.collection];
   const item=list?.find(x=>x.id===action.itemId&&!x.deletedAt);if(!item)invalid('That item no longer exists.');
+  if(action.collection==='exams'&&action.expectedUpdatedAt!==item.updatedAt)invalid('This exam changed in another tab. Reopen it before deleting.');
   item.deletedAt=now;item.updatedAt=now;
+  if(action.collection==='exams'&&item.id==='legacy:'+item.planId){const p=w.plans.find(p=>p.id===item.planId);if(p){p.examDate='';p.updatedAt=now;}}
   if(action.collection==='chapters'){const plan=w.plans.find(p=>p.id===action.planId);if(plan)plan.updatedAt=now;}
   if(action.collection==='chapters')for(const child of list.filter(c=>c.parentId===item.id)){child.deletedAt=now;child.updatedAt=now;}
  }
