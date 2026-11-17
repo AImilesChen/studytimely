@@ -14,7 +14,7 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  if(path.startsWith('/api/community/'))return communityApi(request,env,config.communityEnabled===true,ctx);
  if(accountPaths.has(path))return accountApi(request,env,config.accountsEnabled===true);
  const headers={'X-Content-Type-Options':'nosniff','Referrer-Policy':['/study-groups','/leaderboard','/account'].includes(path)?'no-referrer':'strict-origin-when-cross-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'};
- if(!config.indexable||path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')))headers['X-Robots-Tag']='noindex, nofollow';
+ if(!config.indexable||path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity')))headers['X-Robots-Tag']='noindex, nofollow';
  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{...headers,Allow:'GET, HEAD'}});
  if(config.origin){
   const primary=new URL(config.origin);
@@ -35,7 +35,7 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  const out=new Headers(response.headers);for(const [key,value] of Object.entries(headers))out.set(key,value);
  if(path==='/analytics-frame.html'||path==='/analytics-frame.js'||missing)out.set('X-Robots-Tag','noindex, nofollow');
  if(path.startsWith('/assets/')||musicAsset)out.set('Cache-Control','public, max-age=31536000, immutable');else out.set('Cache-Control','no-cache');
- if(path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')))out.set('Cache-Control','no-store');
+ if(path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity')))out.set('Cache-Control','no-store');
  const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com":'';
  out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${config.communityEnabled&&path==='/study-groups'?' '+(url.protocol==='https:'?'wss://':'ws://')+url.host:''}${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});

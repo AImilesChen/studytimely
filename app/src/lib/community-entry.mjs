@@ -1,5 +1,9 @@
 export const COMMUNITY_ENTRY_KEY='studytimely-community-entry';
 const lifetime=10*60*1000;
+const roomId=value=>/^[a-f0-9-]{36}$/.test(value||'');
+export function initialRoomTarget(search,hasInvitation=false){const id=new URLSearchParams(search).get('room');return !hasInvitation&&roomId(id)?id:'';}
+export function activityRoomPath(id,current){const url=new URL(current),activity=url.searchParams.get('activity'),same=!url.searchParams.has('room')||url.searchParams.get('room')===id;return '/study-groups?room='+encodeURIComponent(id)+(same&&roomId(activity)?'&activity='+encodeURIComponent(activity):'');}
+export function roomActivityInvitation(origin,code,activity=''){const url=new URL('/study-groups',origin);url.searchParams.set('invite',code);if(roomId(activity))url.searchParams.set('activity',activity);return url.href;}
 export function invitationCode(value,origin='https://studytimely.com'){
  const text=String(value||'').trim();
  if(/^[A-Za-z0-9_-]{12,80}$/.test(text))return text;

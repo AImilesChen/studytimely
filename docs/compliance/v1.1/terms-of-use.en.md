@@ -1,6 +1,6 @@
 # Terms of Use
 
-Effective date: 2026-11-13. Last updated: 2026-11-14.
+Effective date: 2026-11-13. Last updated: 2026-11-17.
 
 ## 1. The service and operator
 
@@ -63,6 +63,8 @@ We will post an updated effective date when these Terms change and give appropri
 Please contact [support@studytimely.com](mailto:support@studytimely.com) about a concern. Applicable law determines your rights and the courts that may hear a dispute. These Terms do not remove mandatory protections available where you live, require mandatory arbitration, waive collective rights, or prevent complaints to a competent regulator.
 
 ## Community participation
+
+Owners may schedule, edit before starting, start, end or cancel study activities. Members register with a personal task, control their own activity timers and choose a self-reported completion result. Activity participation does not itself create study time; focus, connection checks, daily limits and existing room-credit rules still apply. Breaks and unverified gaps are excluded. Activity credit is part of the same room totals and is not added to global scores again. Private tasks and check-out notes are not published to other members. Standard study notices and activity titles remain usable when free-text review is unavailable; custom public activity titles require review. Activities send no email or push reminders. Closing a room ends its active activity and cancels scheduled ones. Download a summary if you need a copy beyond the activity retention period described in the Privacy Policy.
 
 Study groups and global rankings are optional and require a Google-linked account, a separate nickname and confirmation that you are at least 16, with parental permission where required. Anonymous visitors may view public rooms and opted-in rankings. Do not impersonate someone, publish another person's information, harass others, send spam, post unlawful or sexual exploitation content, or manipulate verified scores. Rooms are for study tasks, questions, progress and brief encouragement. Dating, sexual solicitation, threats, hateful or pornographic material, advertising, external links and exchanging contact details or social handles are not allowed. Do not put your school, contact details or sensitive personal information in room names, nicknames or chat. Rooms default to eight members, including the owner, and have a maximum of 24. Offline members retain their membership places.
 

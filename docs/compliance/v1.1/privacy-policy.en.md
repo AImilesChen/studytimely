@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: 2026-11-13. Last updated: 2026-11-14.
+Effective date: 2026-11-13. Last updated: 2026-11-17.
 
 ## 1. Who is responsible
 
@@ -37,6 +37,10 @@ Cloudflare D1 stores private accounts and cloud snapshots in an EU-jurisdiction 
 Sync is an explicit choice. Snapshots support up to 1 MiB; use JSON backup for larger histories. Sync keeps deletion markers and checks cloud versions to avoid silent overwrites. In Account you can download a cloud backup, export account data, clear the cloud snapshot, sign out or delete the account and all its sessions. Local records and downloaded files remain separate. Account and cloud data remain until you delete them or we need to restrict an account for security or legal reasons. Deletion removes them from the active database. Provider recovery copies may remain for up to 30 days and are not used as active accounts. Expired codes, sessions and rate-limit records cannot be used after expiry and are removed during subsequent sign-in housekeeping. If a recovery copy is restored, applicable deletion requests must be reapplied.
 
 ## Optional study groups, chat and rankings
+
+Room owners can schedule study activities with a subject, standard or reviewed custom title, chosen time zone, date, focus interval and optional break. Activity details, participant nicknames, selected subjects, timer-based participation, verified activity time and self-reported completion statuses are available to current room members, not anonymous visitors. Joining an activity explicitly saves a personal task on the server. Task text and optional check-out notes are available through the app only to their author’s authenticated account; they are not included in other members’ activity responses. Avoid putting sensitive information in these fields. Room subjects and preset pinned notices follow the room’s existing visibility. Starting an activity does not automatically start other members’ timers.
+
+Activity records, registrations, personal tasks and check-out notes are removed during daily housekeeping once the later of the scheduled date and actual start/end is more than 90 days old. A scheduled future activity is not removed merely because it was created 90 days ago. Account deletion removes that account’s participation and private notes; deleting a room owner also removes the owned rooms and their activities. Account exports include your own activity participation and activities you organise; a downloaded activity summary contains the member-visible summary and your own private task/notes, never another member’s private text. Downloaded copies remain under the recipient’s control. Private task and check-out text is checked locally for prohibited contacts and abuse but is not sent to the external content-review provider. Optional custom public activity titles require configured automatic review before sharing, using the same text-only Microsoft review path described below. Without it, standard activity titles and preset notices remain available while free-text chat sending stays paused.
 
 Participation is for users aged 16 and over and requires a Google-linked account plus explicit acceptance of the community rules. Anonymous visitors may browse public rooms and opted-in global rankings. Choose a nickname without your name, school, contact details or precise location. Public rooms expose their name, host nickname, member nicknames, online indicators and verified room-time totals to visitors. Private rooms require a valid invitation to join and member access to view; keep invitation codes confidential. Closing invitations or replacing the code prevents new joins but does not remove existing members. Room visibility cannot be changed from private to public.
 

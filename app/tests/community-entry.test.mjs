@@ -36,3 +36,12 @@ test('the public landing may index while invitation and room responses remain no
   assert.equal(response.headers.get('cache-control'),'no-store');
  }
 });
+import {initialRoomTarget,activityRoomPath,roomActivityInvitation} from '../src/lib/community-entry.mjs';
+test('activity invitations join before opening a private room and preserve the selected activity after joining',()=>{
+ const room=crypto.randomUUID(),activity=crypto.randomUUID(),other=crypto.randomUUID(),code='a'.repeat(24);
+ const link=new URL(roomActivityInvitation('https://studytimely.com',code,activity));assert.equal(link.searchParams.has('room'),false);assert.equal(link.searchParams.get('activity'),activity);
+ assert.equal(initialRoomTarget('?room='+room+'&invite='+code,true),'');assert.equal(initialRoomTarget('?room='+room,false),room);
+ assert.equal(activityRoomPath(room,link.href),'/study-groups?room='+room+'&activity='+activity);
+ assert.equal(activityRoomPath(other,'https://studytimely.com/study-groups?room='+room+'&activity='+activity),'/study-groups?room='+other);
+ assert.ok(!roomActivityInvitation('https://studytimely.com',code,'invalid').includes('activity='));
+});
