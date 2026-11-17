@@ -26,6 +26,10 @@ export async function groupPreview(request,env){
  if(!room){const id=crypto.randomUUID();await call('/rooms','POST',{id,name:'Preview study group',visibility:'private',capacity:4,goalMinutes:120});room=await env.DB.prepare('SELECT id,invite_token FROM community_rooms WHERE id=?').bind(id).first();}
  let activity=await env.DB.prepare("SELECT id FROM community_activities WHERE room_id=? ORDER BY CASE WHEN status='ended' THEN 0 WHEN status='running' THEN 1 WHEN status='scheduled' THEN 2 ELSE 3 END,created_at DESC LIMIT 1").bind(room.id).first();
  if(!activity){const id=crypto.randomUUID();await call('/rooms/'+room.id+'/activities','POST',{id,subject:'general',kind:'focus',...activityWall(at+15*60000,'UTC'),zone:'UTC',focusMinutes:25,breakMinutes:5});activity={id};}
+ if(env.FIXTURE_MEMBERS_QA==='true'&&role==='owner'){
+  const partner=await prepare('learner'),existing=await env.DB.prepare('SELECT 1 AS found FROM community_members WHERE room_id=? AND profile_id=?').bind(room.id,partner.profileId).first();
+  if(!existing){const response=await api(new Request(url.origin+'/api/community/rooms/'+room.id+'/join',{method:'POST',headers:{origin:url.origin,'Content-Type':'application/json',cookie:partner.session.cookie.split(';')[0],'X-CSRF-Token':partner.session.csrf},body:JSON.stringify({accepted:true,code:room.invite_token})}),env,true);if(!response.ok)throw Error('Synthetic member preparation failed');}
+ }
  const viewer=role==='owner'?owner:await prepare('learner'),membership=await env.DB.prepare('SELECT 1 AS joined FROM community_members WHERE room_id=? AND profile_id=? AND banned=0 AND left_at=0').bind(room.id,viewer.profileId).first();
  const destination=new URL('/study-groups',url.origin);if(membership)destination.searchParams.set('room',room.id);else destination.searchParams.set('invite',room.invite_token);destination.searchParams.set('activity',activity.id);
  return new Response(null,{status:303,headers:{Location:destination.pathname+destination.search,'Set-Cookie':viewer.session.cookie,'Cache-Control':'no-store','X-Robots-Tag':'noindex, nofollow'}});

@@ -1,6 +1,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {HandTap,HandsClapping,Sparkle,Play,Pause,Coffee,UsersThree,LockSimple,Copy,BookOpen,WifiSlash,CheckCircle} from '@phosphor-icons/react';
 import {companionState,companionSeconds,COMPANION_LABELS,INTERACTIONS} from '../lib/companion-model.mjs';
+import {MemberCardControl} from './RoomMembers.jsx';
 import {StudyMessageBody,StudySticker} from './StudyMessageBody.jsx';
 import {STUDY_MESSAGES} from '../lib/study-messages.mjs';
 import '../study-companions.css';
@@ -8,7 +9,7 @@ const effects={tap:HandTap,cheer:HandsClapping,celebrate:Sparkle};
 const clock=seconds=>[Math.floor(seconds/3600),Math.floor(seconds%3600/60),Math.floor(seconds%60)].map(n=>String(n).padStart(2,'0')).join(':');
 const minutes=seconds=>`${Math.floor((seconds||0)/60)} min`;
 
-export function StudyCompanions({selected,profile,me,timer,now,connection,busy,studying,live,onStart,onPause,onPresence,onInteract,onQuick,feedback,children}){
+export function StudyCompanions({selected,profile,me,timer,now,connection,busy,studying,live,onStart,onPause,onPresence,onInteract,onQuick,feedback,children,onManageMember}){
  const [group,setGroup]=useState('status'),[copy,setCopy]=useState(''),[effect,setEffect]=useState(null),[sent,setSent]=useState('');
  const seen=useRef(new Set()),messageStart=useRef(now);
  const self=selected.members.find(m=>m.id===profile?.id),blocked=id=>(me?.blocks||[]).some(b=>(b.id||b)===id);
@@ -26,7 +27,7 @@ export function StudyCompanions({selected,profile,me,timer,now,connection,busy,s
    const unavailable=!canUse||selected.mutedUntil>now||blocked(member.id)||state==='offline'||state==='studying'||!member.allow_nudges||cooldown>now;
    const reason=state==='offline'?'Available when they are online':state==='studying'?'Quiet while their timer runs':!member.allow_nudges?'Interactions turned off':cooldown>now?'Give them a little time':blocked(member.id)?'Member hidden':'';
    return <article className={`companion-seat companion-${state} ${you?'companion-self':''} ${you&&effect?'companion-effect-'+effect.kind:''}`} key={member.id}>
-    <div className="companion-person"><span className="companion-avatar" aria-hidden="true">{member.nickname.slice(0,1).toUpperCase()}{state==='studying'&&<span className="companion-pulse"/>}</span><div><h3>{member.nickname}{you&&<span className="companion-you">You</span>}</h3><span className="companion-state"><i/>{COMPANION_LABELS[state]}</span></div></div>
+    <div className="companion-person"><span className="companion-avatar" aria-hidden="true">{member.nickname.slice(0,1).toUpperCase()}{state==='studying'&&<span className="companion-pulse"/>}</span><div><h3>{member.nickname}{you&&<span className="companion-you">You</span>}{!you&&member.id===selected.room.ownerId&&<span className="companion-you">Owner</span>}</h3><span className="companion-state"><i/>{COMPANION_LABELS[state]}</span></div>{selected.owner&&member.id!==selected.room.ownerId&&canUse&&<MemberCardControl member={member} onManage={onManageMember}/>}</div>
     <div className="companion-clock" role="timer" aria-label={`${member.nickname} room session time`}>{clock(companionSeconds(member,now))}</div><p className="companion-today">{minutes(member.today_seconds)} today{you&&timer?.activity_id&&timer?.room_id===selected.room.id?' · Activity timer':''}</p>
     {canUse&&(you?<div className="companion-own-actions">{studying?<button className="button primary" disabled={busy} onClick={onPause}><Pause size={18}/>Pause</button>:<button className="button primary" disabled={busy||live} onClick={()=>onStart(false)}><Play size={18} weight="fill"/><span className="companion-start-long">{state==='check'?'Check in & start':'Start studying'}</span><span className="companion-start-short">{state==='check'?'Check in':'Start'}</span></button>}<button className="button companion-break" disabled={busy||(!studying&&live)} onClick={()=>onPresence({state:member.focus_state==='break'?'ready':'break',...(timer?.room_id===selected.room.id?{lease:timer.lease}:{})})}><Coffee size={18}/>{member.focus_state==='break'?'Back':'Break'}</button></div>:<div className="companion-reactions" role="group" aria-label={`Encourage ${member.nickname}`}>{INTERACTIONS.map(item=>{const Icon=effects[item.id];return <button type="button" key={item.id} disabled={busy||unavailable} className="companion-reaction" aria-label={`${item.label} · ${member.nickname}`} title={reason||item.label} onClick={()=>interact(member,item.id)}><Icon size={21}/><span>{item.id==='tap'?'Tap':item.id==='cheer'?'Cheer':'Celebrate'}</span></button>;})}</div>)}
    </article>;
