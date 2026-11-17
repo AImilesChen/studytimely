@@ -73,3 +73,5 @@ dialog.site-explorer-dialog{width:min(960px,calc(100vw - 40px));max-width:none;m
  .global-site-header .header-actions>.site-menu-toggle{width:40px;padding:3px}
  .global-site-header .header-actions>.site-menu-toggle>svg{width:21px;height:21px}
 }
+
+.site-primary-nav>a.site-account-link{min-width:154px;border:1px solid var(--line);border-radius:24px;color:var(--fg);text-decoration:none;font-weight:500}
