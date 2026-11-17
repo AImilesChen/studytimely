@@ -4,6 +4,7 @@ import {issueSession} from '../../server/auth-shared.mjs';
 import {pendingRegistration} from '../../server/registration.mjs';
 import {createCommunityApi} from '../../server/community.mjs';
 import {groupPreview} from './group-preview.mjs';
+import {syntheticCloudflareReview} from './cf-review.mjs';
 export {StudyRoom};
 // No network request: deterministic safety responses for localhost UI/integration QA only.
 const fixtureCommunity=createCommunityApi({reviewFetch:async(_url,options)=>{
@@ -15,6 +16,7 @@ const emails=['owner@studytimely.invalid','learner@studytimely.invalid','admin@s
 export default {async fetch(request,env,ctx){
  const url=new URL(request.url);if(!['127.0.0.1','localhost','[::1]'].includes(url.hostname))return new Response('Local synthetic fixture only',{status:403});
  const fixture={...env,COMMUNITY_ADMIN_EMAILS:'admin@studytimely.invalid',COMMUNITY_REVIEW_ENABLED:'true',AZURE_CONTENT_SAFETY_ENDPOINT:'https://synthetic.cognitiveservices.azure.com',AZURE_CONTENT_SAFETY_KEY:'synthetic-local-review-not-a-real-key'};
+ if(env.FIXTURE_CF_REVIEW==='true'){fixture.COMMUNITY_REVIEW_PROVIDER='cloudflare';fixture.AI=syntheticCloudflareReview();}
  if(env.FIXTURE_REVIEW_DISABLED==='true'){fixture.COMMUNITY_REVIEW_ENABLED='false';delete fixture.AZURE_CONTENT_SAFETY_KEY;}
  if(url.pathname==='/__test/group-preview')return groupPreview(request,fixture);
  if(url.pathname.startsWith('/api/community/'))return fixtureCommunity(request,fixture,true,ctx);

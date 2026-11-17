@@ -1,5 +1,5 @@
 import {body,fail,result,rateLimit} from './auth-shared.mjs';
-import {reviewConfiguration,reviewChat,enforceLocalContent} from './chat-review.mjs';
+import {reviewAvailability,reviewChat,enforceLocalContent} from './chat-review.mjs';
 import {activityInput,ACTIVITY_SUBJECTS,ACTIVITY_OUTCOMES,ROOM_NOTICES} from '../src/lib/group-activities.mjs';
 const q=(env,sql,...args)=>env.DB.prepare(sql).bind(...args);
 const rows=async s=>(await s.all()).results||[];
@@ -43,7 +43,7 @@ export async function roomActivities({request,env,at,r,profile,requireProfile,is
   const participants=await rows(q(env,`SELECT m.profile_id,p.nickname,m.subject,m.seconds,m.first_started_at,m.checked_out_at,m.outcome,m.withdrawn_at
    FROM community_activity_members m JOIN community_profiles p ON p.id=m.profile_id WHERE m.activity_id=? ORDER BY m.joined_at,p.nickname`,a.id));
   const own=await mine(),active=participants.filter(m=>!m.withdrawn_at),summary={reserved:active.length,attended:participants.filter(m=>m.first_started_at>0).length,seconds:participants.reduce((n,m)=>n+m.seconds,0),checkedOut:active.filter(m=>m.checked_out_at>0).length,completed:active.filter(m=>m.outcome==='completed').length,partial:active.filter(m=>m.outcome==='partial').length,notStarted:active.filter(m=>m.outcome==='not_started').length};
-  return result({activity:activityRecord(a),participants,own:own?{version:own.version,task:own.task_text,subject:own.subject,reflection:own.reflection,outcome:own.outcome,checkedOutAt:own.checked_out_at,withdrawnAt:own.withdrawn_at,seconds:own.seconds}:null,summary,serverNow:at,customTitlesAvailable:!!reviewConfiguration(env)});
+  return result({activity:activityRecord(a),participants,own:own?{version:own.version,task:own.task_text,subject:own.subject,reflection:own.reflection,outcome:own.outcome,checkedOutAt:own.checked_out_at,withdrawnAt:own.withdrawn_at,seconds:own.seconds}:null,summary,serverNow:at,customTitlesAvailable:(await reviewAvailability(env,at)).available});
  }
  writable();const input=await body(request);await rateLimit(env,'activity-action',profile.id,120,3600000,at);
  if(!operation&&method==='PATCH'){

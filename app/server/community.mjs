@@ -1,6 +1,8 @@
 import {ApiError,fail,result,body,identity,rateLimit,randomToken} from './auth-shared.mjs';
 import {COMMUNITY,utcDay,nickname,cleanText,roomInput,creditWindow,communityRules} from '../src/lib/community-model.mjs';
-import {reviewConfiguration,enforceLocalContent,reviewChat} from './chat-review.mjs';
+import {reviewConfiguration,reviewAvailability,enforceLocalContent,reviewChat} from './chat-review.mjs';
+import {studyMessage} from '../src/lib/study-messages.mjs';
+import {reviewBudgetStatus} from './review-budget.mjs';
 import {publicRanking,personalRanking} from './leaderboard.mjs';
 import {roomActivities,saveRoomHome,finishDueActivities,activityTimerContext,withdrawRoomActivities} from './group-activities.mjs';
 const uuid=value=>typeof value==='string'&&/^[a-f0-9-]{36}$/.test(value);
@@ -18,6 +20,8 @@ export async function communityMaintenance(env,at=Date.now()){
   q(env,'DELETE FROM community_credits WHERE created_at<?',at-30*86400000),
   q(env,"UPDATE community_timers SET status='paused' WHERE activity_id IN (SELECT id FROM community_activities WHERE MAX(starts_at,started_at,ended_at)<?)",at-90*86400000),
   q(env,'DELETE FROM community_activities WHERE MAX(starts_at,started_at,ended_at)<?',at-90*86400000),
+  q(env,'DELETE FROM community_review_cache WHERE expires_at<=?',at),
+  q(env,'DELETE FROM community_review_budgets WHERE expires_at<?',at),
   q(env,'DELETE FROM community_rank_history WHERE day<?',year),
   q(env,'DELETE FROM community_daily WHERE day<?',year),
   q(env,'DELETE FROM community_room_daily WHERE day<?',year),
@@ -29,6 +33,7 @@ export async function communityMaintenance(env,at=Date.now()){
 export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeoutMs=5000}={}){
  return async(request,env,enabled=true,ctx)=>{
   const url=new URL(request.url),path=url.pathname.replace('/api/community',''),method=request.method,at=Math.floor(now()/1000)*1000,day=utcDay(at);
+  let availability;const review=()=>availability??=reviewAvailability(env,at);
   try{
    if(!enabled||!env.DB)fail(503,'COMMUNITY_UNAVAILABLE','Study groups are not available here yet. Local tools still work.');
    const user=await identity(request,env,at,false),profile=user?await q(env,'SELECT * FROM community_profiles WHERE account_id=?',user.id).first():null,isAdmin=!!user?.google_sub&&admins(env).includes(user.email.toLowerCase());
@@ -63,7 +68,7 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
     const mine=profile?await rows(q(env,`SELECT r.id,r.name,r.visibility,r.owner_id,r.closed_at FROM community_rooms r JOIN community_members m ON m.room_id=r.id WHERE m.profile_id=? AND m.banned=0 AND m.left_at=0 ORDER BY (r.closed_at>0) ASC,r.created_at DESC LIMIT 10`,profile.id)):[];
     const history=profile?await rows(q(env,'SELECT day,rank,seconds FROM community_rank_history WHERE profile_id=? ORDER BY day DESC LIMIT 30',profile.id)):[];
     const blocks=profile?await rows(q(env,'SELECT b.blocked_id AS id,p.nickname FROM community_blocks b JOIN community_profiles p ON p.id=b.blocked_id WHERE b.blocker_id=?',profile.id)):[];
-    return result({profile:profile?{id:profile.id,nickname:profile.nickname,publicRanking:!!profile.public_ranking,version:profile.version}:null,rooms:mine,history,blocks,timer:await timer(),serverNow:at,creditedToday:profile?(await q(env,'SELECT seconds FROM community_daily WHERE profile_id=? AND day=?',profile.id,day).first())?.seconds||0:0,moderator:isAdmin,moderationAvailable:admins(env).length>0,chatReviewAvailable:!!reviewConfiguration(env),rules:communityRules()});
+    return result({profile:profile?{id:profile.id,nickname:profile.nickname,publicRanking:!!profile.public_ranking,version:profile.version}:null,rooms:mine,history,blocks,timer:await timer(),serverNow:at,creditedToday:profile?(await q(env,'SELECT seconds FROM community_daily WHERE profile_id=? AND day=?',profile.id,day).first())?.seconds||0:0,moderator:isAdmin,moderationAvailable:admins(env).length>0,chatReviewAvailable:(await review()).available,review:await review(),rules:communityRules()});
    }
    if(path==='/profile'&&method==='PUT'){
     requireUser();const input=await body(request);if((!profile&&input.accepted!==true)||typeof input.publicRanking!=='boolean')fail(400,'COMMUNITY_POLICY','Confirm the community rules and choose whether to join public rankings.');
@@ -118,8 +123,8 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
       t.status AS timer_status,t.activity_id,t.last_at AS timer_last_at,t.check_at AS timer_check_at FROM community_members m JOIN community_profiles p ON p.id=m.profile_id LEFT JOIN community_timers t ON t.profile_id=p.id AND t.room_id=m.room_id
       WHERE m.room_id=? AND m.banned=0 AND m.left_at=0 ORDER BY today_seconds DESC,p.nickname LIMIT 24`,id,day,id,id));
      const totals=await q(env,'SELECT COALESCE(sum(seconds),0) AS total_seconds,COALESCE(sum(CASE WHEN day=? THEN seconds ELSE 0 END),0) AS today_seconds FROM community_room_daily WHERE room_id=?',day,id).first();
-     const messages=r.member?await rows(q(env,`SELECT m.id,m.author_id,p.nickname,m.text,m.created_at FROM community_messages m JOIN community_profiles p ON p.id=m.author_id WHERE m.room_id=? AND m.hidden=0 AND m.created_at>=? AND NOT EXISTS(SELECT 1 FROM community_blocks b WHERE b.blocker_id=? AND b.blocked_id=m.author_id) ORDER BY m.created_at DESC,m.id DESC LIMIT 50`,id,at-30*86400000,profile.id)):[];
-     return result({room:{id,name:r.room.name,subject:r.room.study_subject,announcement:r.room.announcement_key,visibility:r.room.visibility,host:members.find(m=>m.id===r.room.owner_id)?.nickname||'Room owner',ownerId:r.room.owner_id,goalMinutes:r.room.goal_minutes,capacity:r.room.capacity,invitationsOpen:!!r.room.invitations_open,roundEndsAt:r.room.round_ends_at,closed:!!r.room.closed_at,version:r.room.version,...(r.room.owner_id===profile?.id?{inviteCode:r.room.invite_token}:{})},members:members.map(m=>({...m,online:m.last_seen>at-75000,studying:m.last_seen>at-75000&&m.timer_status==='running'&&m.timer_last_at>=at-COMMUNITY.maxHeartbeatGapMs&&m.timer_check_at>at})),totals,messages:messages.reverse(),member:!!r.member,owner:r.room.owner_id===profile?.id,mutedUntil:r.membership?.muted_until||0,removedMembers:r.room.owner_id===profile?.id?await rows(q(env,'SELECT p.id,p.nickname FROM community_members m JOIN community_profiles p ON p.id=m.profile_id WHERE m.room_id=? AND m.banned=1',id)):[],moderationAvailable:admins(env).length>0,chatReviewAvailable:!!reviewConfiguration(env),serverNow:at});
+     const messages=r.member?await rows(q(env,`SELECT m.id,m.author_id,p.nickname,m.text,m.template_id,m.created_at FROM community_messages m JOIN community_profiles p ON p.id=m.author_id WHERE m.room_id=? AND m.hidden=0 AND m.created_at>=? AND NOT EXISTS(SELECT 1 FROM community_blocks b WHERE b.blocker_id=? AND b.blocked_id=m.author_id) ORDER BY m.created_at DESC,m.id DESC LIMIT 50`,id,at-30*86400000,profile.id)):[];
+     return result({room:{id,name:r.room.name,subject:r.room.study_subject,announcement:r.room.announcement_key,visibility:r.room.visibility,host:members.find(m=>m.id===r.room.owner_id)?.nickname||'Room owner',ownerId:r.room.owner_id,goalMinutes:r.room.goal_minutes,capacity:r.room.capacity,invitationsOpen:!!r.room.invitations_open,roundEndsAt:r.room.round_ends_at,closed:!!r.room.closed_at,version:r.room.version,...(r.room.owner_id===profile?.id?{inviteCode:r.room.invite_token}:{})},members:members.map(m=>({...m,online:m.last_seen>at-75000,studying:m.last_seen>at-75000&&m.timer_status==='running'&&m.timer_last_at>=at-COMMUNITY.maxHeartbeatGapMs&&m.timer_check_at>at})),totals,messages:messages.reverse(),member:!!r.member,owner:r.room.owner_id===profile?.id,mutedUntil:r.membership?.muted_until||0,removedMembers:r.room.owner_id===profile?.id?await rows(q(env,'SELECT p.id,p.nickname FROM community_members m JOIN community_profiles p ON p.id=m.profile_id WHERE m.room_id=? AND m.banned=1',id)):[],moderationAvailable:admins(env).length>0,chatReviewAvailable:(await review()).available,review:await review(),serverNow:at});
     }
     if(action==='leave'&&method==='POST'){
      requireMember(r);if(r.room.owner_id===profile.id)fail(409,'OWNER','Close the room before leaving as its owner.');
@@ -147,14 +152,21 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
     }
     if(action==='messages'&&method==='POST'){
      requireMember(r);if(!admins(env).length)fail(503,'MODERATION_UNAVAILABLE','Chat opens after a platform moderator has been configured.');if(r.membership.muted_until>at)fail(403,'MUTED','You are currently muted in this room.');
-     const input=await body(request),text=cleanText(input.text,{max:500,label:'Message'});if(!uuid(input.id))fail(400,'INVALID','Provide a message request ID.');
-     const prior=await q(env,'SELECT author_id,room_id,text FROM community_messages WHERE id=?',input.id).first();if(prior){if(prior.author_id!==profile.id||prior.room_id!==id||prior.text!==text)fail(409,'CONFLICT','Use a new message request ID.');return result({sent:true,id:input.id});}
+     const input=await body(request);
+     const hasTemplate=Object.hasOwn(input,'templateId'),template=hasTemplate?studyMessage(input.templateId):null;
+     if(hasTemplate&&!template)fail(400,'INVALID','Choose an available study message.');
+     if(Object.hasOwn(input,'text')&&typeof input.text!=='string')fail(400,'INVALID','Message text must be text.');
+     const extra=typeof input.text==='string'?input.text.trim():'';
+     const fixed=!!template&&!extra,templateId=fixed?template.id:null;
+     const text=cleanText(template?template.text+(extra?' '+extra:''):input.text,{max:500,label:'Message'});
+     if(!uuid(input.id))fail(400,'INVALID','Provide a message request ID.');
+     const prior=await q(env,'SELECT author_id,room_id,text,template_id FROM community_messages WHERE id=?',input.id).first();if(prior){if(prior.author_id!==profile.id||prior.room_id!==id||prior.text!==text||(prior.template_id||null)!==templateId)fail(409,'CONFLICT','Use a new message request ID.');return result({sent:true,id:input.id});}
      await rateLimit(env,'chat-fast',profile.id,3,10000,at);await rateLimit(env,'chat-hour',profile.id,30,3600000,at);
-     await reviewChat(text,env,{at,fetcher:reviewFetch,timeoutMs:reviewTimeoutMs});
+     if(fixed)enforceLocalContent(text);else await reviewChat(text,env,{at,fetcher:reviewFetch,timeoutMs:reviewTimeoutMs});
      const finishedAt=Math.floor(now()/1000)*1000;
      // Review can take seconds. Re-check membership, mute, room and session before publishing.
-     const written=await q(env,`INSERT INTO community_messages(id,room_id,author_id,text,created_at) SELECT ?,?,?,?,? WHERE EXISTS(SELECT 1 FROM community_members m JOIN community_rooms r ON r.id=m.room_id JOIN community_profiles p ON p.id=m.profile_id JOIN sessions s ON s.account_id=p.account_id WHERE m.room_id=? AND m.profile_id=? AND m.banned=0 AND m.left_at=0 AND m.muted_until<=? AND r.closed_at=0 AND s.token_hash=? AND s.expires_at>?) ON CONFLICT(id) DO NOTHING RETURNING id`,input.id,id,profile.id,text,finishedAt,id,profile.id,finishedAt,user.sessionHash,finishedAt).first();
-     if(!written){const duplicate=await q(env,'SELECT author_id,room_id,text FROM community_messages WHERE id=?',input.id).first();if(duplicate?.author_id===profile.id&&duplicate.room_id===id&&duplicate.text===text)return result({sent:true,id:input.id});if(duplicate)fail(409,'CONFLICT','Use a new message request ID.');fail(403,'MEMBERSHIP','Your room permissions changed.');}await signal(id);return result({sent:true,id:input.id},201);
+     const written=await q(env,`INSERT INTO community_messages(id,room_id,author_id,text,template_id,created_at) SELECT ?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM community_members m JOIN community_rooms r ON r.id=m.room_id JOIN community_profiles p ON p.id=m.profile_id JOIN sessions s ON s.account_id=p.account_id WHERE m.room_id=? AND m.profile_id=? AND m.banned=0 AND m.left_at=0 AND m.muted_until<=? AND r.closed_at=0 AND s.token_hash=? AND s.expires_at>?) ON CONFLICT(id) DO NOTHING RETURNING id`,input.id,id,profile.id,text,templateId,finishedAt,id,profile.id,finishedAt,user.sessionHash,finishedAt).first();
+     if(!written){const duplicate=await q(env,'SELECT author_id,room_id,text,template_id FROM community_messages WHERE id=?',input.id).first();if(duplicate?.author_id===profile.id&&duplicate.room_id===id&&duplicate.text===text&&(duplicate.template_id||null)===templateId)return result({sent:true,id:input.id});if(duplicate)fail(409,'CONFLICT','Use a new message request ID.');fail(403,'MEMBERSHIP','Your room permissions changed.');}await signal(id);return result({sent:true,id:input.id},201);
     }
     if(action==='reports'&&method==='POST'){
      requireMember(r);const input=await body(request);if(!['spam','harassment','privacy','other'].includes(input.reason)||!uuid(input.messageId))fail(400,'INVALID','Choose a message and report reason.');
@@ -170,6 +182,10 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
    if(path==='/blocks'&&method==='POST'){
     requireProfile();const input=await body(request);if(!uuid(input.profileId)||input.profileId===profile.id)fail(400,'INVALID','Choose another community member.');
     if(input.block===false)await q(env,'DELETE FROM community_blocks WHERE blocker_id=? AND blocked_id=?',profile.id,input.profileId).run();else await q(env,'INSERT INTO community_blocks(blocker_id,blocked_id) VALUES(?,?) ON CONFLICT DO NOTHING',profile.id,input.profileId).run();return result({saved:true});
+   }
+   if(path==='/review-status'&&method==='GET'){
+    requireProfile();if(!isAdmin)fail(403,'FORBIDDEN','Only platform moderators can view safety capacity.');
+    const review=await reviewAvailability(env,at),budget=reviewConfiguration(env)?.provider==='cloudflare'?await reviewBudgetStatus(env,at):null;return result({review,budget});
    }
    if(path==='/moderation'&&method==='GET'){
     requireProfile();const list=await rows(q(env,`SELECT x.id,x.room_id,r.name AS room_name,r.owner_id,p.nickname AS author,x.subject_id,x.reason,x.detail,x.excerpt,x.created_at FROM community_reports x JOIN community_rooms r ON r.id=x.room_id LEFT JOIN community_profiles p ON p.id=x.subject_id WHERE x.status='open' AND (?=1 OR (r.owner_id=? AND COALESCE(x.subject_id,'')<>?)) ORDER BY x.created_at DESC LIMIT 100`,isAdmin?1:0,profile.id,profile.id));return result({reports:list,platformModerator:isAdmin});

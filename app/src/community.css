@@ -2,3 +2,17 @@
 
 .community textarea:focus-visible{outline:2px solid var(--fg);outline-offset:4px}
 .community .session-notice,.account-panel .session-notice{position:static;inset:auto;transform:none;width:auto;max-width:100%;box-sizing:border-box;margin:0 0 20px;z-index:auto;box-shadow:none}
+
+.review-capacity-panel .community-stats>div{gap:16px}.review-capacity-panel .community-stats strong{white-space:nowrap;flex-shrink:0;overflow-wrap:normal;font-variant-numeric:tabular-nums}.review-capacity-panel .community-stats span{min-width:0;flex:1}
+@media(max-width:640px){.community .panel-title>.community-row{min-width:0;max-width:100%;width:100%;flex:1 1 100%;flex-wrap:wrap}}
+
+/* Study chat: fixed updates first; secondary guidance stays in a disclosure. */
+.community-chat .panel-title h3{margin:0}.community-chat .panel-title p{margin:8px 0 0}
+.study-quick-updates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px}
+.study-quick-updates .button{display:flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:12px}
+.study-quick-updates svg,.study-template-message svg,.member-shared-status svg{flex-shrink:0}
+.study-template-message{display:flex;align-items:center;gap:10px}.member-shared-status{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted)}
+.community .community-members li>div:first-child{align-items:center}.study-chat-compose .community-row{justify-content:space-between;margin-top:12px}
+.study-chat-info{margin-top:20px;color:var(--muted);font-size:.85rem;line-height:1.7}.study-chat-info p{margin:12px 0}
+@media(max-width:750px){.study-quick-updates{grid-template-columns:repeat(2,minmax(0,1fr))}.community .community-members li>div:first-child{flex-direction:column;align-items:flex-start;gap:8px}}
+@media(max-width:380px){.study-quick-updates .button{flex-direction:column;gap:6px;font-size:.875rem;padding:10px 8px}}

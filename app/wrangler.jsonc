@@ -4,6 +4,7 @@
   "compatibility_date": "2026-11-12",
   "workers_dev": false,
   "preview_urls": false,
+  "ai": {"binding": "AI"},
   "routes": [
     {
       "pattern": "studytimely.com",
@@ -38,7 +39,10 @@
     }
   ],
   "vars": {
-    "SUPPORT_EMAIL": "support@studytimely.com"
+    "SUPPORT_EMAIL": "support@studytimely.com",
+    "COMMUNITY_REVIEW_PROVIDER": "cloudflare",
+    "COMMUNITY_REVIEW_ENABLED": "false",
+    "COMMUNITY_REVIEW_DAILY_NEURONS": "5000"
   },
   "durable_objects": {
     "bindings": [
