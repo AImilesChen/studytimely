@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {setupCommunity} from './helpers/community.mjs';
+import {setupSubscribedCommunity as setupCommunity} from './helpers/community.mjs';
 import {rankingWindow,rankingPage,rankingDuration,rankingStandings} from '../src/lib/leaderboard-model.mjs';
 import {metadata} from '../src/lib/site.mjs';
 import {createCommunityApi} from '../server/community.mjs';

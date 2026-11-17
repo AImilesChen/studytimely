@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {localContentIssue} from '../src/lib/community-safety.mjs';
 import {reviewConfiguration} from '../server/chat-review.mjs';
-import {setupCommunity as setup,reviewResult,syntheticReviewEnv} from './helpers/community.mjs';
+import {setupSubscribedCommunity as setup,reviewResult,syntheticReviewEnv} from './helpers/community.mjs';
 const post=(s,r,a,text='Finished chapter two')=>s.call('/rooms/'+r.id+'/messages','POST',{id:crypto.randomUUID(),text},a);
 test('local rules catch contact obfuscation/solicitation without blocking ordinary study topics',()=>{
  for(const text of ['reader@example.invalid','reader (at) example (dot) com','https://example.com','ｅｘａｍｐｌｅ．ｃｏｍ','w\u200bechat: reader','微信：abc123','add me on discord','phone +44 7700 900123','13800138000','looking for a girlfriend','找 女 友','send me nudes','I will kill you'])assert.ok(localContentIssue(text),text);

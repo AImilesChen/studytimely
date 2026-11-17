@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {setupCommunity as setup} from './helpers/community.mjs';
+import {setupSubscribedCommunity as setup} from './helpers/community.mjs';
 import {STUDY_MESSAGES} from '../src/lib/study-messages.mjs';
 import {reviewChat,reviewConfiguration,CF_REVIEW_MODEL} from '../server/chat-review.mjs';
 import {reviewCacheKey,cacheApproval,REVIEW_POLICY_VERSION,REVIEW_CACHE_MS} from '../server/review-cache.mjs';
@@ -15,7 +15,7 @@ test('two members exchange trusted updates without AI, timers, task or leaderboa
   s.env.COMMUNITY_REVIEW_ENABLED='false';
   for(const [i,m] of STUDY_MESSAGES.entries()){s.advance(11000);assert.equal((await send(s,r,i%2?a:b,{templateId:m.id})).status,201);}
   const view=await s.call('/rooms/'+r.id,'GET',undefined,b);assert.equal(view.chatReviewAvailable,false);
-  assert.deepEqual(view.messages.map(m=>[m.template_id,m.text]),STUDY_MESSAGES.map(m=>[m.id,m.text]));assert.equal(calls,0);
+  assert.deepEqual(view.messages.map(m=>[m.quick_id||m.template_id,m.text]),STUDY_MESSAGES.map(m=>[m.id,m.text]));assert.equal(calls,0);
   for(const table of ['community_timers','community_credits','community_daily','community_review_attempts','community_review_cache'])assert.equal(s.db.prepare('SELECT count(*) n FROM '+table).get().n,0,table);
  }finally{s.close();}
 });

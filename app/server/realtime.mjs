@@ -21,6 +21,7 @@ export class StudyRoom {
   const a=ws.deserializeAttachment();if(typeof message!=='string'||message.length>100||message!=='presence'){ws.close(1008,'Unsupported message');return;}
   const at=Date.now();if(at-a.lastPing<15000)return;if(!await this.valid(a)){ws.close(1008,'Room access ended');return;}
   a.lastPing=at;ws.serializeAttachment(a);await this.env.DB.prepare('UPDATE community_members SET last_seen=? WHERE room_id=? AND profile_id=?').bind(at,a.roomId,a.profileId).run();ws.send(JSON.stringify({type:'presence'}));
+  const last=await this.ctx.storage.get('presenceAt')||0;if(at-last>=15000){await this.ctx.storage.put('presenceAt',at);await this.broadcast();}
  }
  async webSocketClose(ws,code){const a=ws.deserializeAttachment();try{ws.close(code===1005?1000:code);}catch{}if(a&&!this.ctx.getWebSockets().some(s=>s!==ws&&s.deserializeAttachment()?.profileId===a.profileId)){await this.env.DB.prepare('UPDATE community_members SET last_seen=0 WHERE room_id=? AND profile_id=?').bind(a.roomId,a.profileId).run();}await this.broadcast();}
  async webSocketError(ws){try{ws.close(1011,'Connection unavailable');}catch{}}

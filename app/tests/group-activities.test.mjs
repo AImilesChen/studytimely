@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {setupCommunity as setup,reviewResult} from './helpers/community.mjs';
+import {setupSubscribedCommunity as setup,reviewResult} from './helpers/community.mjs';
 import {activityInput,activityPhase,activityWall} from '../src/lib/group-activities.mjs';
 import {communityMaintenance} from '../server/community.mjs';
 const payload=(s,patch={})=>({id:crypto.randomUUID(),subject:'maths',kind:'practice',...activityWall(s.now+600000,'Europe/London'),zone:'Europe/London',focusMinutes:25,breakMinutes:5,...patch});

@@ -4,7 +4,7 @@ import {MODERATION_CORPUS} from './fixtures/moderation-corpus.mjs';
 import {localContentIssue} from '../src/lib/community-safety.mjs';
 import {reviewChat,reviewConfiguration,reviewAvailability,cloudflareReviewInput,parseCloudflareReview,CF_REVIEW_MODEL} from '../server/chat-review.mjs';
 import {reserveReview,settleReview,reviewBudgetStatus} from '../server/review-budget.mjs';
-import {setupCommunity as setup} from './helpers/community.mjs';
+import {setupSubscribedCommunity as setup} from './helpers/community.mjs';
 import {communityMaintenance} from '../server/community.mjs';
 const answer=(safe=true,patch={})=>({response:{safe,categories:safe?[]:['S1']},usage:{prompt_tokens:230,completion_tokens:6,neurons:10.14},...patch});
 function useCF(s,run=async()=>answer()){Object.assign(s.env,{COMMUNITY_REVIEW_PROVIDER:'cloudflare',AI:{run}});return s;}
