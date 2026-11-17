@@ -16,3 +16,5 @@
 .study-chat-info{margin-top:20px;color:var(--muted);font-size:.85rem;line-height:1.7}.study-chat-info p{margin:12px 0}
 @media(max-width:750px){.study-quick-updates{grid-template-columns:repeat(2,minmax(0,1fr))}.community .community-members li>div:first-child{flex-direction:column;align-items:flex-start;gap:8px}}
 @media(max-width:380px){.study-quick-updates .button{flex-direction:column;gap:6px;font-size:.875rem;padding:10px 8px}}
+
+.community .room-goal-field .field{margin-bottom:0}.community .room-goal-field .help{margin:8px 0 0;font-size:14px;line-height:1.6}
