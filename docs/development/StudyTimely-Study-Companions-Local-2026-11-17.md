@@ -2,6 +2,8 @@
 
 Implemented locally on `v2-google-community`, based on documentation HEAD `cdc4295`. Changes are uncommitted, unpushed and **not deployed**. Production remains V2.27.0. No Stripe, paid plan, production database, credentials, DNS, analytics or protected Sites adapter changed.
 
+This is the historical local handoff. The user subsequently authorised publication; [V2.28.0 release record](StudyTimely-V2.28.0-Release.md) supersedes its deployment status below.
+
 ## Room experience
 
 - The first room view has a four-seat companion board beside recent messages and quick communication. Own timer controls are visible. Activities, room overview, totals and moderation remain in expandable secondary sections; an activity invitation still opens its activity section.
