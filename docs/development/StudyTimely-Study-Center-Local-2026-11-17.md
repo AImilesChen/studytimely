@@ -1,5 +1,7 @@
 # My Study Center — first-stage local implementation
 
+Publication update: the implementation below, plus dynamic Sign in / My Study Center navigation, is now published as V2.25.0. See [the release record](StudyTimely-V2.25.0-Release.md) for the actual runtime commit, deployment and production verification. Historical local-only statements below describe the state before that release.
+
 Clean preview: <http://127.0.0.1:4286/account>. This origin has no learning records and uses an isolated local fixture database. Port 4287 contains explicitly labelled synthetic QA records in separate browser storage and a separate fixture persistence directory. Neither is production. Production/package remain V2.24.0. No commit, push or deployment was performed.
 
 ## Implemented
