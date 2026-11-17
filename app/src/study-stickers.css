@@ -1,0 +1,38 @@
+.study-message-body{display:flex;align-items:center;gap:14px;min-width:0}
+.study-message-body p{flex:1;min-width:0;overflow-wrap:anywhere;margin:0!important}
+.study-sticker{position:relative;display:inline-flex;width:88px;height:88px;flex:0 0 88px;align-items:center;justify-content:center;user-select:none;isolation:isolate}
+.study-sticker-motion{display:block;width:100%;height:100%;transform-origin:50% 80%;pointer-events:none}
+.study-sticker img{display:block;object-fit:contain;width:100%;height:100%;pointer-events:none}
+.study-sticker-small{width:30px;height:30px;flex-basis:30px;pointer-events:none}
+.study-sticker-replay{position:absolute;inset:-3px;padding:0!important;border:1px solid transparent;border-radius:18px;background:transparent;color:var(--fg);cursor:pointer;z-index:2;min-height:0!important;box-shadow:none}
+.study-sticker-replay svg{position:absolute;right:0;bottom:0;background:var(--surface);border:1px solid var(--line);box-sizing:content-box;border-radius:50%;padding:4px;opacity:0;transition:opacity .15s}
+.study-sticker-replay:hover svg,.study-sticker-replay:focus-visible svg{opacity:1}
+.study-sticker-replay:hover{background:transparent;border-color:var(--line)}
+.study-sticker-replay:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+.study-sticker-particles{position:absolute;inset:0;pointer-events:none;z-index:1}
+.study-sticker-particles i{position:absolute;width:9px;height:9px;opacity:0;background:#efa49e;border-radius:3px}
+.study-sticker-particles i:nth-child(1){left:10%;top:28%;--drift:-13px;--lift:-21px}
+.study-sticker-particles i:nth-child(2){right:12%;top:18%;--drift:13px;--lift:-27px;background:#a8d7c0;--delay:.1s}
+.study-sticker-particles i:nth-child(3){right:5%;top:55%;--drift:17px;--lift:-13px;background:#c5b2e6;--delay:.18s}
+.study-sticker-playing .study-sticker-particles i{animation:study-cat-spark .85s ease-out var(--delay,0s) 1}
+[data-sticker-kind=study] .study-sticker-enter{animation:study-cat-work .9s ease-in-out 1}
+[data-sticker-kind=encourage] .study-sticker-enter{animation:study-cat-cheer 1s ease-in-out 1}
+[data-sticker-kind=complete] .study-sticker-enter{animation:study-cat-celebrate 1.1s ease-in-out 1}
+[data-sticker-kind=break] .study-sticker-enter{animation:study-cat-rest 1.2s ease-in-out 1}
+[data-sticker-kind=help] .study-sticker-enter{animation:study-cat-puzzle 1s ease-in-out 1}
+@keyframes study-cat-work{0%,100%{transform:none}20%,60%{transform:translateY(-2px) rotate(-4deg)}40%,80%{transform:translateY(1px) rotate(3deg)}}
+@keyframes study-cat-cheer{0%,100%{transform:none}20%{transform:translateY(-5px) rotate(-9deg)}45%{transform:translateY(-3px) rotate(8deg)}70%{transform:translateY(-4px) rotate(-5deg)}}
+@keyframes study-cat-celebrate{0%,100%{transform:none}15%{transform:scale(1.05,.92)}35%{transform:translateY(-12px) rotate(-6deg) scale(.98,1.04)}60%{transform:scale(1.07,.94)}80%{transform:translateY(-4px) rotate(4deg)}}
+@keyframes study-cat-rest{0%,100%{transform:none}35%{transform:translateY(-3px) rotate(-5deg)}70%{transform:translateY(-1px) rotate(3deg)}}
+@keyframes study-cat-puzzle{0%,100%{transform:none}25%{transform:rotate(-10deg)}60%{transform:rotate(8deg)}80%{transform:rotate(-3deg)}}
+@keyframes study-cat-spark{0%{opacity:0;transform:scale(.2)}25%{opacity:.85}100%{opacity:0;transform:translate(var(--drift),var(--lift)) rotate(65deg) scale(.5)}}
+.companion-recent .study-message-body{padding:0}
+.community .companion-recent .study-message-body p{font-size:15px}
+.companion-communication .companion-recent{max-height:420px}
+.community .companion-quick-list .button{display:flex;justify-content:flex-start;text-align:left;gap:8px}
+.community .companion-quick-list .button>span:last-child{min-width:0;flex:1}
+.community-messages .study-message-body{margin:12px 0}
+html[data-motion=reduced] .study-sticker-replay{display:none}
+html[data-motion=reduced] .study-sticker-motion{transform:none!important}
+@media(prefers-reduced-motion:reduce){.study-sticker-enter,.study-sticker-playing .study-sticker-particles i{animation:none!important}.study-sticker-replay{display:none}.study-sticker-motion{transform:none!important}}
+@media(max-width:600px){.study-message-body{gap:10px}.study-sticker{width:72px;height:72px;flex-basis:72px}.study-sticker-small{width:28px;height:28px;flex-basis:28px}.community .companion-quick-list .button{font-size:13px;padding:9px}}

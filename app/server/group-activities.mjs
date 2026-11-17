@@ -77,8 +77,4 @@ export async function roomActivities({request,env,at,r,profile,requireProfile,is
  }
  fail(405,'METHOD','This activity action is not supported.');
 }
-export async function saveRoomHome({request,env,at,r,profile,isAdmin,signal}){
- if(!profile||!r.member||(r.room.owner_id!==profile.id&&!isAdmin))fail(403,'FORBIDDEN','Only the room owner can edit the room overview.');
- const input=await body(request);if(!Object.hasOwn(ACTIVITY_SUBJECTS,input.subject)||!Object.hasOwn(ROOM_NOTICES,input.announcement))fail(400,'INVALID','Choose a room subject and a study notice.');
- const saved=await q(env,'UPDATE community_rooms SET study_subject=?,announcement_key=?,version=version+1 WHERE id=? AND version=? AND closed_at=0 RETURNING version',input.subject,input.announcement,r.room.id,input.version).first();if(!saved)fail(409,'CONFLICT','Room settings changed. Refresh before saving.');await signal(r.room.id);return result({saved:true,version:saved.version});
-}
+export {saveRoomHome} from './room-theme.mjs';
