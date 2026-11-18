@@ -1,3 +1,5 @@
+import {emptyPlanning,validatePlanning,mergePlanning} from './planning-schema.mjs';
+import {planningAction} from './planning-actions.mjs';
 import {emptyLearning,validateLearning,mergeLearning,beginLearning,recordTask,recordGoal} from './learning-history.mjs';
 import {DomainError,dayKey,dailyTotals,hasProgress,makeTimer,validateSettings} from './model.mjs';
 import {validateHabit,habitSave,habitCheck,mergeHabit,habitSummary,habitPolicy} from './habits.mjs';
@@ -5,7 +7,7 @@ import {parseSyllabusOutline,materialiseOutline,syllabusLeaves} from './syllabus
 import {BLOCK_KINDS,blockConflicts,conflictMessage,scheduleDraftDays} from './schedule.mjs';
 import {migrateExams,validateExam} from './exams.mjs';
 
-export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],examVersion:1,exams:[],weeklyGoal:0,learning:emptyLearning(),deletedSessions:Object.create(null)});
+export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],examVersion:1,exams:[],weeklyGoal:0,learning:emptyLearning(),planning:emptyPlanning(),deletedSessions:Object.create(null)});
 const invalid=message=>{throw new DomainError('INVALID',message);};
 export const alive=items=>(items||[]).filter(x=>!x.deletedAt);
 const text=(v,max=140,optional=false)=>{if(typeof v!=='string'||v.length>max||(!optional&&!v.trim()))invalid(`Enter text from ${optional?0:1} to ${max} characters.`);return v.trim();};
@@ -33,7 +35,7 @@ export function validateWorkspace(input){
  if(Object.keys(input.deletedSessions).length>50000)invalid('Too many deletion markers.');
  for(const [id,t]of Object.entries(input.deletedSessions)){identifier(id);deletedSessions[id]=stamp(t);}
  let exams;try{exams=migrateExams(input,plans);}catch(e){invalid(e.message);}
- return{tasks,habits,plans,blocks,examVersion:1,exams,weeklyGoal:number(input.weeklyGoal||0,0,10080),goalUpdatedAt:input.goalUpdatedAt?stamp(input.goalUpdatedAt):0,learning:(()=>{try{return validateLearning(input.learning);}catch(e){invalid(e.message);}})(),deletedSessions};
+ return{tasks,habits,plans,blocks,planning:validatePlanning(input.planning),examVersion:1,exams,weeklyGoal:number(input.weeklyGoal||0,0,10080),goalUpdatedAt:input.goalUpdatedAt?stamp(input.goalUpdatedAt):0,learning:(()=>{try{return validateLearning(input.learning);}catch(e){invalid(e.message);}})(),deletedSessions};
 }
 function choose(a,b){if(!a)return b;if(!b)return a;const at=Math.max(a.updatedAt,a.deletedAt||0),bt=Math.max(b.updatedAt,b.deletedAt||0);return bt>at?b:bt<at?a:JSON.stringify(a)>JSON.stringify(b)?a:b;}
 function mergeItems(a,b,extra){const map=new Map(a.map(x=>[x.id,x]));for(const item of b){const previous=map.get(item.id);map.set(item.id,extra&&previous?extra(previous,item):choose(previous,item));}return[...map.values()];}
@@ -45,7 +47,7 @@ export function mergeWorkspace(a,b){
   habits:mergeItems(a.habits,b.habits,(x,y)=>mergeHabit(x,y,choose)),
   plans:mergeItems(a.plans,b.plans,(x,y)=>{const winner=choose(x,y),modern=x.syllabusVersion===2||y.syllabusVersion===2;return {...winner,...(modern?{syllabusVersion:2,nextChapterId:winner.syllabusVersion===2?winner.nextChapterId:(x.syllabusVersion===2?x:y).nextChapterId}:{}),chapters:mergeItems(x.chapters,y.chapters,(c,d)=>{const chosen=choose(c,d);return {...chosen,needsReview:winner.syllabusVersion!==2&&modern?(x.syllabusVersion===2?c:d).needsReview:chosen.needsReview};})};}),
   weeklyGoal:b.goalUpdatedAt>a.goalUpdatedAt?b.weeklyGoal:a.weeklyGoal,goalUpdatedAt:Math.max(a.goalUpdatedAt,b.goalUpdatedAt),
-  learning:mergeLearning(a.learning,b.learning),deletedSessions:{...a.deletedSessions}
+  planning:mergePlanning(a.planning,b.planning),learning:mergeLearning(a.learning,b.learning),deletedSessions:{...a.deletedSessions}
  };
  for(const [id,t]of Object.entries(b.deletedSessions))result.deletedSessions[id]=Math.max(t,result.deletedSessions[id]||0);
  // A child edited on another device cannot revive its deleted parent.
@@ -55,7 +57,8 @@ export function mergeWorkspace(a,b){
 export function workspaceAction(state,action,{id,now,owner}){
  const w=state.workspace=validateWorkspace(state.workspace),type=action.type;
  const upsert=(key,fields)=>{const old=action.itemId?w[key].find(x=>x.id===action.itemId&&!x.deletedAt):null;if(action.itemId&&!old)invalid('This item changed or was removed.');if(old&&action.expectedUpdatedAt!==undefined&&action.expectedUpdatedAt!==old.updatedAt)invalid('This item changed in another tab. Reopen it before saving.');const entry={...old,...fields,id:old?.id||id,updatedAt:now,deletedAt:0};const candidate={...w,[key]:old?w[key].map(x=>x.id===old.id?entry:x):[...w[key],entry]};state.workspace=validateWorkspace(candidate);};
- if(type==='task-save'){beginLearning(state,now,id);upsert('tasks',{title:action.title,subject:action.subject||'',dueDate:action.dueDate||'',plannedDate:action.plannedDate||'',priority:action.priority||'normal',estimateMinutes:action.estimateMinutes||0,done:!!action.done});recordTask(state,state.workspace.tasks.find(t=>t.id===(action.itemId||id)),now,id);}
+ if(type.startsWith('planning-')){try{planningAction(state,action,{id,now,owner});}catch(e){invalid(e.message);}}
+ else if(type==='task-save'){beginLearning(state,now,id);upsert('tasks',{title:action.title,subject:action.subject||'',dueDate:action.dueDate||'',plannedDate:action.plannedDate||'',priority:action.priority||'normal',estimateMinutes:action.estimateMinutes||0,done:!!action.done});recordTask(state,state.workspace.tasks.find(t=>t.id===(action.itemId||id)),now,id);}
  else if(type==='habit-save')habitSave(w,action,{id,now});
  else if(type==='habit-check')habitCheck(w,action,now);
  else if(type==='habit-prepare'){
@@ -154,8 +157,10 @@ export function workspaceAction(state,action,{id,now,owner}){
   if(hasProgress(state.timer))throw new DomainError('BUSY','Finish or reset the active session before starting a different task.');
   let target;if(action.taskId)target=alive(w.tasks).find(x=>x.id===action.taskId);else target=alive(w.plans).find(x=>x.id===action.planId)?.chapters.find(x=>x.id===action.chapterId&&!x.deletedAt);
   if(!target)invalid('This study target no longer exists.');
+  const block=action.planningBlockId?alive(w.planning.blocks).find(b=>b.id===action.planningBlockId&&b.taskId===action.taskId&&b.status==='planned'):null;if(action.planningBlockId&&!block)invalid('This planned session changed. Reopen the plan.');
+  const sourceRule=w.planning.rules.find(r=>r.id===action.taskId&&!r.deletedAt);
   const mode=action.mode||'study';if(!['study','focus','pomodoro'].includes(mode))invalid('Choose a study timer.');
-  state.timer={...makeTimer(mode,state.settings,id,now,owner),subject:target.subject,taskId:action.taskId||'',taskTitle:action.taskId?target.title:'',planId:action.planId||'',chapterId:action.chapterId||'',chapterTitle:action.chapterId?target.title:'',status:'running',since:now,startedAt:now};
+  state.timer={...makeTimer(mode,state.settings,id,now,owner),...(sourceRule?.sourcePlanId?{planId:sourceRule.sourcePlanId,chapterId:sourceRule.sourceChapterId,chapterTitle:w.plans.find(p=>p.id===sourceRule.sourcePlanId)?.chapters.find(c=>c.id===sourceRule.sourceChapterId)?.title||''}:{}),...(block?{planningBlockId:block.id}:{}),subject:target.subject,taskId:action.taskId||'',taskTitle:action.taskId?target.title:'',planId:action.planId||sourceRule?.sourcePlanId||'',chapterId:action.chapterId||sourceRule?.sourceChapterId||'',chapterTitle:action.chapterId?target.title:sourceRule?.sourceChapterId?w.plans.find(p=>p.id===sourceRule.sourcePlanId)?.chapters.find(c=>c.id===sourceRule.sourceChapterId)?.title||'':'',status:'running',since:now,startedAt:now};
  }
  else return false;
  state.workspace=validateWorkspace(state.workspace);

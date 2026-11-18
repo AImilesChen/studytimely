@@ -5,6 +5,7 @@ import {validateWorkspace} from './workspace.mjs';
 export const DATABASE='studytimely';
 export const STORE='local-state';
 export const ROOT_KEY='v1';
+export const PLANNING_KEY='advanced-planning-v1';
 export const CHANNEL='studytimely-state-v1';
 export const SESSION_PREFERENCE_KEYS=['worldClockCities','theme','spaceTheme','ambient','ambientVolume','ambientPresets','timerSize','musicTrack','musicVolume','musicRepeat','lastTool','lastPage','reducedMotion','sound','volume','clock24','showSeconds','showDate'];
 const uuid=()=>crypto.randomUUID();
@@ -37,13 +38,14 @@ export function createRepository({indexedDB=globalThis.indexedDB,makeId=uuid,not
    const database=await open();return new Promise((resolve,reject)=>{
      let outcome,originalError;
      const tx=database.transaction(STORE,change?'readwrite':'readonly'),store=tx.objectStore(STORE),request=store.get(ROOT_KEY);
-     request.onsuccess=()=>{
+     request.onsuccess=()=>{const side=store.get(PLANNING_KEY);side.onsuccess=()=>{
        try{
-         const existing=request.result;
-         if(change){outcome=change(existing);store.put(persistedState(outcome.state),ROOT_KEY);}
+         let existing=request.result;
+         if(existing&&side.result?.epoch===existing.epoch)existing={...existing,workspace:{...existing.workspace,planning:side.result.planning}};
+         if(change){outcome=change(existing);store.put(persistedState(outcome.state),ROOT_KEY);store.put({epoch:outcome.state.epoch,planning:outcome.state.workspace.planning},PLANNING_KEY);}
          else outcome={state:existing?checkState(existing):null,event:null};
        }catch(error){originalError=error;tx.abort();}
-     };
+     };};
      tx.oncomplete=()=>{if(change)notify();resolve(outcome);};
      tx.onabort=tx.onerror=()=>reject(originalError||new DomainError('STORAGE','Study data could not be saved. Keep this tab open and try again.'));
    }).catch(error=>{if(error instanceof DomainError)throw error;throw new DomainError('STORAGE','Study data could not be saved. Keep this tab open and try again.');});

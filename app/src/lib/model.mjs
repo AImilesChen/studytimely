@@ -29,7 +29,7 @@ function record(state,t,now,status){
  const intervals=intervalsAt(t,now),seconds=Math.floor(sumIntervals(intervals)/1000);
  if(seconds<1||state.sessions.some(s=>s.id===t.id))return false;
  const segments=takeIntervals(intervals,seconds*1000);
- state.sessions.unshift({id:t.id,mode:t.mode,subject:t.subject,startedAt:segments[0][0],endedAt:segments.at(-1)[1],durationSeconds:seconds,status,segments,...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle'].filter(k=>t[k]).map(k=>[k,t[k]]))});
+ state.sessions.unshift({id:t.id,mode:t.mode,subject:t.subject,startedAt:segments[0][0],endedAt:segments.at(-1)[1],durationSeconds:seconds,status,segments,...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle','planningBlockId'].filter(k=>t[k]).map(k=>[k,t[k]]))});
  return true;
 }
 function review(t,now,reason){
@@ -37,7 +37,7 @@ function review(t,now,reason){
  pauseTimer(t,last);t.status='review';t.reviewReason=reason;t.reviewSegments=candidate;t.reviewMaxSeconds=Math.floor(sumIntervals(candidate)/1000);t.lastObserved=now;
 }
 function nextPomodoro(state,t,now,phase,completed=t.completedStudies,run=false){
- state.timer={...makeTimer('pomodoro',state.settings,t.rootId,now,t.owner),...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle'].filter(k=>t[k]).map(k=>[k,t[k]])),id:t.rootId+':'+(t.sequence+1),sequence:t.sequence+1,phase,completedStudies:completed,durationSeconds:durationFor('pomodoro',phase,state.settings),subject:t.subject,status:run?'running':'ready',since:run?now:null,startedAt:run?now:null};
+ state.timer={...makeTimer('pomodoro',state.settings,t.rootId,now,t.owner),...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle','planningBlockId'].filter(k=>t[k]).map(k=>[k,t[k]])),id:t.rootId+':'+(t.sequence+1),sequence:t.sequence+1,phase,completedStudies:completed,durationSeconds:durationFor('pomodoro',phase,state.settings),subject:t.subject,status:run?'running':'ready',since:run?now:null,startedAt:run?now:null};
 }
 function settle(state,now){
  const t=state.timer;if(!t||t.status!=='running')return null;
@@ -227,7 +227,7 @@ export function validateBackup(b,{internal=false}={}){
    if(!Number.isFinite(s.startedAt)||!Number.isFinite(s.endedAt)||s.startedAt<0||s.endedAt<s.startedAt)fail('INVALID','The backup contains an invalid date.');
    let end=0;const segments=s.segments.map(xs=>{if(!Array.isArray(xs)||xs.length!==2||xs.some(n=>!Number.isFinite(n)||n<0)||xs[1]<xs[0]||xs[0]<end)fail('INVALID','The backup contains invalid time intervals.');end=xs[1];return[xs[0],xs[1]];});
    if(!segments.length||sumIntervals(segments)!==s.durationSeconds*1000||segments[0][0]!==s.startedAt||segments.at(-1)[1]!==s.endedAt)fail('INVALID','The backup duration does not match its time intervals.');
-   const target={};for(const key of ['taskId','taskTitle','planId','chapterId','chapterTitle'])if(s[key]!==undefined){if(typeof s[key]!=='string'||s[key].length>150)fail('INVALID','Invalid study target.');target[key]=s[key];}
+   const target={};for(const key of ['taskId','taskTitle','planId','chapterId','chapterTitle','planningBlockId'])if(s[key]!==undefined){if(typeof s[key]!=='string'||s[key].length>150)fail('INVALID','Invalid study target.');target[key]=s[key];}
    seen.add(s.id);return{id:s.id,mode:s.mode,subject:s.subject,startedAt:s.startedAt,endedAt:s.endedAt,durationSeconds:s.durationSeconds,status:s.status,segments,...target};
  });
  const subjects=b.subjects.map(s=>{if(typeof s!=='string'||!s.trim()||s.length>40)fail('INVALID','The backup contains an invalid subject.');return s.trim();});

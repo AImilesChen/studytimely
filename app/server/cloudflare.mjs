@@ -16,7 +16,7 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  if(path.startsWith('/api/community/'))return communityApi(request,env,config.communityEnabled===true,ctx);
  if(accountPaths.has(path))return accountApi(request,env,config.accountsEnabled===true);
  const headers={'X-Content-Type-Options':'nosniff','Referrer-Policy':['/study-groups','/leaderboard','/account'].includes(path)?'no-referrer':'strict-origin-when-cross-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'};
- if(!config.indexable||path==='/study-tracker'&&(url.searchParams.has('example')||url.searchParams.has('view'))||path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity')))headers['X-Robots-Tag']='noindex, nofollow';
+ if(!config.indexable||['/study-tracker','/study-planner'].includes(path)&&(url.searchParams.has('example')||url.searchParams.has('view'))||path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity')))headers['X-Robots-Tag']='noindex, nofollow';
  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{...headers,Allow:'GET, HEAD'}});
  if(config.origin){
   const primary=new URL(config.origin);

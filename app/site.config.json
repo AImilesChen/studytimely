@@ -17,5 +17,7 @@
   "communityEnabled": true,
   "communityPoliciesReviewed": true,
   "advancedAnalyticsPreview": true,
-  "advancedAnalyticsPreviewEndsAt": 0
+  "advancedAnalyticsPreviewEndsAt": 0,
+  "advancedPlanningPreview": true,
+  "advancedPlanningPreviewEndsAt": 0
 }

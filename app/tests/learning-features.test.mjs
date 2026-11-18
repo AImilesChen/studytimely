@@ -37,3 +37,14 @@ test('older cloud clients cannot erase planning evidence, and the stored workspa
   const rejected=await call('/api/workspace','PUT',{version:1,document:old},auth.csrf);assert.equal(rejected.status,400);assert.equal((await rejected.json()).error.code,'UPDATE_REQUIRED');const saved=await(await call('/api/workspace')).json();assert.equal(saved.document.workspace.learning.events.length,document.workspace.learning.events.length);
  }finally{s.db.close();}
 });
+
+test('older clients cannot strip advanced goals from the cloud snapshot',async()=>{
+ const s=setup();try{s.db.prepare('INSERT INTO accounts(id,email,created_at) VALUES(?,?,?)').run('a','a@example.invalid',at);s.db.prepare('INSERT INTO sessions(token_hash,account_id,expires_at) VALUES(?,?,?)').run(await digest(token),'a',at+10000);
+  const api=createAccountsApi({now:()=>at}),cookie='__Host-studytimely-session='+token,call=(path,method='GET',data,csrf='')=>api(new Request('https://study.test'+path,{method,headers:{origin:'https://study.test',cookie,'x-csrf-token':csrf,'content-type':'application/json'},body:data?JSON.stringify(data):undefined}),s.env);
+  const auth=await(await call('/api/auth/me')).json();let state=emptyState('a');state=transition(state,{type:'planning-goal',epoch:'a',expectedRevision:0,title:'Private goal',deadline:'2026-12-01',kind:'custom'},{id:'task',now:at,owner:'local'}).state;const document=backupOf(state);
+  assert.equal((await call('/api/workspace','PUT',{version:0,document},auth.csrf)).status,200);const old=structuredClone(document);delete old.workspace.planning;
+  const rejected=await call('/api/workspace','PUT',{version:1,document:old},auth.csrf);assert.equal(rejected.status,400);assert.equal((await rejected.json()).error.code,'UPDATE_REQUIRED');const saved=await(await call('/api/workspace')).json();assert.equal(saved.document.workspace.planning.goals.length,document.workspace.planning.goals.length);
+ }finally{s.db.close();}
+});
+
+test('planning preview has its own policy, expires correctly and shares trusted subscription access',async()=>{const response=await learningFeatures(req(),{}, {advancedPlanningPreview:true},at);const data=await response.json();assert.equal(data.planning.source,'preview');assert.equal(data.analytics.allowed,false);const expired=await learningFeatures(req(),{}, {advancedPlanningPreview:true,advancedPlanningPreviewEndsAt:at-1},at);assert.equal((await expired.json()).planning.allowed,false);});
