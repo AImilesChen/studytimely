@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: 2026-11-13. Last updated: 2026-11-17.
+Effective date: 2026-11-13. Last updated: 2026-11-18.
 
 ## 1. Who is responsible
 
