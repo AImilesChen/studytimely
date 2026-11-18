@@ -1,3 +1,4 @@
+import {handleAutomaticSync} from './automatic-sync.mjs';
 import {losesPlanningHistory} from '../src/lib/planning-schema.mjs';
 import {losesLearningHistory} from '../src/lib/learning-history.mjs';
 import {losesExamHistory} from '../src/lib/exams.mjs';
@@ -31,9 +32,10 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
     identity=await query('SELECT a.id,a.email,a.google_sub,a.created_at,a.policy_accepted_at,a.policy_version,s.expires_at FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.token_hash=? AND s.expires_at>?',sessionHash,at).first();
    }
    const csrf=identity?await hmac(env.AUTH_HMAC,'csrf:'+sessionToken):'';
-   if(path==='/api/auth/me'&&method==='GET')return result({user:identity?{email:identity.email,createdAt:identity.created_at,googleLinked:!!identity.google_sub}:null,csrf:identity?csrf:null,providers:{google:!!(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)}});
+   if(path==='/api/auth/me'&&method==='GET')return result({user:identity?{syncAccountId:identity.id,email:identity.email,createdAt:identity.created_at,googleLinked:!!identity.google_sub}:null,csrf:identity?csrf:null,providers:{google:!!(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)}});
    if(!publicPaths.includes(path)&&!identity)fail(401,'NO_AUTH','Sign in to use cloud data. Anonymous tools remain available.');
    if(identity&&!publicPaths.includes(path)&&!['GET','HEAD'].includes(method)&&!equal(request.headers.get('x-csrf-token'),csrf))fail(403,'CSRF','Refresh your account page and try again.');
+   if(path.startsWith('/api/sync/'))return await handleAutomaticSync({request,env,identity,sessionHash,at,limit});
    if(path==='/api/auth/request-code'&&method==='POST'){
     const input=await body(request),address=email(input.email);
     if(!emailRecoveryOnly&&input.accepted!==true)fail(400,'AGE_POLICY','Confirm the account age and privacy requirements before continuing.');
@@ -68,6 +70,7 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
     return result({version:row?.version||0,document:row?.document?JSON.parse(row.document):null,updatedAt:row?.updated_at||null});
    }
    if(path==='/api/workspace'&&['PUT','DELETE'].includes(method)){
+    if(await query('SELECT version FROM sync_heads WHERE account_id=?',identity.id).first())fail(409,'SYNC_UPGRADE','Automatic sync is enabled. Use Sync & recovery; older clients cannot replace this workspace.');
     await limit('sync-account',identity.id,120,3600000);
     const input=await body(request,MAX_SYNC_BYTES+4096);if(!Number.isInteger(input.version)||input.version<0)fail(400,'INVALID','Provide the cloud version you last reviewed.');
     let document=null;
@@ -84,7 +87,8 @@ export function createAccountsApi({now=Date.now,makeCode=randomCode,makeToken=ra
     const row=await query('SELECT version,document,updated_at FROM workspaces WHERE account_id=?',identity.id).first();
     const profile=await query('SELECT id,nickname,public_ranking,accepted_at FROM community_profiles WHERE account_id=?',identity.id).first();
     const community=profile?{profile,roomAccessPreference:await query('SELECT free_room_id,version,updated_at FROM community_room_preferences WHERE owner_id=?',profile.id).first(),entitlements:await query('SELECT member_limit,free_text,expires_at,updated_at FROM community_entitlements WHERE account_id=?',identity.id).first(),interactions:(await query('SELECT room_id,sender_id,recipient_id,kind,created_at,expires_at FROM community_interactions WHERE (sender_id=? OR recipient_id=?) AND expires_at>?',profile.id,profile.id,at).all()).results,activityParticipation:(await query('SELECT * FROM community_activity_members WHERE profile_id=?',profile.id).all()).results,ownedActivities:(await query('SELECT a.* FROM community_activities a JOIN community_rooms r ON r.id=a.room_id WHERE r.owner_id=?',profile.id).all()).results,ownedRooms:(await query('SELECT id,name,visibility,study_subject,custom_theme,announcement_key,goal_minutes,capacity,invitations_open,created_at,closed_at FROM community_rooms WHERE owner_id=?',profile.id).all()).results,roomTime:(await query('SELECT room_id,day,seconds FROM community_room_daily WHERE profile_id=?',profile.id).all()).results,rankHistory:(await query('SELECT day,rank,seconds FROM community_rank_history WHERE profile_id=?',profile.id).all()).results,blocks:(await query('SELECT blocked_id FROM community_blocks WHERE blocker_id=?',profile.id).all()).results,memberships:(await query('SELECT room_id,joined_at,left_at,banned,focus_state,allow_nudges,state_updated_at FROM community_members WHERE profile_id=?',profile.id).all()).results,daily:(await query('SELECT day,seconds FROM community_daily WHERE profile_id=?',profile.id).all()).results,messages:(await query('SELECT room_id,text,created_at FROM community_messages WHERE author_id=?',profile.id).all()).results,reports:(await query('SELECT room_id,reason,detail,status,created_at FROM community_reports WHERE reporter_id=?',profile.id).all()).results}:null;
-    return result({community,account:{email:identity.email,createdAt:identity.created_at,googleSubject:identity.google_sub||null,policyAcceptedAt:identity.policy_accepted_at||null,policyVersion:identity.policy_version||null},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
+    const syncHead=await query('SELECT generation,version FROM sync_heads WHERE account_id=?',identity.id).first();const syncRecords=syncHead?Object.fromEntries((await query('SELECT record_key,document FROM sync_records WHERE account_id=?',identity.id).all()).results.filter(r=>r.document!=='null').map(r=>[r.record_key,JSON.parse(r.document)])):null;
+    return result({automaticSync:syncHead?{...syncHead,records:syncRecords,backups:(await query('SELECT id,source,checksum,created_at FROM sync_backups WHERE account_id=? AND created_at>=?',identity.id,at-30*86400000).all()).results,recentlyDeleted:(await query('SELECT record_key,label,deleted_at FROM sync_trash WHERE account_id=? AND deleted_at>=?',identity.id,at-30*86400000).all()).results,devices:(await query('SELECT id,name,last_seen FROM sync_devices WHERE account_id=?',identity.id).all()).results}:null,community,account:{email:identity.email,createdAt:identity.created_at,googleSubject:identity.google_sub||null,policyAcceptedAt:identity.policy_accepted_at||null,policyVersion:identity.policy_version||null},workspace:row?.document?JSON.parse(row.document):null,version:row?.version||0,exportedAt:new Date(at).toISOString()});
    }
    if(path==='/api/account'&&method==='DELETE'){
     const input=await body(request);if(input.confirm!=='DELETE')fail(400,'CONFIRM','Confirm account deletion explicitly.');

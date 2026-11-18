@@ -24,7 +24,7 @@ export function StudyHomeContent({navigate,onFocus,pwa,locked}){
    <h2 id="study-intro-heading">A free online study timer for your daily routine</h2>
    <div className="study-copy-grid">
    <p>StudyTimely gives you a place to time a study session, take breaks and review what you have completed. Open the page and select Start when you are ready. The study timer counts upwards, so you can begin a chapter, an assignment or a practice set without first deciding how many minutes it should take.</p>
-   <p>Use the core tools without an account. Your study records stay in the browser you use, with optional manual cloud sync when you choose it. If you prefer a fixed session length, switch to a focus countdown or a Pomodoro routine. Choose the timer around the task you have today.</p>
+   <p>Use the core tools without an account. Your study records stay in the browser you use, with optional cloud sync when you choose it. If you prefer a fixed session length, switch to a focus countdown or a Pomodoro routine. Choose the timer around the task you have today.</p>
    </div>
   </section>
   <section aria-labelledby="timer-choices-heading">
@@ -81,7 +81,7 @@ export function StudyHomeContent({navigate,onFocus,pwa,locked}){
    <h2 id="study-records-heading">Keep a useful record of your study time</h2>
    <div className="study-copy-grid study-records-grid">
     <div><h3>Review completed study time</h3><p>A daily goal is a reference for your plan, not time already completed. Saved study sessions add actual study time to your total; pauses, Pomodoro breaks and planned schedule blocks do not. Reviewing subjects and recent sessions can help you decide where to put your next study block.</p></div>
-    <div><h3>Keep a backup</h3><p>Settings → Data lets you export a JSON backup or a sessions CSV, and import a compatible JSON backup. Clearing site data, private browsing or losing a device can remove local records. An optional account gives you a manual Sync now action; signing in alone does not upload your study history.</p></div>
+    <div><h3>Keep a backup</h3><p>Settings → Data lets you export a JSON backup or a sessions CSV, and import a compatible JSON backup. Clearing site data, private browsing or losing a device can remove local records. An optional account gives you manual sync and an explicit automatic-sync option; signing in alone does not upload your study history.</p></div>
    </div>
   </section>
   <PwaStatus pwa={pwa} locked={locked} compact/>

@@ -27,3 +27,17 @@ Capture the main list and a selected review at the supplied screenshot's viewpor
 Also inspect Today/Plans future/current/missed/feedback states, reopen validation, frozen-pending-write/retry behaviour, Plan options, quiet reminder timing/dismissal/open-task delivery across visible/hidden tabs, and the example-to-own-workspace transition in the actual browser.
 
 Automated checks and the final preview build are recorded in the local colour handoff. They do not substitute for the pending visual comparison.
+
+
+## Sync & recovery center — 18 November 2026
+
+Final visual result: **blocked**. Local implementation adds a high-contrast sync status, explicit first-use choices, backup/version preview, conflict alternatives, recently deleted items and device management within the existing study-center settings. Code defines desktop columns and single-column phone layouts; existing typography/icons remain. Seven explicit text/background pairs calculate at >=7.42:1.
+
+Local model/storage/API verification and HTTP checks are recorded in `docs/development/StudyTimely-Auto-Sync-Local-2026-11-18.md`. They do not establish visual or interactive acceptance. Opening `http://127.0.0.1:4298/__test/sync-preview` in the in-app browser returned queued; no new capture/control capability was available. No after screenshots, mobile geometry, actual keyboard/focus/download/Google-return/offline/sleep interactions or full accessibility pass are claimed. No alternate browser or OS capture was used.
+
+Pending: inspect anonymous/first-enable/existing-cloud/guest-import states, both themes, selected options and cloud/local counts; exercise cancellation, save failure, offline/reconnect, two-device field conflict, deletion, linked restore preview, stale-preview rejection, full-restore confirmation, held old queues, current/other-device naming/revocation and export. Inspect 1440px and 390px layouts, long names, zoom, focus, errors and console/resources before changing this result to passed.
+
+
+## Account integration refinement — 18 November 2026
+
+Visual result remains **blocked**, pending actual in-app-browser capture/control. The user supplied the before screenshots and approved a narrow revision preserving the existing learning center. Overview now ends with a compact data card; Settings puts account controls first, removes the duplicate browser-backup panel, and contains the complete sync center. Inactive recovery omits large vacant columns, selected backups reveal the preview, and a real error uses one retry status. Shared background gating treats anonymous/local-only access as normal. Default synthetic entry returns to Overview. Nine actual rendered-component/shared-state checks passed; they are not browser screenshots or physical interaction acceptance. See `docs/development/StudyTimely-Account-Sync-Layout-Local-2026-11-18.md` for verification and pending browser checks.

@@ -59,6 +59,7 @@ export function useStudyStore(){
    document.addEventListener('visibilitychange',visible);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',visible);};
  },[ready,execute]);
  const wipe=useCallback(async()=>{try{const result=volatile.current?{state:emptyState(crypto.randomUUID()),event:'cleared'}:await repo.current.wipe();pending.current=null;try{if(typeof localStorage!=='undefined')clearPlannerDeviceState(localStorage);}catch{}apply(result.state);setReady(true);setError(null);setEvent({name:'cleared',at:Date.now()});return result;}catch{setError({code:'STORAGE',message:'Stored data could not be cleared. Try again.'});return null;}},[apply]);
+ const syncLocal=useCallback(async(method,...args)=>{if(pending.current&&!['syncInfo','guestBackup','pauseSync'].includes(method))throw Error('Resolve the pending local save before syncing, changing workspaces or restoring.');if(volatile.current)throw Error('Automatic sync needs persistent local storage.');const result=await repo.current[method](...args);if(result?.state&&method!=='syncInfo')apply(result.state);return result;},[apply]);
  const getSnapshot=useCallback(()=>volatile.current?Promise.resolve(ref.current):repo.current.read(),[]);
- return{data,ready,error,memory,event,owner:owner.current,command,retry,useMemory,refresh,wipe,getSnapshot,clearError:()=>setError(null),hasPending:!!pending.current,pendingAt:pending.current?.at};
+ return{syncLocal,data,ready,error,memory,event,owner:owner.current,command,retry,useMemory,refresh,wipe,getSnapshot,clearError:()=>setError(null),hasPending:!!pending.current,pendingAt:pending.current?.at};
 }

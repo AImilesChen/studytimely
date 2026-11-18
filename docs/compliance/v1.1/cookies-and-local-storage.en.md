@@ -51,3 +51,12 @@ Open Settings → Data for the export, import and clear controls described above
 We update this notice when the actual storage or tracking setup changes. Contact our privacy email with questions.
 
 Optional appearance and sound sync includes only the selected presentation preferences when you opt in from Account. Local page-performance readings stay in memory; they are not cookies, persisted records or remote analytics.
+
+
+## Automatic sync and recovery storage
+
+The existing IndexedDB store `studytimely` / `local-state` additionally keeps `automatic-sync-v1` and `sync-profile:*` records. They hold the active account workspace association, separate cached account and unsigned-in workspaces, explicit automatic-sync choice, acknowledged cloud data, pending/in-flight mutation IDs, conflict alternatives and local protective backups. Signing in alone does not upload these records. Account-specific data stays separate when accounts change. Active timers, alarms, analytics choices, audio and device reminder settings are excluded from automatic cloud transfers.
+
+Pending changes and cached account workspaces remain until synced, explicitly replaced or cleared. This browser keeps up to 10 protection copies for up to 30 days; pruning occurs when protection copies are created. Clear local study data removes these cached workspaces, queues and local backups and disables automatic sync; browser website-data controls can also remove them. Cloud copies and downloaded files are separate. The cloud recovery limits, private session/device list and account-deletion controls are described in the [Privacy Policy](/privacy).
+
+The sessionStorage key `studytimely-sync-entry` remembers that a user chose to sign in from Sync & recovery. It holds only a ten-minute return-intent timestamp, contains no account token or study data, and is removed on successful return, cancellation or later return handling. Browser session storage also ends with the tab session.

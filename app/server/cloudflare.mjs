@@ -1,3 +1,4 @@
+import {automaticSyncMaintenance} from './automatic-sync.mjs';
 import {learningFeatures} from './learning-features.mjs';
 import {MUSIC_TRACKS} from '../src/lib/music-catalog.mjs';
 import {musicAssetResponse} from './music-assets.mjs';
@@ -14,7 +15,7 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  if(path==='/api/learning/features')return learningFeatures(request,env,config);
  if(path.startsWith('/api/auth/google/'))return googleApi(request,env);
  if(path.startsWith('/api/community/'))return communityApi(request,env,config.communityEnabled===true,ctx);
- if(accountPaths.has(path))return accountApi(request,env,config.accountsEnabled===true);
+ if(accountPaths.has(path)||path.startsWith('/api/sync/'))return accountApi(request,env,config.accountsEnabled===true);
  const headers={'X-Content-Type-Options':'nosniff','Referrer-Policy':['/study-groups','/leaderboard','/account'].includes(path)?'no-referrer':'strict-origin-when-cross-origin','Permissions-Policy':'camera=(), microphone=(), geolocation=()'};
  if(!config.indexable||['/study-tracker','/study-planner'].includes(path)&&(url.searchParams.has('example')||url.searchParams.has('view')||path==='/study-planner'&&(url.searchParams.has('exam')||url.searchParams.has('syllabus')))||path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity')))headers['X-Robots-Tag']='noindex, nofollow';
  if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405,headers:{...headers,Allow:'GET, HEAD'}});
@@ -41,4 +42,4 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com":'';
  out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${config.communityEnabled&&path==='/study-groups'?' '+(url.protocol==='https:'?'wss://':'ws://')+url.host:''}${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});
-},async scheduled(event,env,ctx){if(config.communityEnabled)ctx.waitUntil(communityMaintenance(env,event.scheduledTime));}};}
+},async scheduled(event,env,ctx){if(config.accountsEnabled)ctx.waitUntil(automaticSyncMaintenance(env,event.scheduledTime));if(config.communityEnabled)ctx.waitUntil(communityMaintenance(env,event.scheduledTime));}};}

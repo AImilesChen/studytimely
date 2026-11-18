@@ -1,3 +1,4 @@
+import {useAutomaticSync} from './lib/useAutomaticSync.jsx';
 import {navigationDestination} from './lib/internal-navigation.mjs';
 import {FlipClockGuide} from './components/FlipClockGuide.jsx';
 import {PomodoroPage} from './components/PomodoroPage.jsx';
@@ -43,6 +44,7 @@ const ICONS={clock:Clock,study:BookOpen,pomodoro:Orange,stopwatch:Timer,countdow
 const LEGAL={'/privacy':privacy,'/terms':terms,'/cookies':cookies};
 export function App({initialPath='/',initialNow=0}){
  const store=useStudyStore(),{data,ready,error,memory,command}=store,s=data.settings;
+ const cloudSync=useAutomaticSync(store,site.accountsEnabled!==false);store.cloudSync=cloudSync;
  const alarmAudio=useAlarm(store),countdownAudio=useCountdownAlert(store);
  const ambient=useAmbient(store),music=useMusic(store),pwa=usePwa();useVitals();
  const [path,setPath]=useState(initialPath),[now,setNow]=useState(initialNow),[calculatorDraft,setCalculatorDraft]=useState(null);
@@ -108,7 +110,7 @@ export function App({initialPath='/',initialNow=0}){
  async function prepareHabitTimer(payload){const result=await command('habit-prepare',payload);if(!result)return {ok:false,message:'The timer was not prepared. Review the active-timer or storage message.'};go(toolFor(payload.mode).path);return {ok:true};}
  function requestReset(){if(!hasProgress(display)&&!display.laps.length){command('reset',{mode});return;}setConfirm({title:'Reset this session?',body:mode==='stopwatch'?'This will clear the current run and all its laps.':'Reset will discard unsaved time in this session. Saved study history will stay in this browser.',action:'Discard and reset',run:()=>command('reset',{mode,timerId:active?.id})});}
  async function resolveConfirm(){if(busy)return;setBusy(true);try{const result=await confirm.run();if(result!==null&&result!==false)setConfirm(null);}finally{setBusy(false);}}
- function clearData(){setSettings(false);setConfirm({title:memory?'Clear temporary tab data?':'Clear local study data?',body:memory?'This clears temporary data and the local alarm in this tab. It does not clear saved browser data or downloaded backups.':'This will stop the timer and alarm and clear saved sessions, tasks, habits, schedules, exam plans, subjects, goals and preferences in all StudyTimely tabs on this browser. Export a backup first if you want to keep a copy.',action:'Clear local data',run:()=>store.wipe()});}
+ function clearData(){setSettings(false);setConfirm({title:memory?'Clear temporary tab data?':'Clear local study data?',body:memory?'This clears temporary data and the local alarm in this tab. It does not clear saved browser data or downloaded backups.':'This stops the timer and alarm and clears every account workspace cached on this browser, including local backups, pending uploads, records and preferences. Cloud data and downloaded files remain separate. Export pending changes first.',action:'Clear local data',run:()=>store.wipe()});}
  function importBackup(backup){setSettings(false);setConfirm({title:'Merge this backup?',body:`The backup contains ${backup.sessions.length} saved sessions, ${backup.workspace?.tasks?.length||0} task items and ${backup.workspace?.plans?.length||0} exam plans. Existing records stay; matching IDs are not added twice. An existing daily goal is kept.`,action:'Import backup',run:()=>command('import',{backup})});}
  async function claim(){await primeAudio();const result=await command('claim');if(result){setRecovery(false);if(result.state.timer?.status==='review'&&isStudy(result.state.timer.mode)){setReviewDraft(String(Math.floor(result.state.timer.baseMs/1000)));setReviewOpen(true);}}}
  async function saveGoal(e){e.preventDefault();setFormError('');const n=Number(goalDraft);if(!/^\d+$/.test(goalDraft)||n<1||n>1440){setFormError('Enter a whole number from 1 to 1440 minutes.');return;}if(await command('goal',{minutes:n}))setGoalOpen(false);}
