@@ -1,3 +1,4 @@
+import {navigationDestination} from './lib/internal-navigation.mjs';
 import {FlipClockGuide} from './components/FlipClockGuide.jsx';
 import {PomodoroPage} from './components/PomodoroPage.jsx';
 import {FocusPage} from './components/FocusPage.jsx';
@@ -82,7 +83,7 @@ export function App({initialPath='/',initialNow=0}){
    const next=TOOLS.find(t=>t.path===destination);
    if(next&&hasProgress(active)&&next.id!==active.mode){setSettings(false);setConfirm({title:'Finish this session before switching timers?',body:isStudy(active.mode)?'Your recorded study time will be saved before opening another timer.':'Switching will reset the current timer and its laps.',action:isStudy(active.mode)?'Finish and switch':'Reset and switch',run:async()=>{const result=await command(isStudy(active.mode)?'finish':'reset',{timerId:active.id,mode:next.id});if(result)go(destination);return result;}});}else go(destination);
  }
- function navigate(e){if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();const url=new URL(e.currentTarget.href);requestNavigation(url.pathname+(url.pathname==='/account'&&url.searchParams.get('view')==='signin'?'?view=signin':''));}
+ function navigate(e){if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();const url=new URL(e.currentTarget.href);requestNavigation(navigationDestination(url));}
  async function startTarget(target){
    const begin=async()=>{const result=await command('workspace-start',target);if(result)go(toolFor(target.mode||'study').path);return result;};
    if(hasProgress(active)){setConfirm({title:'Start a different study task?',body:'The current study time will be saved first. A general timer and its laps will be reset.',action:'Finish and start task',run:async()=>{if(await command(isStudy(active.mode)?'finish':'reset',{timerId:active.id}))return begin();return null;}});}else await begin();

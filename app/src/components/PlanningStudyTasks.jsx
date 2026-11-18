@@ -1,0 +1,46 @@
+import {useRef,useState} from 'react';
+import {ArrowRight,ArrowLeft,CheckCircle,Check,MagnifyingGlass,PencilSimple,CalendarBlank} from '@phosphor-icons/react';
+import {Dialog} from './Dialog.jsx';
+import {PlanningTypeIcon} from './PlanningCalendarParts.jsx';
+import {calendarKind,calendarKindLabel} from '../lib/planning-calendar.mjs';
+import {studyTaskGroups} from '../lib/planning-plan-view.mjs';
+import {studyTaskPage,preferredStudyTask,studyDetailTitle,studyTaskAction,studyGroupCaption,studyGroupTypes,studyTaskLabels} from '../lib/planning-task-detail.mjs';
+import {duration,zonedDay} from '../lib/study-analysis.mjs';
+
+const minutes=n=>n===null?'Needs estimate':n===0?'0 min':duration(n*60);
+const shortDate=d=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(d+'T12:00Z'));
+function timeText(b,zone){const f=at=>new Date(at).toLocaleTimeString('en-GB',{timeZone:zone,hour:'2-digit',minute:'2-digit'});return `${shortDate(zonedDay(b.startAt,zone))} · ${f(b.startAt)}–${f(b.endAt)}`;}
+
+export function StudyTopicRow({group,selected,expanded,onSelect}){
+ const types=studyGroupTypes(group),kind=types.length===1?types[0].kind:group.kind;
+ return <button className={`sp-topic-row${selected?' is-selected':''}`} data-kind={kind} aria-current={selected?'true':undefined} aria-expanded={expanded} aria-haspopup="dialog" onClick={e=>onSelect(group,e)}><span className="sp-topic-icon"><PlanningTypeIcon kind={kind} size={22}/></span><span className="sp-topic-name"><strong title={group.title}>{group.title}</strong><span className="sp-topic-types">{types.map(({kind,count})=><span key={kind} className="sp-type-chip" data-kind={kind}>{count>1?`${count} `:''}{calendarKindLabel(kind)}</span>)}{group.complete&&<span className="sp-topic-complete"><CheckCircle size={15}/>Completed</span>}{!types.length&&<span className="sp-topic-no-tasks">{studyGroupCaption(group)}</span>}</span></span><span className="sp-topic-trailing"><strong>{group.unknown?'Estimate':minutes(group.remaining)}</strong><span>{selected?<Check size={15} weight="bold"/>:null}View details <ArrowRight size={14}/></span></span></button>;
+}
+
+export function StudyTaskDetail({group,selected,goal,zone,disabled,canCreate,paused,demo,clock,onPick,onTask,onArrange,onSession,onStart,onSchedule,onClose}){
+ const action=studyTaskAction(selected,{paused,demo,now:clock});
+ function primary(){if(action.type==='start')onStart(selected.next);else if(action.type==='session')onSession(selected.next);else if(action.type==='edit')onTask(selected.task,goal);else if(action.type==='arrange')onArrange(goal);}
+ return <div className="sp-task-drawer-body"><div className="sp-task-drawer-caption"><span>{goal.subject||'Study plan'} · {group.total} task{group.total===1?'':'s'}</span><strong>{group.unknown?'Some work needs an estimate':minutes(group.remaining)+' remaining'}</strong></div>
+  <div className="sp-task-drawer-scroll"><h3>Learning steps</h3>{group.rows.length?<div className="sp-drawer-task-list">{group.rows.map(row=>{const kind=calendarKind({prep:row.prep}),picked=row.task.id===selected?.task.id;return <button key={row.task.id} className={`sp-drawer-task${picked?' is-selected':''}`} data-kind={kind} aria-pressed={picked} onClick={()=>onPick(row.task.id)}><span className="sp-drawer-task-icon"><PlanningTypeIcon kind={kind} size={23}/></span><span className="sp-drawer-task-copy"><span className="sp-drawer-task-eyebrow"><span className="sp-type-chip" data-kind={kind}>{calendarKindLabel(kind)}</span><span className={`sp-drawer-task-status state-${row.state}`}>{row.task.done?<CheckCircle size={14}/>:null}{paused&&!['active','feedback'].includes(row.state)&&!row.task.done?'Paused':studyTaskLabels[row.state]}</span></span><strong>{studyDetailTitle(row,group)}</strong><span className="sp-drawer-task-time">{row.next?`${timeText(row.next,zone)} · ${minutes((row.next.endAt-row.next.startAt)/60000)} · ${zone}`:row.remaining===null?'Needs a time estimate':`${minutes(row.remaining)} remaining · No study time arranged`}</span></span><span className="sp-drawer-task-choice" aria-hidden="true">{picked?<Check size={16} weight="bold"/>:null}</span></button>;})}</div>:<p className="sp-drawer-empty">No study or review task is included for this topic. Change its familiarity in Preparation settings if it needs more study.</p>}
+   {selected&&<section className="sp-drawer-selection" aria-label="Selected task options">{selected.next&&<button className="text-button" disabled={disabled} onClick={()=>onSession(selected.next)}><CalendarBlank size={16}/>{['active','feedback'].includes(selected.state)?'Session details':'Edit scheduled time'}</button>}{selected.upcoming.length>1&&<button className="text-button" onClick={()=>onSchedule(goal,selected.next)}>View all {selected.upcoming.length} sessions <ArrowRight size={14}/></button>}</section>}
+  </div>
+  <footer className="sp-task-drawer-footer">{selected?<><button className="button sp-drawer-edit" disabled={!canCreate} onClick={()=>onTask(selected.task,goal)}><PencilSimple size={16}/>Edit task</button>{action.type==='none'?(selected.task.done?<button className="button primary sp-drawer-primary" disabled={!canCreate} onClick={()=>onTask(selected.task,goal,{reopen:true})}>Reopen task <ArrowRight size={16}/></button>:<span className="sp-drawer-readonly">{action.label}</span>):<button className="button primary sp-drawer-primary" disabled={disabled||(['edit','arrange'].includes(action.type)&&!canCreate)} onClick={primary}>{action.label}<ArrowRight size={16}/></button>}</>:<button className="button" onClick={onClose}>Close details</button>}</footer>
+ </div>;
+}
+
+export function StudyTaskDrawer({open,suspended,group,taskId,phase,returnFocusRef,fallbackFocusRef,...props}){
+ const selected=preferredStudyTask(group,taskId,phase);
+ return <Dialog open={!!open&&!!group&&!suspended} title={group?.title||'Study tasks'} close={props.onClose} className="sp-study-drawer sp-learning-colours" initialFocus=".sp-drawer-task[aria-pressed=true]" {...{returnFocusRef,fallbackFocusRef}}>{open&&group&&<StudyTaskDetail {...props} {...{group,selected}}/>}</Dialog>;
+}
+
+export function PlanningStudyTasks({rows,allRows=rows,prep,goal,phase='all',onPhase,detailSuspended=false,...props}){
+ const [view,setView]=useState({page:0,query:'',groupId:'',taskId:'',open:false}),origin=useRef(null),heading=useRef(null),groups=studyTaskGroups(rows,prep,{includeEmpty:phase==='all'}),allGroups=studyTaskGroups(allRows,prep),page=studyTaskPage(groups,view),group=allGroups.find(g=>g.id===view.groupId);
+ const patch=v=>setView(old=>({...old,...v}));
+ function select(g,e){origin.current=e?.currentTarget||origin.current;origin.current?.focus?.({preventScroll:true});setView(old=>({...old,groupId:g.id,taskId:old.groupId===g.id?old.taskId:'',open:true}));}
+ return <section className="sp-study-tasks sp-study-tasks-list sp-learning-colours" aria-label="Study tasks"><div className="sp-study-tasks-heading"><h3 ref={heading} tabIndex={-1}>Study tasks</h3>{rows.some(r=>!r.task.done&&r.state!=='omitted')&&<button className="text-button" disabled={!props.canCreate||props.paused} onClick={()=>props.onArrange(goal)}>Arrange study <ArrowRight size={15}/></button>}</div>
+  <div className="sp-topic-tools">{prep&&<div className="sp-study-filters" aria-label="Task types">{[['all','All'],['learn','Study'],['review','Review'],['mock','Mock']].map(([id,label])=><button key={id} data-kind={id==='learn'?'study':id} aria-pressed={phase===id} onClick={()=>{patch({page:0,open:false,taskId:''});onPhase?.(id);}}>{id!=='all'&&<PlanningTypeIcon kind={id==='learn'?'study':id} size={15}/>} {label}</button>)}</div>}{(allGroups.length>5||view.query)&&<label className="sp-topic-search"><MagnifyingGlass size={16}/><input type="search" aria-label="Find a topic or task" placeholder="Find a topic" value={view.query} onChange={e=>patch({query:e.target.value,page:0,open:false})}/></label>}</div>
+  <ul className="sp-topic-list" aria-label="Topics and study tasks">{page.rows.map(g=><li key={g.id}><StudyTopicRow group={g} selected={view.groupId===g.id} expanded={view.open&&view.groupId===g.id&&!detailSuspended} onSelect={select}/></li>)}</ul>
+  {!page.total&&<div className="sp-topic-empty"><p>{view.query?'No topics match your search.':phase!=='all'?'No tasks of this type. Choose All.':'No tasks yet. Add one small learning step.'}</p>{view.query&&<button className="text-button" onClick={()=>patch({query:'',page:0})}>Clear search</button>}</div>}
+  {page.pages>1&&<nav className="sp-topic-pagination" aria-label="Topic pages"><span aria-live="polite">{page.start}–{page.end} of {page.total}</span><div><button className="button" aria-label="Previous topic page" disabled={!page.page} onClick={()=>patch({page:page.page-1})}><ArrowLeft size={16}/>Previous</button><button className="button" aria-label="Next topic page" disabled={page.page===page.pages-1} onClick={()=>patch({page:page.page+1})}>Next<ArrowRight size={16}/></button></div></nav>}
+  <StudyTaskDrawer {...props} {...{group,goal,phase}} open={view.open} suspended={detailSuspended} taskId={view.taskId} onPick={taskId=>patch({taskId})} onClose={()=>patch({open:false})} returnFocusRef={origin} fallbackFocusRef={heading}/>
+ </section>;
+}

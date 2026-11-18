@@ -1,6 +1,7 @@
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {emptyState,transition,elapsedMs} from './model.mjs';
 import {createRepository,CHANNEL,SESSION_PREFERENCE_KEYS} from './storage.mjs';
+import {clearPlannerDeviceState} from './planner-device-state.mjs';
 
 export function useStudyStore(){
  const [data,setData]=useState(()=>emptyState()),[ready,setReady]=useState(false),[error,setError]=useState(null),[memory,setMemory]=useState(false),[event,setEvent]=useState(null);
@@ -57,7 +58,7 @@ export function useStudyStore(){
    const timer=setInterval(tick,250);const visible=()=>{if(document.visibilityState==='visible'){tickAt.current=0;tick();}};
    document.addEventListener('visibilitychange',visible);return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',visible);};
  },[ready,execute]);
- const wipe=useCallback(async()=>{try{const result=volatile.current?{state:emptyState(crypto.randomUUID()),event:'cleared'}:await repo.current.wipe();pending.current=null;apply(result.state);setReady(true);setError(null);setEvent({name:'cleared',at:Date.now()});return result;}catch{setError({code:'STORAGE',message:'Stored data could not be cleared. Try again.'});return null;}},[apply]);
+ const wipe=useCallback(async()=>{try{const result=volatile.current?{state:emptyState(crypto.randomUUID()),event:'cleared'}:await repo.current.wipe();pending.current=null;try{if(typeof localStorage!=='undefined')clearPlannerDeviceState(localStorage);}catch{}apply(result.state);setReady(true);setError(null);setEvent({name:'cleared',at:Date.now()});return result;}catch{setError({code:'STORAGE',message:'Stored data could not be cleared. Try again.'});return null;}},[apply]);
  const getSnapshot=useCallback(()=>volatile.current?Promise.resolve(ref.current):repo.current.read(),[]);
  return{data,ready,error,memory,event,owner:owner.current,command,retry,useMemory,refresh,wipe,getSnapshot,clearError:()=>setError(null),hasPending:!!pending.current,pendingAt:pending.current?.at};
 }

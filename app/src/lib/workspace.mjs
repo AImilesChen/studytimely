@@ -6,6 +6,7 @@ import {validateHabit,habitSave,habitCheck,mergeHabit,habitSummary,habitPolicy} 
 import {parseSyllabusOutline,materialiseOutline,syllabusLeaves} from './syllabus.mjs';
 import {BLOCK_KINDS,blockConflicts,conflictMessage,scheduleDraftDays} from './schedule.mjs';
 import {migrateExams,validateExam} from './exams.mjs';
+import {preparationFor,preparationExam,preparationDeadline} from './exam-preparation.mjs';
 
 export const emptyWorkspace=()=>({tasks:[],habits:[],plans:[],blocks:[],examVersion:1,exams:[],weeklyGoal:0,learning:emptyLearning(),planning:emptyPlanning(),deletedSessions:Object.create(null)});
 const invalid=message=>{throw new DomainError('INVALID',message);};
@@ -159,6 +160,7 @@ export function workspaceAction(state,action,{id,now,owner}){
   if(!target)invalid('This study target no longer exists.');
   const block=action.planningBlockId?alive(w.planning.blocks).find(b=>b.id===action.planningBlockId&&b.taskId===action.taskId&&b.status==='planned'):null;if(action.planningBlockId&&!block)invalid('This planned session changed. Reopen the plan.');
   const sourceRule=w.planning.rules.find(r=>r.id===action.taskId&&!r.deletedAt);
+  if(sourceRule?.prep?.omitted)invalid('This optional preparation activity was left out. Include it again before starting.');if(sourceRule?.prep){const prep=preparationFor(state,sourceRule.goalId);if(!preparationExam(state,prep)||preparationDeadline(state,prep)<=now)invalid('This exam preparation is paused. Update its exam before starting another session.');}
   const mode=action.mode||'study';if(!['study','focus','pomodoro'].includes(mode))invalid('Choose a study timer.');
   state.timer={...makeTimer(mode,state.settings,id,now,owner),...(sourceRule?.sourcePlanId?{planId:sourceRule.sourcePlanId,chapterId:sourceRule.sourceChapterId,chapterTitle:w.plans.find(p=>p.id===sourceRule.sourcePlanId)?.chapters.find(c=>c.id===sourceRule.sourceChapterId)?.title||''}:{}),...(block?{planningBlockId:block.id}:{}),subject:target.subject,taskId:action.taskId||'',taskTitle:action.taskId?target.title:'',planId:action.planId||sourceRule?.sourcePlanId||'',chapterId:action.chapterId||sourceRule?.sourceChapterId||'',chapterTitle:action.chapterId?target.title:sourceRule?.sourceChapterId?w.plans.find(p=>p.id===sourceRule.sourcePlanId)?.chapters.find(c=>c.id===sourceRule.sourceChapterId)?.title||'':'',status:'running',since:now,startedAt:now};
  }

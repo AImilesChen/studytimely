@@ -1,0 +1,15 @@
+import {useState} from 'react';
+import {BookOpen,ArrowClockwise,Timer,NotePencil,Plus,CheckCircle,Play,LockSimple,WarningCircle,MagnifyingGlass} from '@phosphor-icons/react';
+import {calendarColour,calendarKind,calendarKindLabel,calendarTaskGroups} from '../lib/planning-calendar.mjs';
+import {duration} from '../lib/study-analysis.mjs';
+
+export function PlanningTypeIcon({kind,size=16,...props}){const Icon={study:BookOpen,review:ArrowClockwise,mock:Timer,corrections:NotePencil}[kind]||BookOpen;return <Icon size={size} aria-hidden="true" {...props}/>;}
+export function PlanningStateIcon({status,locked}){
+ const Icon={active:Play,feedback:NotePencil,reviewed:CheckCircle,missed:WarningCircle}[status]|| (locked?LockSimple:null);
+ return Icon?<Icon className="sp-event-state" size={14} aria-label={{active:'In progress',feedback:'Needs feedback',reviewed:'Feedback saved',missed:'Needs rescheduling'}[status]||'Locked'}/>:null;
+}
+export function PlanningBacklog({source,goal,clock,goals,disabled,onGoal,onAdd,onTask}){
+ const [search,setSearch]=useState(''),groups=calendarTaskGroups(source,goal,clock),query=search.trim().toLowerCase(),filter=rows=>rows.filter(({task})=>!query||`${task.title} ${task.subject}`.toLowerCase().includes(query));
+ const render=(row,arranged=false)=>{const {task,rule,unarranged}=row,kind=calendarKind(rule);return <button key={task.id} className="sp-backlog-task" style={{'--session-color':calendarColour(task.subject)}} onClick={()=>onTask(task)} disabled={disabled} aria-label={`Edit ${task.title}`}><span className="sp-backlog-task-title"><PlanningTypeIcon kind={kind}/><strong>{task.title}</strong></span><span>{task.subject||'Unlabelled'} · {arranged?'All remaining time arranged':unarranged===null?'Add a time estimate':unarranged===0?'Confirm remaining work':`${duration(unarranged*60)} to arrange`}</span>{task.dueDate&&<small>Due {task.dueDate}</small>}</button>;};
+ return <aside className="sp-backlog sp-backlog-bounded" aria-label="Tasks to arrange"><label>Plan<select value={goal} onChange={e=>onGoal(e.target.value)}><option value="">All plans and tasks</option>{goals.map(g=><option key={g.id} value={g.id}>{g.title}</option>)}</select></label><div className="sp-backlog-title"><h2>To arrange <small>{groups.pending.length}</small></h2></div><label className="sp-backlog-search"><MagnifyingGlass size={16}/><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Find a task" aria-label="Find a task"/></label><div className="sp-backlog-list">{filter(groups.pending).map(row=>render(row))}{!filter(groups.pending).length&&<p className="sp-note">{query?'No matching tasks.':groups.arranged.length?'Your remaining work is arranged.':'Add a task to plan your next study.'}</p>}{groups.arranged.length>0&&<details className="sp-arranged-tasks"><summary>Arranged <span>{groups.arranged.length}</span></summary>{filter(groups.arranged).map(row=>render(row,true))}</details>}</div><button className="button sp-backlog-add" disabled={disabled} onClick={onAdd}><Plus size={17}/>Add task</button></aside>;
+}

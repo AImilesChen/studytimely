@@ -1,5 +1,5 @@
 import {emptyState,transition} from './model.mjs';
-import {generateStudySchedule} from './planning-engine.mjs';
+import {generateStudySchedule,planningFingerprint} from './planning-engine.mjs';
 import {zonedDay} from './study-analysis.mjs';
 import {shiftPlannerDay as shiftDay} from './planner.mjs';
 
@@ -14,7 +14,14 @@ export function planningExample(now,zone='UTC'){
  p.blocks=generateStudySchedule(data,{start:today,days:7},now).blocks.map((b,i)=>({...b,id:'example-slot-'+i,source:'generated',locked:false,status:'planned',updatedAt:now,deletedAt:0}));
  return data;
 }
-export const createPlanningSandbox=(now,zone)=>({data:planningExample(now,zone),simulations:{}});
+export function preparationExample(now,zone='UTC'){
+ let data=emptyState('preparation-example');data.subjects=['Maths','English'];data.workspace.planning.settings.zone=zone;const today=zonedDay(now,zone);
+ const first={exam:{title:'Maths final',subject:'Maths',date:shiftDay(today,14)},topics:[{title:'Quadratic equations',minutes:40,confidence:'new'},{title:'Graphs and functions',minutes:30,confidence:'weak'},{title:'Probability',minutes:30,confidence:'confident'}],rounds:1,gapDays:2,mockMinutes:60,importance:'normal',windows:Array.from({length:7},(_,i)=>({weekday:i+1,start:1080,end:1260})),settings:{zone,maxDailyMinutes:120}};
+ const second={exam:{title:'English paper',subject:'English',date:shiftDay(today,10)},topics:[{title:'Essay structure',minutes:30,confidence:'new'}],rounds:1,gapDays:2,mockMinutes:0,importance:'normal'};
+ for(const [i,draft] of [first,second].entries()){const id='prep-example-'+i;data=transition(data,{type:'planning-preparation',epoch:data.epoch,expectedRevision:data.workspace.planning.revision,basis:planningFingerprint(data),draftId:id,draft,apply:true,at:now,recipe:{start:today,days:14,goalId:''}},{now,id:id+':save',owner:'example'}).state;}
+ return data;
+}
+export const createPlanningSandbox=(now,zone,kind='study')=>({data:kind==='prep'?preparationExample(now,zone):planningExample(now,zone),simulations:{}});
 export function sandboxCommand(sandbox,type,payload,now,id){
  const b=sandbox.data.workspace.planning.blocks.find(b=>b.id===payload.itemId&&!b.deletedAt),running=Object.values(sandbox.simulations).some(s=>s.status==='running');
  if(type==='simulate-start'||type==='simulate-finish'){
@@ -24,7 +31,8 @@ export function sandboxCommand(sandbox,type,payload,now,id){
   return{...sandbox,simulations:{...sandbox.simulations,[b.id]:{status:type==='simulate-start'?'running':'finished',seconds:type==='simulate-finish'?Math.round((b.endAt-b.startAt)/1000):0}}};
  }
  if(!type.startsWith('planning-'))throw Error('Only example planning actions are available here.');
- if(running&&['planning-apply','planning-undo','planning-block','planning-feedback'].includes(type))throw Error('Finish the example simulation before changing its schedule.');
+ if(['planning-apply','planning-preparation','planning-block','planning-session'].includes(type)&&Object.entries(sandbox.simulations).some(([id,s])=>s.status==='finished'&&!sandbox.data.workspace.planning.feedback.some(f=>f.blockId===id&&!f.deletedAt)))throw Error('Save the simulated feedback before rearranging its session.');
+ if(running&&['planning-apply','planning-undo','planning-block','planning-session','planning-feedback','planning-preparation'].includes(type))throw Error('Finish the example simulation before changing its schedule.');
  const result=transition(sandbox.data,{type,epoch:sandbox.data.epoch,expectedRevision:sandbox.data.workspace.planning.revision,...payload},{now,id,owner:'example'});
  return {...sandbox,data:result.state};
 }

@@ -1,0 +1,55 @@
+/* Execution first: restrained filters, compact rows and one clear next action. */
+.sp-plans-compact .sp-plan-next{padding:14px 18px;min-height:96px;gap:12px;margin-bottom:18px}
+.sp-plans-compact .sp-plan-next h3{margin:5px 0;font-size:18px}
+.sp-plans-compact .sp-plan-next.state-replan{background:#ffe5b9;border-color:#d5a25b;color:#633807}
+.sp-plans-compact .sp-plan-next.state-replan :is(h3,time,small),.sp-plans-compact .sp-plan-next.state-replan .sp-next-label>span:first-child{color:#633807}
+.sp-plans-compact .sp-plan-next.state-replan .sp-next-icon{background:#fff2d9;border-color:#ad7736;color:#633807}
+.sp-topic-tools .sp-study-filters>button[data-kind]:not([aria-pressed=true]){background:transparent;border-color:transparent;box-shadow:none;color:var(--topic-muted)}
+.sp-topic-tools .sp-study-filters>button[data-kind]:not([aria-pressed=true]) svg{color:var(--type-tone)}
+html[data-theme=light] .sp-topic-tools .sp-study-filters>button[data-kind]:not([aria-pressed=true]) svg{color:var(--type-ink)}
+.sp-topic-tools .sp-study-filters>button[aria-pressed=true]{box-shadow:none;border-width:1px}
+.sp-topic-tools .sp-study-filters>button[aria-pressed=true]:not([data-kind=all]){background:var(--type-tone);color:var(--type-ink);border-color:var(--type-mark);box-shadow:none}
+.sp-topic-tools .sp-study-filters>button:hover{background:var(--topic-hover)}
+.sp-topic-row{min-height:88px;padding:13px 16px}
+.sp-topic-row.is-selected{box-shadow:inset 0 0 0 1px var(--topic-fg)}
+.sp-topic-name>.sp-topic-types{margin-top:7px}
+.sp-topic-types .sp-type-chip{font-weight:500;padding:2px 7px}
+.sp-storage-status{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;padding:12px 0;margin:4px 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
+.sp-storage-status>span{display:flex;align-items:center;gap:7px}
+.sp-storage-status>small{font-size:12px}
+.sp-storage-status>div{display:flex;align-items:center;gap:16px;margin-left:auto;flex-wrap:wrap}
+.sp-storage-status a,.sp-storage-status .text-button{font-size:13px;min-height:36px;display:inline-flex;align-items:center}
+.sp-storage-status .text-button{gap:6px}
+.sp-options-links{display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:22px;padding-top:18px;font-size:14px}
+.sp-reminder-options h3{font-size:20px;margin:0 0 12px}
+.sp-reminder-options p{font-size:14px;line-height:1.65}
+.sp-reminder-options label{font-size:15px}
+.sp-reminder-options .sp-check{margin:20px 0}
+.sp-reminder-options .sp-check input{width:19px;min-height:19px;height:19px;flex-shrink:0}
+.sp-reminder-options>.button{min-height:44px}
+.sp-reminder-notice{display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid #9aafcf;background:#e7f0ff;color:#1a365f;border-radius:12px;margin:0 0 18px}
+.sp-reminder-notice>svg{flex-shrink:0}
+.sp-reminder-notice>div{flex:1;min-width:0}
+.sp-reminder-notice strong,.sp-reminder-notice span{display:block;overflow-wrap:anywhere;line-height:1.5}
+.sp-reminder-notice strong{font-size:16px}
+.sp-reminder-notice span{font-size:14px;margin-top:4px}
+.sp-reminder-notice>.button{min-height:44px;background:#2563c5;border-color:#2563c5;color:#fff;font-size:14px;flex-shrink:0}
+.sp-reminder-notice>.icon-button{color:#1a365f;flex-shrink:0}
+.sp-reopen-check{margin:14px 0;font-size:15px}
+.sp-reopen-check input{width:19px;min-height:19px;height:19px}
+.sp-next-session.state-replan{border-color:#c49b5c}
+.sp-next-session.state-replan>div>span{color:#e7bd80}
+html[data-theme=light] .sp-next-session.state-replan>div>span{color:#805115}
+@media(max-width:760px){
+ .sp-plans-compact .sp-plan-next{padding:14px;min-height:0}
+ .sp-topic-row{padding:13px 10px}
+ .sp-storage-status{gap:6px 12px}
+ .sp-storage-status>div{margin-left:0;width:100%;gap:14px}
+ .sp-storage-status a,.sp-storage-status .text-button{min-height:44px}
+ .sp-reminder-notice{align-items:flex-start;gap:10px;flex-wrap:wrap;padding:14px}
+ .sp-reminder-notice>div{flex-basis:calc(100% - 36px)}
+ .sp-reminder-notice>.button{margin-left:30px}
+ .sp-reminder-notice>.icon-button{margin-left:auto}
+}
+
+.sp-modal-fields{border:0;padding:0;margin:0;min-width:0}

@@ -1,3 +1,4 @@
+import {recordManualSync} from '../lib/manual-sync-status.mjs';
 import {accountStatus} from '../lib/account-status.mjs';
 import {StudyCenter} from './StudyCenter.jsx';
 import {readCommunityEntry} from '../lib/community-entry.mjs';
@@ -29,6 +30,7 @@ export function Account({store,confirm,site,now,navigate,onStart}){
   const result=await store.command('import',{backup:merged,applyPreferences:syncPreferences});if(!result)throw Error('The local merge could not be saved. Nothing was uploaded.');
   const document={...backupOf(result.state),...(merged.preferences?{preferences:merged.preferences}:{})};
   const saved=await accountRequest('/api/workspace',{method:'PUT',data:{version:remote.version,document},csrf:auth.csrf});
+  try{recordManualSync(localStorage,result.state.epoch,Date.now());}catch{}
   setCloud({...saved,document});setMessage('The merged workspace snapshot was saved locally and to your account. New changes need another sync.');
  });}
  const changeCloud=()=>confirm({title:'Clear cloud study data?',body:'This clears the cloud snapshot. Data in this browser and downloaded backups remain. Syncing again can upload local records again.',action:'Clear cloud snapshot',run:()=>action(async()=>{const remote=await accountRequest('/api/workspace');const r=await accountRequest('/api/workspace',{method:'DELETE',data:{version:remote.version},csrf:auth.csrf});setCloud({...r,document:null});setMessage('Cloud snapshot cleared. Local records are still here.');return true;})});
