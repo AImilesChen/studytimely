@@ -111,3 +111,71 @@ html[data-theme=light] .sa-previous-bar{opacity:.9}
 html[data-theme=light] .sa-day-subjects i{filter:brightness(.72) saturate(1.15)}
 @media(max-width:1050px){.sa-month-heading{flex-direction:column;gap:16px}.sa-month-navigation{justify-content:flex-start}.sa-month-layout{grid-template-columns:minmax(0,1.6fr) minmax(230px,1fr);gap:20px}.sa-month-day{min-height:70px;padding-inline:2px}.sa-day-panel{padding:18px}}
 @media(max-width:760px){.sa-month-panel{padding:20px 16px;border-radius:15px;margin-top:22px}.sa-month-heading{gap:18px;margin-bottom:20px}.sa-month-navigation{width:100%;gap:6px}.sa-month-navigation>strong{flex:1;min-width:0;font-size:16px}.sa-month-navigation>.button{flex-basis:100%;width:100%;margin:6px 0 0;justify-content:center}.sa-month-navigation>.text-button{margin-top:4px}.sa-month-layout{grid-template-columns:1fr;gap:20px}.sa-month-weekdays,.sa-month-grid{gap:5px}.sa-month-weekdays{font-size:14px;margin-bottom:8px}.sa-month-day{min-height:61px;padding:6px 1px 8px;border-radius:7px;gap:6px}.sa-month-date{font-size:14px;min-width:22px;height:22px}.sa-month-time{font-size:14px}.sa-day-full{display:none}.sa-day-compact{display:inline}.sa-month-legend{gap:7px 12px;font-size:13px}.sa-month-legend>.sa-month-zone{flex-basis:100%;margin-left:0}.sa-day-panel{padding:20px}.sa-day-panel>header>strong{font-size:30px}.sa-storage{gap:4px 18px;line-height:1.7}.sa-storage>span{flex-basis:100%;font-size:14px}.sa-storage a,.sa-storage .text-button{font-size:14px}}
+/* Records: explicit subject setup, actionable empty states and daily groups. */
+.sa-page .log-guide caption{text-align:left;font-size:15px;line-height:1.6;color:var(--muted);padding:0 0 16px}
+.sa-page .log-guide table{width:100%;border-collapse:collapse;text-align:left;font-size:16px;line-height:1.7}
+.sa-page .log-guide :is(th,td){border-bottom:1px solid var(--line);vertical-align:top}
+.sa-subject-filter{display:flex;align-items:center;gap:10px;min-width:0}
+.sa-subject-filter label{min-width:0}
+.sa-subject-filter select{max-width:230px;min-height:42px;border:0;background:transparent;padding:8px 28px 8px 8px}
+.sa-subject-filter>.text-button{font-size:14px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.sa-filters.is-records>.text-button{margin-left:auto}
+.sa-record-empty{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;padding:24px;border:1px solid var(--sa-chart-border);border-radius:16px;background:var(--sa-chart-surface);margin:0 0 24px}
+.sa-record-empty>i{display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--sa-chart-border);border-radius:13px;color:var(--muted)}
+.sa-record-empty h2{font-size:20px;line-height:1.4;margin:0 0 8px;letter-spacing:-.015em}
+.sa-record-empty p{font-size:15px;line-height:1.7;color:var(--muted);margin:0;max-width:62ch}
+.sa-empty-actions{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;justify-content:flex-end;max-width:340px}
+.sa-empty-actions .button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
+.sa-empty-actions .text-button{display:inline-flex;align-items:center;gap:8px;font-size:14px}
+.sa-record-day{border:1px solid var(--sa-chart-border);border-radius:16px;overflow:hidden;margin-bottom:22px;background:var(--sa-chart-surface)}
+.sa-record-day>header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:1px solid var(--sa-chart-border)}
+.sa-record-day>header>div{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;min-width:0}
+.sa-record-day h3{font-size:18px;font-weight:600;line-height:1.5;margin:0;overflow-wrap:anywhere}
+.sa-record-day>header span{font-size:14px;color:var(--muted)}
+.sa-record-day>header>strong{font-size:23px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sa-record-columns,.sa-record-day li{display:grid;grid-template-columns:minmax(180px,1fr) minmax(160px,.65fr) 100px 90px 84px;gap:20px;align-items:center;padding:18px 24px}
+.sa-record-columns{font-size:13px;color:var(--muted);padding-block:12px;background:var(--bg)}
+.sa-record-day ul{list-style:none;margin:0;padding:0}
+.sa-record-day li+li{border-top:1px solid var(--sa-chart-border)}
+.sa-record-identity{display:flex;align-items:flex-start;gap:11px;min-width:0}
+.sa-record-identity>i{width:9px;height:9px;flex-shrink:0;border-radius:50%;margin-top:8px}
+.sa-record-identity h4{font-size:16px;font-weight:600;line-height:1.55;margin:0;overflow-wrap:anywhere}
+.sa-record-identity p{font-size:14px;line-height:1.65;color:var(--muted);margin:3px 0 0;overflow-wrap:anywhere}
+.sa-record-window{font-size:14px;font-variant-numeric:tabular-nums;line-height:1.7}
+.sa-record-mode{font-size:14px;color:var(--muted)}
+.sa-record-duration{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums}
+.sa-record-day li>.text-button{display:inline-flex;align-items:center;justify-content:flex-end;gap:5px;font-size:14px;min-height:40px}
+.sa-record-day>.sa-note{margin:0;padding:12px 24px;border-top:1px solid var(--sa-chart-border)}
+@media(max-width:1050px){
+ .sa-record-empty{grid-template-columns:auto minmax(0,1fr)}
+ .sa-empty-actions{grid-column:2;justify-content:flex-start;max-width:none}
+ .sa-record-columns,.sa-record-day li{grid-template-columns:minmax(145px,1fr) 155px 80px 76px 78px;gap:12px;padding-inline:20px}
+}
+@media(max-width:760px){
+ .sa-subject-filter{width:100%;justify-content:space-between;gap:12px}
+ .sa-subject-filter label{flex:1}
+ .sa-subject-filter select{width:100%;max-width:none}
+ .sa-record-empty{padding:20px 18px;gap:14px}
+ .sa-record-empty>i{width:38px;height:38px;border-radius:10px}
+ .sa-record-empty h2{font-size:19px}
+ .sa-record-empty p{font-size:15px}
+ .sa-empty-actions{grid-column:1/-1;margin-top:4px}
+ .sa-record-day>header{padding:18px;align-items:flex-start}
+ .sa-record-day>header>div{display:block}
+ .sa-record-day>header>div>span{display:block;margin-top:5px}
+ .sa-record-day h3{font-size:16px}
+ .sa-record-day>header>strong{font-size:21px}
+ .sa-record-columns{display:none}
+ .sa-record-day li{grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;padding:18px}
+ .sa-record-identity{grid-column:1;grid-row:1/3}
+ .sa-record-duration{grid-column:2;grid-row:1;justify-self:end}
+ .sa-record-mode{grid-column:2;grid-row:2;justify-self:end}
+ .sa-record-window{grid-column:1;grid-row:3;padding-left:20px}
+ .sa-record-day li>.text-button{grid-column:2;grid-row:3}
+ .sa-record-day>.sa-note{padding-inline:18px}
+}
+
+.sa-record-date-short{display:none}.sa-record-day h3>span{font:inherit;color:inherit}
+@media(max-width:760px){.sa-record-date-full{display:none}.sa-record-date-short{display:inline}}
+
+.sa-record-more{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:16px 0 28px}.sa-record-more .sa-note{margin:0}.sa-record-more .button{display:inline-flex;align-items:center;gap:8px}

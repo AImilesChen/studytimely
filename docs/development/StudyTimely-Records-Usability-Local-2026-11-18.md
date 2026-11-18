@@ -1,0 +1,27 @@
+# Analytics records usability — local revision
+
+18 November 2026. Implements the user-approved alignment, subject-filter, empty-state and daily-record layout plan. Production remains V2.31.0 (Worker 6b31ee3f-0983-423a-b75d-4c5bc30f95a4); no commit, push or deployment in this task.
+
+## Behavior
+
+- The related-tools table caption now says “Choose your next study step.” and is explicitly left aligned with readable caption/table type. Existing tools, links, long-form guide and ten FAQs are retained.
+- Subject choices use configured labels and retained learning subjects across the entire local history. Deleted, future-only and non-learning records do not manufacture history options. Unlabelled appears only when retained learning actually has no subject. An empty subject index displays No subjects yet and a real Add subject action. The dialog uses the existing validated local subject command, rejects duplicate labels and preserves original record labels; it does not start a timer. It focuses the input, resets its draft on reopen and prevents duplicate submission. These focus behaviors are implemented, not browser-accepted.
+- Truly empty learning history offers Start studying and an isolated example. A date-range miss offers View all history; subject/mode/drilldown misses offer Clear filters plus View all history. Overview and Records share these states. A missing current-week match is no longer confused with a completely empty history.
+- All history is a separate Records-only read mode spanning the earliest retained learning date through today. It clears narrow filters when opened from an empty-state recovery action; the period selector can retain subject/mode filters when explicitly chosen. It does not expand chart/goal/review analysis beyond its existing 366-day limit, enumerate empty multi-year calendars or change stored data. Leaving Records restores the prior report period. CSV uses the latest local snapshot and exports every matching session, not only loaded rows.
+- Records are grouped by IANA calendar date, with complete per-day totals, subjects/tasks, recorded windows, timer modes, counted durations and existing session details/deletion. Cross-midnight sessions appear under contributing dates with clipped intervals and the original session identity. Original session count and CSV are not duplicated. Pauses are excluded. Windows disclose UTC offsets across a clock change; an end at the next midnight is shown as 24:00. Narrow layouts use a shorter date label and stacked entries.
+- Initially 100 daily entries load; Show more records adds 100. Partial-day headings retain the full matched daily total and disclose the number shown. The overall summary counts original sessions and all contributing dates. The list is not a new credit source.
+- Records hides Compare previous and the comparison-range sentence while keeping subject/mode/date/zone filters and CSV. The zero-record average caption and redundant inline backup button are removed. One footer backup action remains. The separate 52-week calendar explicitly says it is independent of filters and avoids generating a blank grid for a wholly empty history.
+
+## Scope and validation
+
+Modified StudyAnalytics.jsx, TrackerGuide.jsx and study-analytics.css; added StudyRecords.jsx, study-records.mjs and two test modules. No new dependency, API, storage format, schema, billing, tracking, provider or protected adapter change. The implementation uses existing English UI, theme tokens and page edges.
+
+- 52 related tests passed, including 12 new records/model/component-render checks and existing analysis/calendar/chart/tracker/Study Center tests. Coverage includes multi-year recovery, conditional subjects, tombstones, duplicate IDs, filtered CSV, midnight/pauses, 23/25-hour days, half-hour zones, display limits, original record preservation and offset-aware rendering. After this run, the final input-focus/draft-remount polish was rebuilt and HTTP-checked.
+- Final build: 56 pages plus 404, local noindex; PWA 9853ff731e5976d5 with 62 resources. Existing bundle-size warning remains.
+- 62 local HTTP page/resource, robots, Sitemap and license checks passed. Source wiring audit confirmed one backup action and connected Records comparison/all-history/load-more controls. git diff --check passed.
+- Synthetic 10000-record history spanning 834 study dates produced 100 visible entries and exact totals in 266ms in one Node measurement; this is not a browser/device performance guarantee.
+- Genuine React server-rendering checks cover subject setup, three empty states and grouped records. In-app browser tools are unavailable. No local Chrome/native substitute, actual click/focus/scroll/mobile screenshot or CSV download acceptance is claimed.
+
+Preview: http://127.0.0.1:4314/study-tracker . Read-only example records: http://127.0.0.1:4314/study-tracker?example=1&view=records . Source records remain private to each browser origin; this preview does not import production personal history. No production or cloud data was changed.
+
+Evidence is ignored under docs/development/evidence/records-usability-2026-11-18/: model-tests.log, tests.log, build.log, http.log and source-audit.json. A future requested publication should build release mode and deploy the matching frontend; no D1 migration is needed for this revision. Existing independent production community/moderation and main-promotion gates remain unchanged.
