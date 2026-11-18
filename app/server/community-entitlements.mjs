@@ -1,8 +1,9 @@
 import {fail} from './auth-shared.mjs';
 export const FREE_ROOM_MEMBERS=4;
+export const FREE_OWNED_ROOMS=1,SUBSCRIBER_OWNED_ROOMS=10;
 export async function communityEntitlements(env,accountId,at){
  const row=accountId?await env.DB.prepare('SELECT member_limit,free_text FROM community_entitlements WHERE account_id=? AND expires_at>?').bind(accountId,at).first():null;
- return {memberLimit:row?.member_limit||FREE_ROOM_MEMBERS,freeText:row?.free_text===1};
+ return {memberLimit:row?.member_limit||FREE_ROOM_MEMBERS,freeText:row?.free_text===1,roomLimit:row?SUBSCRIBER_OWNED_ROOMS:FREE_OWNED_ROOMS};
 }
 export async function ownerEntitlements(env,profileId,at){
  const row=await env.DB.prepare('SELECT account_id FROM community_profiles WHERE id=?').bind(profileId).first();

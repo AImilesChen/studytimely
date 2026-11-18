@@ -1,1 +1,1 @@
-export {Tracker} from './StudyTracker.jsx';
+export {StudyAnalytics as Tracker} from './StudyAnalytics.jsx';

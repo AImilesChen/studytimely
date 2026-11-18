@@ -1,0 +1,17 @@
+import {useEffect,useState} from 'react';
+import './room-allowance.css';
+export function RoomAllowance({selected,me,profile,busy,onRoom,onSeats,onRefresh}){
+ const access=selected.access,own=selected.owner,rooms=(me?.rooms||[]).filter(r=>r.owner_id===profile?.id&&!r.closed_at);
+ const memberKey=selected.members.map(m=>m.id).sort().join(',');
+ const [chosen,setChosen]=useState(access?.freeRoomId||''),[ids,setIds]=useState([]);
+ useEffect(()=>{setChosen(access?.freeRoomId||'');setIds(access?.freeMemberIds?.length||selected.room.freeSeatsChosen?(access.freeMemberIds||[]).filter(id=>selected.members.some(m=>m.id===id)):selected.members.filter(m=>m.id!==selected.room.ownerId).slice().sort((a,b)=>(a.joined_at-b.joined_at)||a.id.localeCompare(b.id)).slice(0,3).map(m=>m.id));},[selected.room.id,selected.room.version,access?.freeRoomId,memberKey]);
+ if(!access||selected.room.closed)return null;
+ const remaining=access.expiresAt-Date.now(),expiring=own&&access.subscriptionActive&&remaining<=7*86400000;
+ return <section className="room-allowance" aria-label="Room plan and access">
+ {selected.member&&!access.canParticipate&&<div className="room-access-notice" role="status"><strong>{access.roomActive?'Your place is read only':'This room is read only'}</strong><p>{access.roomActive?'The owner’s plan currently allows fewer active places. Your membership and retained records are kept.':'The owner’s current plan does not include this active room. Retained records remain available.'}</p><button className="button" disabled={busy} onClick={onRefresh}>Refresh access</button></div>}
+ {expiring&&<p className="room-access-reminder">Your subscription ends {new Date(access.expiresAt).toLocaleString()}. Choose the room and four places to keep active below.</p>}
+ {own&&!selected.room.closed&&<details><summary>{access.subscriptionActive?'Free room & places after expiry':'Choose your free room & places'}</summary><p className="help">Free: 1 active room with 4 places, including you. Subscription: up to 10 rooms, with the capacity in your plan. Other rooms and places become read only when the entitlement ends.</p>
+ <form onSubmit={e=>{e.preventDefault();onRoom(chosen,me?.freeRoomSelection?.version||0);}}><label className="field">Room to keep active<select value={chosen} disabled={busy} onChange={e=>setChosen(e.target.value)}>{rooms.map(r=><option value={r.id} key={r.id}>{r.name}</option>)}</select></label><button className="button" disabled={busy||!chosen}>Save free room</button></form>
+ <form onSubmit={e=>{e.preventDefault();onSeats(ids,selected.room.version);}}><fieldset disabled={busy}><legend>Free places in this room</legend><p className="help">Your owner place is included. Choose up to {Math.min(4,selected.room.capacity)-1} others. No selection saved yet? The earliest joined members fill the default places.</p>{selected.members.filter(m=>m.id!==selected.room.ownerId).map(m=><label className="room-seat-choice" key={m.id}><input type="checkbox" checked={ids.includes(m.id)} disabled={!ids.includes(m.id)&&ids.length>=Math.min(4,selected.room.capacity)-1} onChange={e=>setIds(old=>e.target.checked?[...old,m.id]:old.filter(id=>id!==m.id))}/>{m.nickname}{m.readOnly?' · read only':''}</label>)}<button className="button" disabled={busy}>Save free places</button></fieldset></form><p className="help">Renewing restores eligible rooms and places. Switching free access pauses timers that lose access; records are kept.</p></details>}
+ </section>;
+}

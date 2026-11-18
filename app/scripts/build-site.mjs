@@ -11,6 +11,8 @@ import {build as bundleWorker} from 'esbuild';
 const root=path.resolve(import.meta.dirname,'..');process.chdir(root);
 const release=process.argv.includes('--release'),config=JSON.parse(await fs.readFile('site.config.json','utf8'));
 const policyFiles=['privacy-policy.en.md','terms-of-use.en.md','cookies-and-local-storage.en.md'];
+if(config.advancedAnalyticsPreview!==undefined&&typeof config.advancedAnalyticsPreview!=='boolean')throw Error('advancedAnalyticsPreview must be boolean.');
+if(config.advancedAnalyticsPreviewEndsAt!==undefined&&(!Number.isSafeInteger(config.advancedAnalyticsPreviewEndsAt)||config.advancedAnalyticsPreviewEndsAt<0))throw Error('Advanced preview expiry must be a non-negative millisecond timestamp.');
 if(release){
  const missing=[];let origin;
  try{origin=new URL(config.origin);if(origin.protocol!=='https:'||origin.pathname!=='/'||origin.search||origin.hash||/localhost|\.test$|\.invalid$/.test(origin.hostname))missing.push('valid public HTTPS origin');}catch{missing.push('origin');}
@@ -48,7 +50,7 @@ await fs.writeFile('dist/client/sitemap.xml',`<?xml version="1.0" encoding="UTF-
 // Explicit individual paths, all inside dist/client; never remove a source or archive.
 for(const name of ['design-review.html','design-review.css','design-review.js']){const file=path.join(root,'dist/client',name);if(existsSync(file))await fs.unlink(file);}
 const pwa=await buildPwa(root,ROUTES);console.log('PWA cache:',pwa);
-await fs.writeFile('dist/cloudflare-entry.mjs',`import {createWorker} from '../server/cloudflare.mjs';\nexport {StudyRoom} from '../server/realtime.mjs';\nexport default createWorker(${JSON.stringify({origin:config.origin,indexable:release,accountsEnabled:config.accountsEnabled===true,communityEnabled:config.communityEnabled===true,analyticsEnabled:!!(config.ga4Id||config.ahrefsKey)&&config.analyticsPolicyReviewed})});\n`);
+await fs.writeFile('dist/cloudflare-entry.mjs',`import {createWorker} from '../server/cloudflare.mjs';\nexport {StudyRoom} from '../server/realtime.mjs';\nexport default createWorker(${JSON.stringify({origin:config.origin,indexable:release,accountsEnabled:config.accountsEnabled===true,communityEnabled:config.communityEnabled===true,advancedAnalyticsPreview:config.advancedAnalyticsPreview===true,advancedAnalyticsPreviewEndsAt:Number(config.advancedAnalyticsPreviewEndsAt)||0,analyticsEnabled:!!(config.ga4Id||config.ahrefsKey)&&config.analyticsPolicyReviewed})});\n`);
 await bundleWorker({entryPoints:['dist/cloudflare-entry.mjs'],bundle:true,format:'esm',platform:'browser',target:'es2022',outfile:'dist/cloudflare/worker.mjs'});
 await import('./prepare-sites-build.mjs');
 console.log(`Pre-rendered ${ROUTES.length} pages + 404. Environment: ${release?'release':'local preview (noindex)'}.`);

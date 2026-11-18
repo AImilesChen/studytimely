@@ -1,4 +1,4 @@
-export const COMMUNITY={maxRooms:3,maxMemberships:10,defaultCapacity:4,maxCapacity:24,capacityPresets:[4,8,12,24],maxMessage:500,heartbeatMs:30000,maxHeartbeatGapMs:90000,checkInMs:25*60000,dailyCapSeconds:8*3600};
+export const COMMUNITY={maxRooms:1,maxMemberships:10,defaultCapacity:4,maxCapacity:24,capacityPresets:[4,8,12,24],maxMessage:500,heartbeatMs:30000,maxHeartbeatGapMs:90000,checkInMs:25*60000,dailyCapSeconds:8*3600};
 export const utcDay=at=>new Date(at).toISOString().slice(0,10);
 export function weekStart(at){const d=new Date(at);d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-((d.getUTCDay()+6)%7));return utcDay(+d);}
 export function cleanText(value,{min=1,max=80,label='Text'}={}){

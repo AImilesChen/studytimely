@@ -1,3 +1,4 @@
+import {participationSQL} from './room-access.mjs';
 // Only the authenticated outer Worker can address this Durable Object namespace.
 export class StudyRoom {
  constructor(ctx,env){this.ctx=ctx;this.env=env;ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('keepalive','alive'));}
@@ -14,13 +15,13 @@ export class StudyRoom {
   if(!await this.valid(a))return new Response('Room access denied',{status:403});
   const sockets=this.ctx.getWebSockets();if(sockets.length>=72||sockets.filter(s=>s.deserializeAttachment()?.profileId===a.profileId).length>=3)return new Response('Too many connections',{status:429});
   const pair=new WebSocketPair(),[client,server]=Object.values(pair);this.ctx.acceptWebSocket(server);server.serializeAttachment(a);
-  await this.env.DB.prepare('UPDATE community_members SET last_seen=? WHERE room_id=? AND profile_id=?').bind(Date.now(),a.roomId,a.profileId).run();await this.broadcast();
+  await this.env.DB.prepare(`UPDATE community_members SET last_seen=? WHERE room_id=? AND profile_id=? AND ${participationSQL('community_members.room_id','community_members.profile_id',Date.now())}`).bind(Date.now(),a.roomId,a.profileId).run();await this.broadcast();
   return new Response(null,{status:101,webSocket:client});
  }
  async webSocketMessage(ws,message){
   const a=ws.deserializeAttachment();if(typeof message!=='string'||message.length>100||message!=='presence'){ws.close(1008,'Unsupported message');return;}
   const at=Date.now();if(at-a.lastPing<15000)return;if(!await this.valid(a)){ws.close(1008,'Room access ended');return;}
-  a.lastPing=at;ws.serializeAttachment(a);await this.env.DB.prepare('UPDATE community_members SET last_seen=? WHERE room_id=? AND profile_id=?').bind(at,a.roomId,a.profileId).run();ws.send(JSON.stringify({type:'presence'}));
+  a.lastPing=at;ws.serializeAttachment(a);await this.env.DB.prepare(`UPDATE community_members SET last_seen=? WHERE room_id=? AND profile_id=? AND ${participationSQL('community_members.room_id','community_members.profile_id',Date.now())}`).bind(at,a.roomId,a.profileId).run();ws.send(JSON.stringify({type:'presence'}));
   const last=await this.ctx.storage.get('presenceAt')||0;if(at-last>=15000){await this.ctx.storage.put('presenceAt',at);await this.broadcast();}
  }
  async webSocketClose(ws,code){const a=ws.deserializeAttachment();try{ws.close(code===1005?1000:code);}catch{}if(a&&!this.ctx.getWebSockets().some(s=>s!==ws&&s.deserializeAttachment()?.profileId===a.profileId)){await this.env.DB.prepare('UPDATE community_members SET last_seen=0 WHERE room_id=? AND profile_id=?').bind(a.roomId,a.profileId).run();}await this.broadcast();}

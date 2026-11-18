@@ -1,3 +1,4 @@
+import {recordGoal} from './learning-history.mjs';
 import {reminderAction} from './reminder.mjs';
 import {MUSIC_TRACKS,MUSIC_REPEAT,musicTrack} from './music-catalog.mjs';
 import {DEFAULT_MIXES,validateMix,validateMixes} from './sound-settings.mjs';
@@ -198,7 +199,7 @@ export function transition(previous,action,{now,owner,id}){
    if(state.subjects.some(s=>s.toLowerCase()===label.toLowerCase()))fail('INVALID','That subject already exists.');
    state.subjects.push(label);if(!hasProgress(state.timer))state.settings.subject=label;event='subject';break;
  }
- case 'goal':state.dailyGoal=integer(action.minutes,0,1440,'Daily goal');event='goal';break;
+ case 'goal':recordGoal(state,'daily-goal',integer(action.minutes,0,1440,'Daily goal'),now,id);state.dailyGoal=action.minutes;event='goal';break;
  case 'delete':state.sessions=state.sessions.filter(s=>s.id!==action.recordId);state.workspace.deletedSessions[action.recordId]=now;event='deleted';break;
  case 'import':{
    if(hasProgress(state.timer))fail('BUSY','Finish or reset the current timer before importing.');
@@ -208,6 +209,7 @@ export function transition(previous,action,{now,owner,id}){
    state.sessions.sort((a,b)=>b.endedAt-a.endedAt);
    for(const s of data.subjects)if(!state.subjects.some(v=>v.toLowerCase()===s.toLowerCase()))state.subjects.push(s);
    if(!state.dailyGoal&&data.dailyGoal)state.dailyGoal=data.dailyGoal;
+    if(state.workspace.learning.startedAt&&state.workspace.learning.events.filter(e=>e.kind==='daily-goal').at(-1)?.minutes!==state.dailyGoal)recordGoal(state,'daily-goal',state.dailyGoal,now,id);
    event='imported';break;
  }
  default:fail('INVALID','Unknown action.');

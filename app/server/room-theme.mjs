@@ -1,3 +1,4 @@
+import {participationSQL} from './room-access.mjs';
 import {body,fail,result,rateLimit} from './auth-shared.mjs';
 import {reviewAvailability,reviewConfiguration,reviewChat,enforceLocalContent} from './chat-review.mjs';
 import {ACTIVITY_SUBJECTS,ROOM_NOTICES} from '../src/lib/group-activities.mjs';
@@ -30,7 +31,7 @@ export async function saveRoomHome({request,env,at,r,profile,user,isAdmin,signal
  const saved=await q(env,`UPDATE community_rooms SET study_subject=?,announcement_key=?,custom_theme=?,version=version+1
   WHERE id=? AND version=? AND closed_at=0 AND (owner_id=? OR ?=1)
   AND EXISTS(SELECT 1 FROM community_members m JOIN community_profiles p ON p.id=m.profile_id JOIN sessions s ON s.account_id=p.account_id
-   WHERE m.room_id=community_rooms.id AND m.profile_id=? AND m.left_at=0 AND m.banned=0 AND m.muted_until<=? AND s.token_hash=? AND s.expires_at>?)
+   WHERE m.room_id=community_rooms.id AND m.profile_id=? AND m.left_at=0 AND m.banned=0 AND m.muted_until<=? AND ${participationSQL('m.room_id','m.profile_id',finishedAt)} AND s.token_hash=? AND s.expires_at>?)
   RETURNING version`,input.subject,input.announcement,custom,r.room.id,input.version,profile.id,stillAdmin?1:0,profile.id,finishedAt,user.sessionHash,finishedAt).first();
  if(!saved)fail(409,'CONFLICT','The room or your access changed. Refresh before saving.');
  await signal(r.room.id);return result({saved:true,version:saved.version});
