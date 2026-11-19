@@ -11,7 +11,7 @@ test('old settings gain medium size, safe master volume and independent starter 
  const a=validateSettings({ambient:{rain:35}}),b=emptyState('b');
  assert.equal(a.timerSize,'medium');assert.equal(a.ambientVolume,60);assert.deepEqual(a.ambient,{rain:35});
  a.ambientPresets[0].mix.rain=99;
- assert.equal(DEFAULT_MIXES[0].mix.rain,55);assert.equal(b.settings.ambientPresets[0].mix.rain,55);
+ assert.equal(DEFAULT_MIXES[0].mix.rain,25);assert.equal(b.settings.ambientPresets[0].mix.rain,25);
  const old=emptyState('e');delete old.settings.timerSize;delete old.settings.ambientPresets;delete old.settings.ambientVolume;
  assert.equal(checkState(old).settings.timerSize,'medium');
 });
@@ -52,7 +52,7 @@ test('white, pink and brown have different spectral balance, with finite click-f
  const sample=id=>createNoiseValues(id,48000,48000,seeded());
  const white=sample('white'),pink=sample('pink'),brown=sample('brown');
  assert.ok(roughness(white)>roughness(pink)*2);assert.ok(roughness(pink)>roughness(brown)*4);
- for(const [id]of SOUND_SCAPES){const v=sample(id);assert.equal(Math.abs(v[0]),0);assert.equal(Math.abs(v.at(-1)),0);assert.ok(v.every(n=>Number.isFinite(n)&&Math.abs(n)<=.9));assert.ok(v.some(n=>Math.abs(n)>.01));}
+ for(const id of ['white','pink','brown']){const v=sample(id);assert.equal(Math.abs(v[0]),0);assert.equal(Math.abs(v.at(-1)),0);assert.ok(v.every(n=>Number.isFinite(n)&&Math.abs(n)<=.9));assert.ok(v.some(n=>Math.abs(n)>.01));}
 });
 function fakeAudio({deferred=false}={}) {
  const instances=[],waits=[];
@@ -64,6 +64,7 @@ function fakeAudio({deferred=false}={}) {
   createDynamicsCompressor(){return {threshold:param(),knee:param(),ratio:param(),connect(){},disconnect(){}};}
   createBuffer(_channels,length){return {length,getChannelData:()=>new Float32Array(length)};}
   createBufferSource(){const n={connect(){},disconnect(){},start(){n.started=true;},stop(){n.stopped=true;}};this.sources.push(n);return n;}
+  async decodeAudioData(){return {duration:40,length:320000,getChannelData:()=>new Float32Array(320000)};}
   async resume(){if(deferred)await new Promise(resolve=>waits.push(resolve));this.state='running';}
   async suspend(){this.state='suspended';}
   async close(){this.state='closed';}
@@ -71,14 +72,18 @@ function fakeAudio({deferred=false}={}) {
  return {Audio,instances,waits};
 }
 test('engine stays lazy, applies master independently and tears down every sound source',async()=>{
- const f=fakeAudio(),engine=createAmbientEngine({AudioContext:f.Audio});engine.update({rain:50});assert.equal(f.instances.length,0);
+ const f=fakeAudio(),engine=createAmbientEngine({AudioContext:f.Audio,fetch:async()=>new Response(new Uint8Array(16))});engine.update({rain:50});assert.equal(f.instances.length,0);
  await engine.start({brown:50,stream:20},40);const c=f.instances[0];assert.equal(c.sources.length,2);assert.equal(c.gains[0].gain.targets.at(-1)[0],.4);
- engine.update({brown:100,stream:0},25);assert.equal(c.gains[0].gain.targets.at(-1)[0],.25);assert.equal(c.gains[1].gain.targets.at(-1)[0],.32);
+ engine.update({brown:100,stream:0},25);assert.equal(c.gains[0].gain.targets.at(-1)[0],.25);assert.equal(c.gains[1].gain.targets.at(-1)[0],.22);
  engine.stop();assert.equal(c.gains[0].gain.targets.at(-1)[0],0);
  await engine.close();assert.ok(c.sources.every(s=>s.stopped));assert.equal(c.state,'closed');
 });
 test('muting during browser audio resume cannot restart a pending sound',async()=>{
- const f=fakeAudio({deferred:true}),engine=createAmbientEngine({AudioContext:f.Audio});
+ const f=fakeAudio({deferred:true}),engine=createAmbientEngine({AudioContext:f.Audio,fetch:async()=>new Response(new Uint8Array(16))});
  const starting=engine.start({rain:50},60);engine.stop();f.waits[0]();
  assert.equal(await starting,false);assert.equal(f.instances[0].sources.length,0);await engine.close();
+});
+
+test('ambient fade affects playback gain only and a new play cancels its pending stop',async()=>{
+ const f=fakeAudio(),engine=createAmbientEngine({AudioContext:f.Audio,fetch:async()=>new Response(new Uint8Array(16))});await engine.start({rain:40},45);const c=f.instances[0];engine.fadeOut();assert.deepEqual(c.gains[0].gain.targets.at(-1),[0,0,.5]);await engine.start({rain:40},45);assert.equal(c.gains[0].gain.targets.at(-1)[0],.45);await engine.close();assert.equal(c.state,'closed');
 });

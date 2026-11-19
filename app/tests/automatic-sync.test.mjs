@@ -88,7 +88,8 @@ test('sync APIs enforce owner, CSRF, origin, logout, device revocation and 30-da
 
 test('concurrent duplicate retry cannot overwrite a newer successful batch',async()=>{
  const s=setup();let a;try{const auth=await s.login();a=await device(s,auth);await save(a,'A');const batch=(await a.prepareSync()).sync.inflight,original=s.env.DB.batch;let count=0,release,ready;const gate=new Promise(r=>release=r),blocked=new Promise(r=>ready=r);
- s.env.DB.batch=async statements=>{if(statements[0].sql.startsWith('INSERT INTO sync_receipts')){count++;if(count===2){ready();await gate;}}return original(statements);};
+ // Hold the first batch until both requests have passed the receipt lookup; otherwise a fast retry may return before the gate.
+ s.env.DB.batch=async statements=>{if(statements[0].sql.startsWith('INSERT INTO sync_receipts')){count++;if(count===1)await blocked;else if(count===2){ready();await gate;}}return original(statements);};
  const first=s.call('/api/sync/mutations','POST',batch,auth),duplicate=s.call('/api/sync/mutations','POST',batch,auth);await blocked;assert.equal((await first).status,200);const remote=await s.json('/api/sync/state','GET',undefined,auth),value={...remote.changes['workspace.tasks:task-one'],title:'B'};
  await s.json('/api/sync/mutations','POST',{id:crypto.randomUUID(),generation:remote.generation,version:remote.version,changes:{'workspace.tasks:task-one':value}},auth);release();assert.equal((await duplicate).status,200);
  const after=await s.json('/api/sync/state','GET',undefined,auth);assert.equal(after.changes['workspace.tasks:task-one'].title,'B');assert.equal(after.version,3);

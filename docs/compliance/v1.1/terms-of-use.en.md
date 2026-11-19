@@ -28,7 +28,7 @@ Open Settings → Data to export or import a JSON backup, or to clear local stud
 
 You keep your rights in information you enter. We do not acquire ownership of your study records. The software processes them to provide the functions you request. Avoid entering unnecessary personal or sensitive information, particularly on a shared device.
 
-Exam templates are editable starter outlines with official source links and a checked date, not complete official syllabuses or endorsements. Check your board and year. Scheduled time and manual check-ins do not manufacture recorded study. Ambient textures are synthesised, not field recordings. Offline use depends on browser cache; sign-in and sync need a connection.
+Exam templates are editable starter outlines with official source links and a checked date, not complete official syllabuses or endorsements. Check your board and year. Scheduled time and manual check-ins do not manufacture recorded study. Natural and room ambience uses licensed CC0 field recordings, edited for quieter looping; white, pink and brown noise are separate synthesised generators. Offline use depends on browser cache; sign-in and sync need a connection.
 
 ## 5. Appropriate use
 
@@ -44,7 +44,7 @@ Study totals describe recorded timer activity; they do not certify learning, att
 
 ## 7. Intellectual property and links
 
-We or the relevant licensors retain rights in the website's code, design and supplied materials, subject to any separately stated licences. Free access does not by itself make the code open source or permit redistribution of licensed sounds, fonts or artwork. This does not restrict your rights in your own records or rights granted by law. The built-in music recordings by Kevin MacLeod are separately licensed under Creative Commons Attribution 4.0. Their titles, source links and attribution are available in the player and in [Music credits](/music/CREDITS.txt), with the [license PDF](/music/CC-BY-4.0.pdf). These Terms do not limit the rights granted by that music license.
+We or the relevant licensors retain rights in the website's code, design and supplied materials, subject to any separately stated licences. Free access does not by itself make the code open source or permit redistribution of licensed sounds, fonts or artwork. This does not restrict your rights in your own records or rights granted by law. The built-in music recordings by Kevin MacLeod are separately licensed under Creative Commons Attribution 4.0. Their titles, source links and attribution are available in the player and in [Music credits](/music/CREDITS.txt), with the [license PDF](/music/CC-BY-4.0.pdf). Field recordings have separate CC0 1.0 source links and changes listed in [Sound credits](/ambient/CREDITS.txt). These Terms do not limit rights granted by those licenses.
 
 External websites have their own terms and policies. References to an exam, school or third-party brand do not imply endorsement or an official relationship.
 

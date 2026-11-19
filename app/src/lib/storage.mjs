@@ -9,7 +9,7 @@ export const ROOT_KEY='v1';
 export const PLANNING_KEY='advanced-planning-v1';
 export const SYNC_KEY='automatic-sync-v1';
 export const CHANNEL='studytimely-state-v1';
-export const SESSION_PREFERENCE_KEYS=['worldClockCities','theme','spaceTheme','ambient','ambientVolume','ambientPresets','timerSize','musicTrack','musicVolume','musicRepeat','lastTool','lastPage','reducedMotion','sound','volume','clock24','showSeconds','showDate'];
+export const SESSION_PREFERENCE_KEYS=['worldClockCities','theme','spaceTheme','ambient','ambientVolume','ambientPresets','timerSize','musicTrack','musicVolume','musicRepeat','musicFavorites','musicQueue','lastTool','lastPage','reducedMotion','sound','volume','clock24','showSeconds','showDate'];
 const uuid=()=>crypto.randomUUID();
 export function persistedState(state){
  // Choosing not to remember preferences retains study data and active timing only.

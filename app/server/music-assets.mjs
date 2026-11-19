@@ -29,9 +29,9 @@ function portion(body,start,length){
   cancel(reason){return reader.cancel(reason);}
  });
 }
-export async function musicAssetResponse(request,response,knownBytes){
+export async function musicAssetResponse(request,response,knownBytes,contentType='audio/mpeg'){
  if(response.status!==200)return response;
- const headers=new Headers(response.headers);headers.set('Content-Type','audio/mpeg');headers.set('Accept-Ranges','bytes');
+ const headers=new Headers(response.headers);headers.set('Content-Type',contentType);headers.set('Accept-Ranges','bytes');
  const total=Number(headers.get('Content-Length')||knownBytes),range=request.headers.get('Range'),ifRange=request.headers.get('If-Range');
  if(!headers.has('Content-Length')&&!headers.has('Content-Encoding')&&Number.isSafeInteger(total)&&total>0)headers.set('Content-Length',String(total));
  const validatorMatches=!ifRange||(ifRange===headers.get('ETag')&&!ifRange.startsWith('W/'))||ifRange===headers.get('Last-Modified');

@@ -1,0 +1,18 @@
+StudyTimely focus scenes, 19 November 2026
+
+Morning mist, Misty hills, Bright bay, Sunlit slopes, Open lakeshore,
+Blue-sky plains, Rainy lake, Valley drizzle, Rain-cleared meadow, Pastel sea,
+Warm lake and Dusk cloud sea are original AI-generated photographic-style
+still landscapes created for StudyTimely using the built-in image_gen tool.
+They do not depict verified real locations and are not live video.
+The exact generation prompts are recorded in the development source handoff.
+
+Rain on glass and Ocean waves use edited, silent real footage with no added room or picture frame.
+
+Rain footage: Rainy Day, Roberto Lee Cortes
+https://www.pexels.com/video/rainy-day-26857124/
+Sea footage: Sea Waves on Beach, Dmitry Marchenkov
+https://www.pexels.com/video/sea-waves-on-beach-14064348/
+Footage licensed under the Pexels License, checked 19 November 2026:
+https://www.pexels.com/license/
+For this focus tool the footage is colour-adjusted and edited into short looping clips.

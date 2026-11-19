@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: 2026-11-13. Last updated: 2026-11-18.
+Effective date: 2026-11-13. Last updated: 2026-11-19.
 
 ## 1. Who is responsible
 
@@ -12,7 +12,7 @@ This policy covers our free browser-based timers and local study records. You do
 
 Active timer state, study-session dates and durations, subject labels, goals and preferences are stored in your browser using IndexedDB. Anonymous use does not upload this database. World-clock city favourites are saved as local preferences on this device, respect Remember preferences on this device, and are not included in account sync or ordinary study backups. Signing in alone does not upload records. Choosing manual Sync now merges saved sessions, subjects, goals, tasks, habits, schedules and exam progress with a private cloud snapshot. Separately, you can explicitly enable automatic sync in My Study Center → Settings → Sync & recovery. After that choice, saved study changes are sent to your account in batches; offline changes remain in a local pending queue until they can upload. Signing in by itself does not enable this. The active timer and analytics choice stay on this device. If you explicitly select Include and apply appearance and sound settings during sync, those selected preferences are also included in the cloud snapshot; they do not start audio automatically. JSON import reads a file locally; export downloads a file to your device.
 
-The built-in music player loads audio from StudyTimely only after you choose playback; it does not connect to Spotify, YouTube or the composer’s website to play music. Track choice, volume and repeat settings are presentation preferences and follow the remember/sync choices above. Playback intent and position are not stored, so music does not start automatically on a new visit. Audio delivery creates ordinary website requests as described below. Opening a composer or license link takes you to that external website.
+The music player and natural ambience controls load recordings from StudyTimely only after you choose playback; it does not connect to Spotify, YouTube or the composer’s website to play music. Track choice, volume, repeat, favorites and playlist settings are presentation preferences and follow the remember/sync choices above. Playback intent and position are not stored, so music does not start automatically on a new visit. Audio delivery creates ordinary website requests as described below. Opening a composer or license link takes you to that external website.
 
 Study Planner reminders are off by default. If enabled, this browser stores the selected reminder timing and a small log of arrangement identifiers and timestamps to avoid repeat reminders across tabs. Checks run only while the planner page is open and visible, and pause during active timers. A successful manual cloud sync may also save its completion timestamp on this browser. These device-only settings and timestamps are not included in study backups or cloud snapshots. Clearing local study data attempts to remove them and resets their workspace association; browser website-data controls can also remove them.
 
@@ -138,3 +138,8 @@ Exam preparation can additionally store the linked exam, selected topics, self-a
 
 
 Clearing local study data removes all cached account workspaces, local protection backups and pending uploads from this browser and turns off its automatic sync. It does not delete cloud data. Pending changes that have never uploaded cannot be recovered from the cloud after local storage is lost; export first. Signing out keeps the account’s local workspace separate from the unsigned-in workspace.
+
+
+### Focus space presets and quick notes
+
+The focus space uses original local scene assets and the existing study timer. Creating a scene or preset adds no learning time. Focus presets and quick notes are stored on this device, separated by the active browser workspace. Notes are not sent to AI or included in study backups, automatic sync or account cloud exports. A separate Download notes action provides a local JSON copy. Removing a note removes it from active device storage; downloaded copies remain under your control. Clear local study data removes these device copies across cached workspaces. If local coordination or persistent storage is unavailable, the interface identifies notes and presets as temporary in the open tab. Turning off Remember preferences prevents new persistent focus-preset settings; notes remain separately local. Converting a note into a task explicitly adds a task title (up to 140 characters) to the existing study workspace, which can enter its backups and optional sync. The full note stays in the focus notebook. Playback requires a user gesture, and no camera, website-blocking extension or attention tracking is used.

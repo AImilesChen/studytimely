@@ -41,3 +41,64 @@ Pending: inspect anonymous/first-enable/existing-cloud/guest-import states, both
 ## Account integration refinement — 18 November 2026
 
 Visual result remains **blocked**, pending actual in-app-browser capture/control. The user supplied the before screenshots and approved a narrow revision preserving the existing learning center. Overview now ends with a compact data card; Settings puts account controls first, removes the duplicate browser-backup panel, and contains the complete sync center. Inactive recovery omits large vacant columns, selected backups reveal the preview, and a real error uses one retry status. Shared background gating treats anonymous/local-only access as normal. Default synthetic entry returns to Overview. Nine actual rendered-component/shared-state checks passed; they are not browser screenshots or physical interaction acceptance. See `docs/development/StudyTimely-Account-Sync-Layout-Local-2026-11-18.md` for verification and pending browser checks.
+
+
+## Advanced focus space — 19 November 2026
+
+Visual result: **blocked pending actual browser acceptance**. Added six original SVG scenes, a landscape stage/current task and timer, adjacent compact setup, secondary native dialogs, presets, notes, and session feedback. Stable dark timer surface over artwork, light/dark setup palettes, explicit active buttons and reduced-motion preference are defined in code. SVG artwork was separately rendered/inspected; it is not a UI screenshot. In-app browser create and getTab calls timed out/reset; open_in_codex only queued the preview. No alternate browser/OS capture, native keyboard/focus/mobile/audio/download or physical interaction verification is claimed. Full logical tests and local HTTP checks are in StudyTimely-Focus-Space-Local-2026-11-19.md. Inspect 1440px and 390/320px layouts, both themes, long tasks, scenes, preset edit/copy/remove, note save/convert/download, pause/finish/review, feedback/break, overlay focus/Escape and console before marking passed.
+
+
+## Focus scenes and sidebar revision — 19 November 2026
+
+Visual result remains **blocked for actual UI acceptance**. User screenshot supplied before evidence. Six photographic-style generated assets replace SVG illustrations; each image was inspected, which is not a browser screenshot. Sidebar now has grouped task/timer/ambience controls, filled selected modes with ticks, restrained framing, switch controls and compact secondary entries. Optional clipped rain/water motion is gated by explicit preference, reduced motion, visibility and intersection. IABgetTab timedout/reset; no native alternative. Final593tests/62HTTP/sixassetHTTP are logical/resource proof only. Inspect actual desktop/mobile/light/dark/selected/expanded/disabled states, cover cropping, rain/water continuity, reduced/background pauses, focus and console before marking passed.
+
+
+## Daylight focus layout and wallpaper replacement — 19 November 2026
+
+Visual result: **blocked pending actual browser acceptance**. Supersedes the dark central timer tile and prior photographic wallpapers. User supplied before screenshots and approved unobstructed scene/right timer plus a brighter healing direction. Six new original daylight generated images were individually inspected; this is image-asset evidence, not a UI screenshot. Normal mode places one timer in the light sidebar; immersive mode uses unframed time and compact controls. Warm-white/teal day appearance, optional night, labelled selections, responsive stacking and narrow toolbar are implemented. Rain/cafe/coast masks now match the new scenes.
+
+594 automated tests, the preview build (56 pages plus 404; 68 precache resources) and 62 HTTP checks passed, including six WebP resource checks. In-app-browser inventory timed out/reset; no after UI screenshot or native alternative was used. Opening a preview is not rendering proof. Actual typography, same-viewport comparison, mobile/zoom geometry, text contrast across photos, immersive focus/Escape, timer lifecycle, dialogs, audio/download and visible rain/water performance remain pending. Inspect 1440px, 390px and 320px in day/night and long-content states before marking passed. Full asset hashes, exact prompts, scope and verification are in docs/development/StudyTimely-Daylight-Focus-Local-2026-11-19.md. Production remains V2.34.0.
+
+
+## Final nature motion and fullscreen revision — 19 November 2026
+
+Visual result remains **blocked pending actual browser acceptance**. This section supersedes all earlier scene-candidate descriptions: the user rejected picture-window/empty-wall, cluttered desk, and library/cafe directions. Final app offers only Ocean waves and Rain on glass, full-frame real silent video with no added room frame. Generated alternatives are not shipped. Source/derived footage and one-frame-per-second contact sheets were inspected as media, not as UI screenshots.
+
+Fullscreen now has persistent scene controls, native fullscreenchange/Esc state integration and failure fallbacks. Immersive digits use white fill, dark stroke/shadow and a local soft gradient. Those changes address the two supplied screenshots; no after UI screenshot was captured. In-app browser getTab timed out/reset; no alternative browser/OS screenshot was used and opening the preview only queued it. 607 logical tests, the build, 62 HTTP checks and video byte ranges passed. Actual layout/contrast on both moving scenes, 1440/390/320px, hour timers, repeated fullscreen/back/Esc, focus restoration, real playback/retry, reduced/background state, console and user timer lifecycle need browser checks before passing. Handoff: docs/development/StudyTimely-Focus-Motion-2026-11-19.md. Production V2.34.0 unchanged.
+
+
+## Nature scene library — 2026-11-19
+
+Result: blocked for actual browser visual acceptance. Twelve individual generated photographic-style stills and the final encoded contact sheet were visually inspected; these are asset evidence, not rendered UI screenshots. Builtin CUA inventory timed out/reset; no alternate browser/OS substitute used. Dialog atmosphere filters, selected footer, phone sizing, native fullscreen and real playback remain unobserved. Build and HTTP/asset/preset checks passed; full test log and source handoff: docs/development/StudyTimely-Nature-Library-2026-11-19.md. Local preview http://127.0.0.1:4305/aesthetic-timer . No publication.
+
+
+Four-atmosphere correction19Nov2026: final12stillcontact sheet inspected with exactly3perrow: morningreading/afternoonstudy/rainyfocus/eveningreading. Four wronglymatchedinitialstillsreplaced; optionalexistingmusic+ambientpairingbutton added. Final608tests/62HTTP/14assetchecks/build pass. CUA connection stillblocked; no renderedafter/mobile/filterclick/musicpairing/nativefullscreen acceptance. Status remains blocked for browser visual QA; asset inspection is separate. Preview4305/aesthetic-timer,productionunchanged.
+
+
+## Audio library — 19 November 2026
+
+Actual in-app browser visual checks completed for this audio scope at default1280px,390px and320px. Music-first library, category/favorite controls, real-recording/noise separation and saved-mix views inspected. Screenshots in ignored sound-library-2026-11-19 evidence; desktop audio-desktop.jpg, narrow audio-mobile.jpg. Found and fixed a photo aspect-ratio/preset-grid minimum-width overflow; final320 page306px and audio dialog271px client/scrollwidth equal. NativeEscape restores Sounds focus; captured warning/error logs empty. Muted new-track preview and zero-master real-brook decode worked, Pauseall/off verified, temporary viewport reset and agent tab closed. No audible subjective listening acceptance is claimed.616tests,40finalfocusedchecks,62HTTP,34exactaudio range/hash checks and silent peak analysis passed; source/credits and full boundaries in StudyTimely-Audio-Library-Local-2026-11-19.md. Earlier scene contrast/motion/fullscreen/multidevice gates remain separate; no deployment.
+
+
+## Audio category colors — 19 November 2026
+
+**Scope: Music & sounds color/selection refinement. Final result: passed.** Earlier independent motion/fullscreen/account acceptance items are not superseded.
+
+Grounding: user-supplied music-panel screenshot and approved category-color plan. Actual before 01-before.jpg and after 02-music-day.jpg were opened together in the same comparison input at 1280x720, same day/All/paused/Meditation02 state. No P0/P1/P2 mismatch was found against the approved changes. Layout and type hierarchy stay the same; intended differences are piano blue, ambient lavender, rhythm apricot, nature green, favorites rose, neutral Free and gold free-preview tags. All use actual library icons and readable labels. Player tint follows its category, row selection gets tint/border/Selected, actual playback gets Playing. No new raster assets or decorative gradients were added.
+
+Additional observed evidence: 03-nature-day.jpg (water/forest card roles and selected paused brook); 04-music-night.jpg (night tokens); 05-phone.jpg (320x740); 06-final-selected.jpg (paused selected first row, dialog scrolled). Native Escape returned focus to Sounds; category Ambient returned seven tracks, Favorites one. The existing saved favorite was preserved. Muted playback was verified before an 8s preview; Playing changed to Selected after Pause all audio. No audible playback was used, paused/off state observed, viewport reset and test tab closed. Browser warning/error capture empty.
+
+Sampled category/tab/player/action/access/selected-label text contrast: day minimum5.13:1, night minimum6.10:1, no sampled result below4.5:1; exact CSS foreground/background values and ratios are in contrast.json. This is sampled text verification, not a full accessibility certification. Phone page width306 <=320; dialog scroll/client widths both271. UI remains usable without color through labels/icons/aria states. Mobile long track names wrap; existing bounded playlist scrolling retained.
+
+Verification: build 56 pages+404, local noindex, PWA a5a5970fef3a2ca4/76.24 existing music/ambient regression tests and62HTTP checks pass; git diff --check has no whitespace errors. Audio bytes, playback engine, account/entitlement behavior, data/sync schemas and dependencies unchanged this refinement. No publish, commit or push. Local preview4306/aesthetic-timer. Evidence directory docs/development/evidence/audio-colors-2026-11-19/ is ignored.
+
+
+## Focus sidebar and below-tool guide — 19 November 2026
+
+**Scoped result: passed for the approved page revision.** Production remains V2.34.0; no publication. This does not supersede separate native-fullscreen, subjective audio or production-community gates.
+
+User screenshot and actual desktop-final.jpg opened together for a design critique. Source is cropped/active foreign-tab; after is idle at1440x1000, so no same-state pixel-match claim. Actual desktop-other-tab.jpg separately verifies a single blue timer card/amber ownership notice, no floating duplicate and no grey Resume form. White task fields, selected blue modes and green environment are distinct. Night tokens inspected. At1280x720 idle Start ends around696px; shared header/H1 no longer overlap. Normal dock has three labelled actions. Static scene motion switch replaced with truthful Photo scene/live-library entry.
+
+Actual IAB starter→50min/no-start/no-audio, empty-task start→pause→back, second-tab Continue here→same49:34/paused, live-only scene filter, nativeFAQ expansion and Music dialog Escape/focus return observed. Synthetic unsaved timer discarded through canonical Reset; no saved learning intentionally created. No audible playback used; final audio not playing. Viewport reset/test tabs closed. Warning/error logs empty. At320 document/body306 and comparison table client/scroll271;390 live scene dialog356/356. Phone layouts use stacked mode cards and responsive scene cards. Nine scoped text pairs>=4.67:1 after correcting placeholders; labels/icons/aria states remain independent of color.
+
+Guide is substantive initial HTML, with six sections,4working setup buttons,8FAQ answers and real related links. Final621full regression tests plus19focused after cosmetic fixes,56+404noindex build/PWA15996cde311f06db-76,62HTTP and scopedSSR metadata checks pass. New guide/classic guide collision detected and fixed; classic tool content restored with no diff. No remaining P0/P1/P2 issue found in this scoped visual/state review. Evidence and full limits: docs/development/StudyTimely-Focus-Page-Local-2026-11-19.md; ignored focus-page-2026-11-19 captures/logs/contrast.json.

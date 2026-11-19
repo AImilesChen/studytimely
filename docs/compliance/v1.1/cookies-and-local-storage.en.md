@@ -1,6 +1,6 @@
 # Cookies and Local Storage Notice
 
-Effective date: 2026-11-13. Last updated: 2026-11-14.
+Effective date: 2026-11-13. Last updated: 2026-11-19.
 
 StudyTimely is operated by mileschen, an individual based in mainland China. Website: [studytimely.com](https://studytimely.com). Contact: [support@studytimely.com](mailto:support@studytimely.com). See our [Privacy Policy](/privacy) for data processing, providers and your rights.
 
@@ -14,7 +14,7 @@ Cookies are small pieces of information a browser may send with website requests
 |---|---|---|
 | IndexedDB: database `studytimely`, store `local-state`, key `v1` — active timer | Maintain the mode, timing intervals and pause state needed to restore the timer | Until replaced by the next timer state or removed. Finish/reset replaces the active state; saved history is managed separately. Settings → Data → Clear local study data stops and removes the current timer. |
 | The same IndexedDB document — study history, tasks, habits, schedules, exam plans, subjects and goals | Show local records, progress and charts | Until you delete them or browser storage is cleared or evicted. No automatic history expiry is configured. Use Study Tracker to delete one record; Settings → Data to export/import a JSON backup or clear local study data. |
-| The same IndexedDB document — appearance, sound (including music track, volume and repeat), saved world-clock cities, last-used tool and operational preferences | Apply the choices you request | Until changed or cleared. In Settings → Appearance, turning off Remember preferences on this device resets appearance, sound, saved world-clock cities and clock-display choices on the next visit. Study records, the goal and operational timer settings remain separate. |
+| The same IndexedDB document — appearance, sound (including music track, volume, repeat, favorites and playlists), saved world-clock cities, last-used tool and operational preferences | Apply the choices you request | Until changed or cleared. In Settings → Appearance, turning off Remember preferences on this device resets appearance, sound, saved world-clock cities and clock-display choices on the next visit. Study records, the goal and operational timer settings remain separate. |
 
 | Local storage: `studytimely-planning-reminders-v1` and `studytimely-last-manual-sync-v1` | Explicitly enabled page-reminder preferences, occurrence IDs/timestamps for repeat prevention, and the last successful manual-sync time | Device-only; excluded from study backups and cloud snapshots. Reminder checks need an open, visible planner. The repeat log is bounded and pruned during successful checks. Clear local study data resets their workspace association and attempts to remove these keys; browser website-data controls can remove them. |
 
@@ -60,3 +60,8 @@ The existing IndexedDB store `studytimely` / `local-state` additionally keeps `a
 Pending changes and cached account workspaces remain until synced, explicitly replaced or cleared. This browser keeps up to 10 protection copies for up to 30 days; pruning occurs when protection copies are created. Clear local study data removes these cached workspaces, queues and local backups and disables automatic sync; browser website-data controls can also remove them. Cloud copies and downloaded files are separate. The cloud recovery limits, private session/device list and account-deletion controls are described in the [Privacy Policy](/privacy).
 
 The sessionStorage key `studytimely-sync-entry` remembers that a user chose to sign in from Sync & recovery. It holds only a ten-minute return-intent timestamp, contains no account token or study data, and is removed on successful return, cancellation or later return handling. Browser session storage also ends with the tab session.
+
+
+### Focus space presets and quick notes
+
+The focus space uses original local scene assets and the existing study timer. Creating a scene or preset adds no learning time. Focus presets and quick notes are stored on this device, separated by the active browser workspace. Notes are not sent to AI or included in study backups, automatic sync or account cloud exports. A separate Download notes action provides a local JSON copy. Removing a note removes it from active device storage; downloaded copies remain under your control. Clear local study data removes these device copies across cached workspaces. If local coordination or persistent storage is unavailable, the interface identifies notes and presets as temporary in the open tab. Turning off Remember preferences prevents new persistent focus-preset settings; notes remain separately local. Converting a note into a task explicitly adds a task title (up to 140 characters) to the existing study workspace, which can enter its backups and optional sync. The full note stays in the focus notebook. Playback requires a user gesture, and no camera, website-blocking extension or attention tracking is used.

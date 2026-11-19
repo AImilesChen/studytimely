@@ -1,13 +1,13 @@
 export const SOUND_SCAPES = [
   ['rain', 'Rain'], ['cafe', 'Café'], ['forest', 'Forest'], ['waves', 'Ocean'],
   ['white', 'White noise'], ['brown', 'Brown noise'], ['pink', 'Pink noise'], ['fire', 'Fireplace'],
-  ['fan', 'Fan'], ['stream', 'Stream'], ['keyboard', 'Keyboard'], ['nature', 'Breeze & chimes']
+  ['fan', 'Fan'], ['stream', 'Stream'], ['keyboard', 'Keyboard'], ['nature', 'Soft breeze']
 ];
 export const SOUND_IDS = SOUND_SCAPES.map(([id]) => id);
 export const DEFAULT_MIXES = [
-  {id:'rainy-reading', name:'Rainy reading', mix:{rain:55, fire:20}, volume:60},
-  {id:'quiet-study', name:'Quiet study', mix:{brown:45, stream:20}, volume:60},
-  {id:'cafe-study', name:'Café study', mix:{cafe:45, rain:20}, volume:60}
+  {id:'rainy-reading', name:'Rainy reading', mix:{rain:25}, volume:45},
+  {id:'quiet-study', name:'Quiet study', mix:{stream:25,nature:10}, volume:45},
+  {id:'cafe-study', name:'Café study', mix:{cafe:20,rain:10}, volume:45}
 ];
 export const MAX_MIXES = 8;
 export function validateMix(mix) {

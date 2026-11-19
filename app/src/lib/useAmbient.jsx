@@ -5,13 +5,14 @@ import {DEFAULT_MIXES,MAX_MIXES,validateMixes} from './sound-settings.mjs';
 export function useAmbient(store) {
  const engine=useRef(null), current=useRef(store.data.settings), queue=useRef(Promise.resolve());
  const pending=useRef(0), playing=useRef(false), intent=useRef(0);
- const [active,setActive]=useState(false), [error,setError]=useState('');
+ const [active,setActive]=useState(false),[loading,setLoading]=useState(false), [error,setError]=useState('');
  if(!pending.current)current.current=store.data.settings;
  useEffect(()=>{engine.current=createAmbientEngine();return()=>{intent.current++;engine.current?.close();};},[]);
+ useEffect(()=>{stop();},[store.data.epoch]);
  useEffect(()=>{
   if(active)engine.current?.update(current.current.ambient,current.current.ambientVolume);
  },[store.data.settings.ambient,store.data.settings.ambientVolume,active]);
- function stop() {intent.current++;playing.current=false;engine.current?.stop();setActive(false);}
+ function stop() {intent.current++;playing.current=false;engine.current?.stop();setActive(false);setLoading(false);}
  async function save(patch) {
   pending.current++;
   const operation=queue.current.then(()=>store.command('settings',{patch}));
@@ -24,12 +25,13 @@ export function useAmbient(store) {
   finally {pending.current--;}
  }
  async function play(mix,volume) {
-  const token=++intent.current;
+  const token=++intent.current;setLoading(true);
   if(!Object.values(mix).some(v=>v>0)){stop();return;}
   try {
    const started=await engine.current.start(mix,volume);
    if(started&&token===intent.current){engine.current.update(current.current.ambient,current.current.ambientVolume);playing.current=true;setActive(true);}
   } catch(e) {if(token===intent.current){stop();setError(e.message);}}
+  finally{if(token===intent.current)setLoading(false);}
  }
  function onVolume(id,volume) {
   setError('');const mix={...current.current.ambient,[id]:volume};
@@ -70,5 +72,8 @@ export function useAmbient(store) {
   current.current={...current.current,ambientPresets:presets};return save({ambientPresets:presets});
  }
  return {mix:store.data.settings.ambient,volume:store.data.settings.ambientVolume,presets:store.data.settings.ambientPresets,
-  active,error,onVolume,onMaster,onMute,onResume,onPreset,onSavePreset,onDeletePreset,onRestorePresets};
+  active,loading,error,onVolume,onMaster,onMute,onResume,onPreset,onSavePreset,onDeletePreset,onRestorePresets,
+  prime:()=>engine.current?.start({},0).catch(()=>false),
+  onFadeOut:()=>{intent.current++;playing.current=false;engine.current?.fadeOut();setActive(false);setLoading(false);},
+  onPlayMix:(mix,volume)=>{current.current={...current.current,ambient:mix,ambientVolume:volume};return play(mix,volume);}};
 }

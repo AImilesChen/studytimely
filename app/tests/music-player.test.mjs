@@ -24,7 +24,7 @@ function fixture(options={}){
   pause(){this.paused=true;this.dispatchEvent(new Event('pause'));}
  }
  const changes=[],advanced=[];
- const engine=createMusicPlayer({createAudio:()=>new Audio(),onChange:s=>changes.push(s),onAdvance:id=>advanced.push(id)});
+ const engine=createMusicPlayer({schedule:options.schedule,unschedule:options.unschedule,fadeMs:options.fadeMs,now:options.now,createAudio:()=>new Audio(),onChange:s=>changes.push(s),onAdvance:id=>advanced.push(id)});
  return {engine,instances,pending,changes,advanced};
 }
 test('music stays lazy and paused when preferences are loaded; playback needs an explicit action',async()=>{
@@ -74,15 +74,15 @@ test('music preferences migrate, validate, persist and stay separate from timer 
  const db=new IDBFactory(),a=createRepository({indexedDB:db}),s=await a.load();await a.command({type:'settings',epoch:s.epoch,patch:{musicTrack:second.id,musicVolume:25,musicRepeat:'one'}},{owner:'a',id:'saved',now:1000});a.close();
  const b=createRepository({indexedDB:db});try{const reloaded=await b.load();assert.equal(reloaded.settings.musicTrack,second.id);assert.equal(reloaded.settings.musicVolume,25);assert.equal(reloaded.settings.musicRepeat,'one');assert.equal(reloaded.timer,null);}finally{b.close();}
 });
-test('all five bundled recordings match their exact licensed source manifest and stay out of precache',async()=>{
- assert.equal(MUSIC_TRACKS.length,5);
+test('all twenty-five bundled recordings match their exact licensed source manifest and stay out of precache',async()=>{
+ assert.equal(MUSIC_TRACKS.length,25);
  for(const t of MUSIC_TRACKS){
   const audio=await fs.readFile(new URL('../public'+t.src,import.meta.url));
   assert.equal(audio.byteLength,t.bytes);assert.equal(createHash('sha256').update(audio).digest('hex'),t.sha256);assert.ok(audio.subarray(0,3).toString()==='ID3'||audio[0]===255&&audio[1]&224);assert.ok(t.bytes<25*1024*1024);
   assert.equal(t.license,'CC BY 4.0');assert.equal(new URL(t.source).hostname,'incompetech.com');assert.match(t.src,new RegExp(t.sha256.slice(0,12)));assert.ok(t.durationSeconds>120);
  }
  const credits=await fs.readFile(new URL('../public/music/CREDITS.txt',import.meta.url),'utf8');for(const t of MUSIC_TRACKS)assert.ok(credits.includes(t.title)&&credits.includes(t.isrc));
- const precache=JSON.parse(await fs.readFile(new URL('../dist/client/pwa-build.json',import.meta.url),'utf8')).precache;assert.ok(!precache.some(s=>s.startsWith('/music/')));
+ const precache=JSON.parse(await fs.readFile(new URL('../dist/client/pwa-build.json',import.meta.url),'utf8')).precache;assert.ok(!precache.some(s=>/^\/(music|ambient)\//.test(s)));
 });
 
 test('muting before the first play gesture is applied to the newly created audio element',async()=>{
@@ -90,4 +90,17 @@ test('muting before the first play gesture is applied to the newly created audio
 });
 test('displayed full recording lengths round encoder fractions consistently with the playlist',()=>{
  assert.equal(musicTime(212.819592),'3:33');assert.equal(musicTime(324.850272),'5:25');assert.equal(musicTime(53),'0:53');assert.equal(musicTime(NaN),'0:00');assert.equal(musicTime(-1),'0:00');
+});
+
+test('eight-second preview stops automatically and cannot stop a newer full playback',async()=>{
+ let serial=0;const jobs=new Map(),f=fixture({schedule:(fn,ms)=>{jobs.set(++serial,{fn,ms});return serial;},unschedule:id=>jobs.delete(id)});
+ await f.engine.play(first.id,{previewSeconds:8});assert.equal(f.engine.snapshot().preview,true);const old=[...jobs.values()][0];assert.equal(old.ms,8000);old.fn();assert.equal(f.instances[0].paused,true);assert.equal(f.engine.snapshot().preview,false);
+ await f.engine.play(first.id,{previewSeconds:8});const stale=[...jobs.values()].at(-1);await f.engine.play(second.id);stale.fn();assert.equal(f.instances[0].paused,false);assert.equal(f.engine.snapshot().trackId,second.id);f.engine.close();
+});
+test('a chosen category playlist advances within that selection',async()=>{
+ const f=fixture();f.engine.configure({queue:[second.id,last.id],repeat:'all'});await f.engine.play(second.id);f.instances[0].dispatchEvent(new Event('ended'));await Promise.resolve();assert.equal(f.engine.snapshot().trackId,last.id);f.instances[0].dispatchEvent(new Event('ended'));await Promise.resolve();assert.equal(f.engine.snapshot().trackId,second.id);assert.throws(()=>f.engine.configure({queue:['missing']}));f.engine.close();
+});
+test('favorites and playlist preferences survive explicit backup without creating study records',()=>{
+ const s=emptyState('favorites');const next=transition(s,{type:'settings',epoch:s.epoch,patch:{musicFavorites:[first.id],musicQueue:[second.id,first.id]}},{owner:'test',id:'save',now:1000}).state;
+ assert.deepEqual(backupOf(next,1000,{includePreferences:true}).preferences.values.musicFavorites,[first.id]);assert.deepEqual(next.sessions,[]);assert.deepEqual(persistedState({...next,settings:{...next.settings,rememberPreferences:false}}).settings.musicFavorites,[]);assert.throws(()=>validateSettings({musicFavorites:['missing']}));assert.throws(()=>validateSettings({musicQueue:[first.id,first.id]}));
 });

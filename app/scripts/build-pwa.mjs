@@ -3,9 +3,13 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 export async function buildPwa(root,routes){
  const dir=path.join(root,'dist/client'),assets=(await fs.readdir(path.join(dir,'assets'))).filter(f=>/\.(js|css|woff2)$/.test(f)).map(f=>'/assets/'+f);
- const version=createHash('sha256').update(assets.join('|')+routes.map(r=>r.path).join('|')).digest('hex').slice(0,16);
+ const scenes=(await fs.readdir(path.join(dir,'focus-scenes'))).filter(f=>f.endsWith('.webp')).map(f=>'/focus-scenes/'+f).sort();
+ const sceneHash=createHash('sha256');for(const scene of scenes)sceneHash.update(await fs.readFile(path.join(dir,scene)));
+ // Video loops are lazy network assets, never a mandatory app-shell download.
+ const videos=(await fs.readdir(path.join(dir,'focus-scenes'))).filter(f=>f.endsWith('.mp4')).sort();for(const video of videos)sceneHash.update(await fs.readFile(path.join(dir,'focus-scenes',video)));
+ const version=createHash('sha256').update(assets.join('|')+routes.map(r=>r.path).join('|')+sceneHash.digest('hex')).digest('hex').slice(0,16);
  const pages=routes.filter(r=>!r.onlineOnly&&!['app','account','privacy','terms','cookies'].includes(r.id)).map(r=>r.path);
- const precache=[...new Set([...pages,'/app','/manifest.webmanifest',...assets,'/design-assets/brand/icon-192.png','/design-assets/brand/app-icon.png'])];
+ const precache=[...new Set([...pages,'/app','/manifest.webmanifest',...assets,...scenes,'/design-assets/brand/icon-192.png','/design-assets/brand/app-icon.png'])];
  const sw=`/* Generated public app-shell cache. No API responses or user records are cached. */
 const CACHE='studytimely-shell-${version}';
 const FILES=${JSON.stringify(precache)};

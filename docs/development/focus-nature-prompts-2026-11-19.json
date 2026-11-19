@@ -1,0 +1,136 @@
+{
+  "generator": "Built-in image_gen",
+  "date": "2026-11-19",
+  "scenes": [
+    {
+      "id": "mist-lake",
+      "name": "Morning mist",
+      "group": "Morning reading",
+      "prompt": "A tranquil freshwater lake at early morning, delicate thin mist over water, distant softly layered blue green hills, pale warm ivory sky, a small natural shoreline only at extreme bottom edge. Water and sky make up most of frame. Open airy calm composition, not dramatic.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-f8b6ccc7-f664-4a74-b2a2-7273d715987d.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A tranquil freshwater lake at early morning, delicate thin mist over water, distant softly layered blue green hills, pale warm ivory sky, a small natural shoreline only at extreme bottom edge. Water and sky make up most of frame. Open airy calm composition, not dramatic."
+    },
+    {
+      "id": "cloud-valley",
+      "name": "Misty hills",
+      "group": "Morning reading",
+      "prompt": "Soft layers of distant green mountains and low white clouds drifting in an expansive valley after rain, morning sun diffused through high thin clouds, airy pale sky occupies upper half. No close branches, no dark dense foreground. Peaceful natural landscape.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-2fcf7164-319c-4273-b265-4c2fd4cd72e7.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. Soft layers of distant green mountains and low white clouds drifting in an expansive valley after rain, morning sun diffused through high thin clouds, airy pale sky occupies upper half. No close branches, no dark dense foreground. Peaceful natural landscape."
+    },
+    {
+      "id": "clear-lagoon",
+      "name": "Bright bay",
+      "group": "Morning reading",
+      "prompt": "A pristine turquoise coastal lagoon, very gently rippled transparent water, distant low headland near horizon, soft pale blue sky with small wispy clouds, fine pale sand appearing only in lower corner. Quiet wide scene, no tropical tourism objects, no towering rocks. Bright yet soft natural daylight.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-ce3bb367-03c3-4bb5-a83a-14efbe9a0ee4.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A pristine turquoise coastal lagoon, very gently rippled transparent water, distant low headland near horizon, soft pale blue sky with small wispy clouds, fine pale sand appearing only in lower corner. Quiet wide scene, no tropical tourism objects, no towering rocks. Bright yet soft natural daylight."
+    },
+    {
+      "id": "sunlit-meadow",
+      "name": "Sunlit slopes",
+      "group": "Afternoon study",
+      "prompt": "An open soft green meadow, a few delicate wildflowers only at bottom edge, rolling distant hills, luminous pale blue sky and thin small clouds, soft warm afternoon sunlight. Grass is fresh sage green not neon, landscape has very few objects. Calm expansive view.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-c1f42da0-ea3f-4f90-9378-206cebe849ba.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. An open soft green meadow, a few delicate wildflowers only at bottom edge, rolling distant hills, luminous pale blue sky and thin small clouds, soft warm afternoon sunlight. Grass is fresh sage green not neon, landscape has very few objects. Calm expansive view."
+    },
+    {
+      "id": "alpine-lake",
+      "name": "Open lakeshore",
+      "group": "Afternoon study",
+      "prompt": "Clear pale blue alpine lake, a softly sunlit distant mountain ridge, a narrow belt of green forest at horizon, spacious pale sky, smooth subtle water reflections. Fresh morning daylight, natural balanced exposure, restrained detail and open centre. No dense foreground.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-9c965b42-e2c8-4b33-95e3-63eea2c6b211.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. Clear pale blue alpine lake, a softly sunlit distant mountain ridge, a narrow belt of green forest at horizon, spacious pale sky, smooth subtle water reflections. Fresh morning daylight, natural balanced exposure, restrained detail and open centre. No dense foreground."
+    },
+    {
+      "id": "blue-plains",
+      "name": "Blue-sky plains",
+      "group": "Afternoon study",
+      "prompt": "A wide open green grassland under a luminous pale blue sky, distant gentle low rolling horizon, a few thin soft white clouds, fresh restrained sage green grasses, balanced soft afternoon daylight, airy welcoming unhurried feeling. Open plain without sea, lake, sand dunes, forest walls, buildings or clutter. Photorealistic calm study background.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-ceaac87c-af25-4596-b97d-78d35cf6068a.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A wide open green grassland under a luminous pale blue sky, distant gentle low rolling horizon, a few thin soft white clouds, fresh restrained sage green grasses, balanced soft afternoon daylight, airy welcoming unhurried feeling. Open plain without sea, lake, sand dunes, forest walls, buildings or clutter. Photorealistic calm study background."
+    },
+    {
+      "id": "rain-lake",
+      "name": "Rainy lake",
+      "group": "Rainy focus",
+      "prompt": "A quiet open lake during fine gentle rain, small rain-made ripples visible across water, soft distant green hillside softened by bright overcast haze, luminous silver blue sky. Fresh reassuring atmosphere, no storm, no black clouds. Viewer is outdoors, no window, no frame.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-62d1e7c1-f1c5-4ab4-a6e6-40b99cb3d2c9.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A quiet open lake during fine gentle rain, small rain-made ripples visible across water, soft distant green hillside softened by bright overcast haze, luminous silver blue sky. Fresh reassuring atmosphere, no storm, no black clouds. Viewer is outdoors, no window, no frame."
+    },
+    {
+      "id": "valley-drizzle",
+      "name": "Valley drizzle",
+      "group": "Rainy focus",
+      "prompt": "A broad tranquil valley in fine gentle drizzle, soft distant green hill layers and open meadow, very fine visible rain streaks and delicate haze, bright pearl-grey sky with diffuse daylight. Photorealistic reassuring peaceful rainy landscape. No sea, lake, window, frames, dense close foliage, black stormclouds, lightning, darkness, dramatic rainstorm.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-f5c34fe8-dd64-4a88-b7b5-06afac126e70.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A broad tranquil valley in fine gentle drizzle, soft distant green hill layers and open meadow, very fine visible rain streaks and delicate haze, bright pearl-grey sky with diffuse daylight. Photorealistic reassuring peaceful rainy landscape. No sea, lake, window, frames, dense close foliage, black stormclouds, lightning, darkness, dramatic rainstorm."
+    },
+    {
+      "id": "rain-cleared-meadow",
+      "name": "Rain-cleared meadow",
+      "group": "Rainy focus",
+      "prompt": "A fresh expansive green meadow just after a light spring rain, subtle water droplets on grasses only along the bottom edge, soft gently rolling low hills, thin residual mist low in distance, bright clearing pearl sky with a soft blue opening. Photorealistic refreshing tranquil landscape suitable for reading. Predominantly open green field, no lake, river, sea, buildings, furniture, frames, heavy shadows or clutter.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-04c9af3b-0487-488b-b8d1-6caf458a6e8b.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A fresh expansive green meadow just after a light spring rain, subtle water droplets on grasses only along the bottom edge, soft gently rolling low hills, thin residual mist low in distance, bright clearing pearl sky with a soft blue opening. Photorealistic refreshing tranquil landscape suitable for reading. Predominantly open green field, no lake, river, sea, buildings, furniture, frames, heavy shadows or clutter."
+    },
+    {
+      "id": "pastel-sea",
+      "name": "Pastel sea",
+      "group": "Evening reading",
+      "prompt": "A peaceful open sea at gentle early sunset, pastel blush pink and pale peach fading into pale blue sky, small soft waves by a very simple smooth pale beach, horizon in upper middle. Bright enough to feel welcoming, no dark silhouettes, no dramatic fiery sunset. Large quiet clear areas.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-a364c1ac-ceeb-4056-8155-16166e56a3db.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A peaceful open sea at gentle early sunset, pastel blush pink and pale peach fading into pale blue sky, small soft waves by a very simple smooth pale beach, horizon in upper middle. Bright enough to feel welcoming, no dark silhouettes, no dramatic fiery sunset. Large quiet clear areas."
+    },
+    {
+      "id": "lavender-lake",
+      "name": "Warm lake",
+      "group": "Evening reading",
+      "prompt": "A broad peaceful lake reflecting very pale lavender and warm peach evening sky, distant low hills along horizon, smooth water with subtle ripples. Welcoming soft light and gentle colors, no dark heavy areas, simple graceful composition with plenty of open water and sky.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-d08d6d2f-c798-4887-8144-d83b16042b32.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A broad peaceful lake reflecting very pale lavender and warm peach evening sky, distant low hills along horizon, smooth water with subtle ripples. Welcoming soft light and gentle colors, no dark heavy areas, simple graceful composition with plenty of open water and sky."
+    },
+    {
+      "id": "dusk-cloud-sea",
+      "name": "Dusk cloud sea",
+      "group": "Evening reading",
+      "prompt": "A serene sea of soft clouds seen from a quiet high natural viewpoint, layered white and pale lavender clouds stretching into distant faint mountain ridges, luminous pastel peach and pale blue dusk sky, gently warm twilight while still bright and airy. Photorealistic refined tranquil atmosphere for reading, no dramatic dark mountains in foreground, no black sky, no sun glare, no saturated orange, no stars, no buildings or people. Clouds and sky fill almost all the frame.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-d8b7614e-c0d1-494b-a974-ab2fd228e7ff.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A serene sea of soft clouds seen from a quiet high natural viewpoint, layered white and pale lavender clouds stretching into distant faint mountain ridges, luminous pastel peach and pale blue dusk sky, gently warm twilight while still bright and airy. Photorealistic refined tranquil atmosphere for reading, no dramatic dark mountains in foreground, no black sky, no sun glare, no saturated orange, no stars, no buildings or people. Clouds and sky fill almost all the frame."
+    }
+  ],
+  "retiredScenes": [
+    {
+      "id": "soft-dunes",
+      "name": "Soft dunes",
+      "group": "Daylight",
+      "prompt": "Minimal gentle coastal sand dunes with a few fine pale grasses in lower corners, open calm blue green ocean beyond, pale blue sky with thin white clouds. Warm sand, cool water, soft diffused daylight. Natural inviting and uncluttered, very wide peaceful horizon.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-09cecd4e-619c-4a58-b3c7-9bf2761adf30.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. Minimal gentle coastal sand dunes with a few fine pale grasses in lower corners, open calm blue green ocean beyond, pale blue sky with thin white clouds. Warm sand, cool water, soft diffused daylight. Natural inviting and uncluttered, very wide peaceful horizon."
+    },
+    {
+      "id": "after-rain",
+      "name": "After the rain",
+      "group": "Rain",
+      "prompt": "Fresh open green rolling hills just after a gentle spring rain, a still small lake in foreground, thin atmospheric mist in distance, luminous pearl grey clouds with a little soft sunlight. Peaceful natural meadow landscape, no dense leaves in foreground, no heavy drama or sharp shafts of light.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-dafe16b8-f3ae-49e5-a1ee-37b6e130ccec.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. Fresh open green rolling hills just after a gentle spring rain, a still small lake in foreground, thin atmospheric mist in distance, luminous pearl grey clouds with a little soft sunlight. Peaceful natural meadow landscape, no dense leaves in foreground, no heavy drama or sharp shafts of light."
+    },
+    {
+      "id": "rain-coast",
+      "name": "Coastal drizzle",
+      "group": "Rain",
+      "prompt": "A calm sheltered coast in light fine drizzle, pale blue grey sea with delicate small waves, distant soft green cape, light luminous overcast sky, small smooth wet beach at bottom. Refreshing bright rainy-day feeling, realistic restrained colors, no storm, no dramatic rocks.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-44601298-35be-448a-95ae-6d54f0722c56.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. A calm sheltered coast in light fine drizzle, pale blue grey sea with delicate small waves, distant soft green cape, light luminous overcast sky, small smooth wet beach at bottom. Refreshing bright rainy-day feeling, realistic restrained colors, no storm, no dramatic rocks."
+    },
+    {
+      "id": "golden-grassland",
+      "name": "Golden hour",
+      "group": "Evening",
+      "prompt": "An expansive soft golden green grassland with a distant gentle hill line, very pale peach evening sky, low warm sunlight softly illuminating grass without glaring sun in frame. Sparse fine grasses in foreground, airy quiet scene, bright welcoming natural photograph not orange saturated.",
+      "source": "G:\\CodexHome\\generated_images\\01a1cfb6-39bc-7af0-a882-1dbac5695035\\exec-3c5cc74a-a104-44c3-975c-48d2156e8e90.png",
+      "fullPrompt": "Use case: photorealistic-natural. Asset type: original full-bleed wallpaper for a calming study focus website. Generate ONE standalone landscape photograph in 16:9, at least 1920x1080 if possible. Premium natural landscape photography, highly realistic textures and subtle detail, soft balanced exposure, healing peaceful welcoming atmosphere, moderate restrained saturation. Clean spacious composition with a quiet centre suitable for a small timer overlay. Fixed eye-level view, no people, animals, buildings, furniture, desks, windows, picture frames, mugs, books, text, logos, watermark. Not illustration, not fantasy, not oversharpened or HDR. Avoid clutter, oppressive shadows, neon greens, huge dramatic skies, tangled foreground branches, travel-ad spectacle. An expansive soft golden green grassland with a distant gentle hill line, very pale peach evening sky, low warm sunlight softly illuminating grass without glaring sun in frame. Sparse fine grasses in foreground, airy quiet scene, bright welcoming natural photograph not orange saturated."
+    }
+  ]
+}

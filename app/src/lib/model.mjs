@@ -1,6 +1,7 @@
+import {focusConfig,focusTimerPatch} from './focus-space.mjs';
 import {recordGoal} from './learning-history.mjs';
 import {reminderAction} from './reminder.mjs';
-import {MUSIC_TRACKS,MUSIC_REPEAT,musicTrack} from './music-catalog.mjs';
+import {MUSIC_TRACKS,MUSIC_REPEAT,musicTrack,validateMusicList} from './music-catalog.mjs';
 import {DEFAULT_MIXES,validateMix,validateMixes} from './sound-settings.mjs';
 import {cityFor} from './world-clock.mjs';
 import {PREFERENCE_KEYS,pickPreferences} from './preferences.mjs';
@@ -10,7 +11,7 @@ export const MAX_GAP=30*60*1000;
 export const MAX_RUN=24*60*60*1000;
 export const MODES=['study','pomodoro','focus','countdown','stopwatch','clock','alarm'];
 const EXTRA_LAST_PAGES={alarm:'/alarm-clock',tracker:'/study-tracker',planner:'/study-planner',schedule:'/study-schedule-maker',habits:'/study-habit-tracker',syllabus:'/syllabus-tracker',exam:'/exam-countdown',aesthetic:'/aesthetic-timer',calculator:'/study-time-calculator'};
-export const DEFAULT_SETTINGS={theme:'dark',spaceTheme:'default',ambient:{},ambientVolume:60,ambientPresets:DEFAULT_MIXES,timerSize:'medium',musicTrack:MUSIC_TRACKS[0].id,musicVolume:35,musicRepeat:'all',worldClockCities:[],lastTool:'study',lastPage:'',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
+export const DEFAULT_SETTINGS={musicFavorites:[],musicQueue:[],theme:'dark',spaceTheme:'default',ambient:{},ambientVolume:60,ambientPresets:DEFAULT_MIXES,timerSize:'medium',musicTrack:MUSIC_TRACKS[0].id,musicVolume:35,musicRepeat:'all',worldClockCities:[],lastTool:'study',lastPage:'',reducedMotion:false,rememberPreferences:true,sound:false,volume:40,clock24:true,showSeconds:true,showDate:true,studyMinutes:25,shortBreak:5,longBreak:15,longEvery:4,cycleLimit:0,autoBreak:false,autoStudy:false,focusSeconds:1500,countdownSeconds:1500,subject:'',analytics:false};
 export function emptyState(epoch='initial'){return{schema:SCHEMA,epoch,revision:0,settings:structuredClone(DEFAULT_SETTINGS),subjects:[],dailyGoal:0,sessions:[],timer:null,reminder:null,workspace:emptyWorkspace()};}
 export class DomainError extends Error{constructor(code,message){super(message);this.code=code;}}
 const fail=(code,message)=>{throw new DomainError(code,message);};
@@ -37,7 +38,7 @@ function review(t,now,reason){
  pauseTimer(t,last);t.status='review';t.reviewReason=reason;t.reviewSegments=candidate;t.reviewMaxSeconds=Math.floor(sumIntervals(candidate)/1000);t.lastObserved=now;
 }
 function nextPomodoro(state,t,now,phase,completed=t.completedStudies,run=false){
- state.timer={...makeTimer('pomodoro',state.settings,t.rootId,now,t.owner),...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle','planningBlockId'].filter(k=>t[k]).map(k=>[k,t[k]])),id:t.rootId+':'+(t.sequence+1),sequence:t.sequence+1,phase,completedStudies:completed,durationSeconds:durationFor('pomodoro',phase,state.settings),subject:t.subject,status:run?'running':'ready',since:run?now:null,startedAt:run?now:null};
+ state.timer={...makeTimer('pomodoro',state.settings,t.rootId,now,t.owner),...(t.studioAudio?{studioAudio:t.studioAudio}:{}),...Object.fromEntries(['taskId','taskTitle','planId','chapterId','chapterTitle','planningBlockId'].filter(k=>t[k]).map(k=>[k,t[k]])),id:t.rootId+':'+(t.sequence+1),sequence:t.sequence+1,phase,completedStudies:completed,durationSeconds:durationFor('pomodoro',phase,state.settings),subject:t.subject,status:run?'running':'ready',since:run?now:null,startedAt:run?now:null};
 }
 function settle(state,now){
  const t=state.timer;if(!t||t.status!=='running')return null;
@@ -81,6 +82,7 @@ export function validateSettings(input){
  try{s.ambient=validateMix(s.ambient);s.ambientPresets=validateMixes(s.ambientPresets);}catch(e){fail('INVALID',e.message);}
  integer(s.ambientVolume,0,100,'Ambient volume');
  integer(s.musicVolume,0,100,'Music volume');
+ try{s.musicFavorites=validateMusicList(s.musicFavorites);s.musicQueue=validateMusicList(s.musicQueue);}catch(e){fail('INVALID',e.message);}
  if(!musicTrack(s.musicTrack)||!MUSIC_REPEAT.includes(s.musicRepeat))fail('INVALID','Choose a supported music track and repeat setting.');
  if(!['small','medium','large'].includes(s.timerSize))fail('INVALID','Choose a supported timer size.');
  for(const k of ['reducedMotion','rememberPreferences','sound','clock24','showSeconds','showDate','autoBreak','autoStudy','analytics'])if(typeof s[k]!=='boolean')fail('INVALID','Invalid preference.');
@@ -96,6 +98,30 @@ export function transition(previous,action,{now,owner,id}){
  if(['start','pause','finish','reset','lap','phase','tick','review','clock-change'].includes(action.type)||action.type.startsWith('pomodoro-'))ownerGuard(state,owner);
  if(action.type.startsWith('pomodoro-')&&state.timer?.mode==='pomodoro'&&state.timer.completedStudies>0&&state.timer.owner!==owner)fail('OTHER_TAB','Move this Pomodoro routine here before changing it.');
  if(action.timerId&&state.timer?.id!==action.timerId)fail('STALE','The timer changed. Review its current phase.');
+ if(action.type==='studio-note-task'){
+  if(typeof action.noteId!=='string'||!/^[a-zA-Z0-9-]{1,100}$/.test(action.noteId))fail('INVALID','Choose a saved thought.');
+  const taskId='focus-note:'+action.noteId;
+  if(state.workspace.tasks.some(t=>t.id===taskId))return {state,event:'workspace-saved'};
+  return transition(state,{type:'task-save',epoch:state.epoch,title:action.title,subject:'',estimateMinutes:0},{now,owner,id:taskId});
+ }
+ if(action.type==='studio-break'){
+  if(hasProgress(state.timer))fail('BUSY','Finish the current timer before taking a break.');
+  integer(action.minutes,1,60,'Break duration');
+  state.timer={...makeTimer('countdown',state.settings,id,now,owner),studioBreak:true,durationSeconds:action.minutes*60,status:'running',since:now,startedAt:now};state.revision++;return {state,event:'studio-break'};
+ }
+ if(action.type==='studio-start'){
+  if(hasProgress(state.timer))fail('BUSY','Finish or reset your current session before choosing a new task or duration.');
+  let config;try{config=focusConfig(action.config);}catch(e){fail('INVALID',e.message);}
+  const ctx={now,owner,id},epoch=state.epoch;
+  state=transition(state,{type:'settings',patch:focusTimerPatch(config),epoch},ctx).state;
+  state.timer=makeTimer(config.mode,state.settings,id,now,owner);
+  let taskId=action.taskId||'';
+  if(taskId&&!state.workspace.tasks.some(t=>t.id===taskId&&!t.deletedAt&&!t.done))fail('INVALID','Choose a current unfinished task.');
+  if(!taskId&&action.title?.trim()){
+   state=transition(state,{type:'task-save',title:action.title,subject:action.subject||'',estimateMinutes:config.minutes,epoch},{...ctx,id:id+':task'}).state;taskId=id+':task';
+  }
+  const started=transition(state,{type:taskId?'workspace-start':'start',mode:config.mode,...(taskId?{taskId}:{}),epoch},ctx);started.state.timer.studioAudio=config.endSound;return started;
+ }
  if(action.type.startsWith('reminder-')){try{event=reminderAction(state,action,{now,owner,id});}catch(e){fail(e.code||'INVALID',e.message);}state.revision++;return {state,event};}
  if(workspaceAction(state,action,{now,owner,id})){state.revision++;return{state,event:action.type==='workspace-start'?'task-started':action.type==='habit-prepare'?'habit-prepared':'workspace-saved'};}
  switch(action.type){
