@@ -21,7 +21,7 @@ export default {async fetch(request,env,ctx){
  if(env.FIXTURE_REVIEW_DISABLED==='true'){fixture.COMMUNITY_REVIEW_ENABLED='false';delete fixture.AZURE_CONTENT_SAFETY_KEY;}
  if(url.pathname==='/__test/sync-preview')return syncPreview(request,fixture);
  if(url.pathname==='/__test/group-preview')return groupPreview(request,fixture);
- if(url.pathname.startsWith('/api/community/'))return fixtureCommunity(request,fixture,true,ctx);
+ if(url.pathname.startsWith('/api/community/')&&env.FIXTURE_USE_BUILT_COMMUNITY!=='true')return fixtureCommunity(request,fixture,true,ctx);
  if(url.pathname==='/__test/registration'&&request.method==='POST'){if(request.headers.get('origin')!==url.origin)return new Response('Forbidden',{status:403});const id=crypto.randomUUID();const proof=await pendingRegistration(request,env,{sub:'synthetic-new-google:'+id,email:'new-'+id.slice(0,8)+'@studytimely.invalid'},'/account',Date.now());return new Response(null,{status:303,headers:{Location:'/account?signin=register','Set-Cookie':proof,'Cache-Control':'no-store'}});}
  if(url.pathname==='/__test/notify'&&request.method==='POST'){const {roomId}=await request.json();if(!/^[a-f0-9-]{36}$/.test(roomId||''))return new Response('Invalid fixture room',{status:400});return env.ROOMS.get(env.ROOMS.idFromName(roomId)).fetch('https://room.internal/notify',{method:'POST'});}
  if(url.pathname==='/__test/sign-in'){

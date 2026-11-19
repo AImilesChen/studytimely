@@ -1,0 +1,128 @@
+/* Room refinement: shared edges, compact invitations and consistent functional colours. */
+.groups-page{--rr-panel:#fff;--rr-card:#f1f6f7;--rr-self:#edf8f1;--rr-line:#bdcfc7;--rr-ink:#203c34;--rr-muted:#526a61;--rr-mint:#d3f0e1;--rr-blue:#dceaff;--rr-lavender:#e9dfff;--rr-amber:#ffe8bf;--rr-slate:#e0e9ee}
+html:not([data-theme=light]) .groups-page{--rr-panel:#202c34;--rr-card:#283741;--rr-self:#244039;--rr-line:#4b6269;--rr-ink:#eef7f3;--rr-muted:#b9cdc7;--rr-mint:#c9efdd;--rr-blue:#d0e4ff;--rr-lavender:#e4d8ff;--rr-amber:#ffe2af;--rr-slate:#d8e5ec}
+.groups-page [data-tone=study]{--room-tone:var(--rr-mint);--room-tone-ink:#1b5941;--room-tone-line:#80b79c}
+.groups-page :is([data-tone=tasks],[data-tone=activities]){--room-tone:var(--rr-blue);--room-tone-ink:#224f7f;--room-tone-line:#83acd4}
+.groups-page :is([data-tone=progress],[data-tone=series]){--room-tone:var(--rr-lavender);--room-tone-ink:#594080;--room-tone-line:#ae97d1}
+.groups-page [data-tone=manage]{--room-tone:var(--rr-slate);--room-tone-ink:#385463;--room-tone-line:#94adba}
+.groups-page .room-workspace-tabs{gap:9px;padding-bottom:13px;margin:22px 0;border-color:var(--rr-line)}
+.groups-page .room-workspace-tabs button{display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;padding:8px 14px;color:var(--rr-muted);font-size:14px;border-radius:12px}
+.groups-page .room-workspace-tabs button svg{display:block;box-sizing:content-box;padding:6px;border-radius:8px;flex-shrink:0;background:var(--room-tone);color:var(--room-tone-ink);width:18px;height:18px}
+.groups-page .room-workspace-tabs button[aria-selected=true]{background:var(--room-tone);color:var(--room-tone-ink);border-color:var(--room-tone-line);box-shadow:inset 0 -3px var(--room-tone-line)}
+.groups-page .room-workspace-tabs button[aria-selected=true] svg{background:transparent}
+.groups-page .group-task-switch button[aria-pressed=true]{background:var(--room-tone);color:var(--room-tone-ink);border-color:var(--room-tone-line)}
+.groups-page .companions-layout{grid-template-columns:minmax(0,1.65fr) minmax(350px,1fr);align-items:stretch;gap:22px;margin-bottom:20px}
+.groups-page .companions-single-panel{grid-template-columns:1fr}
+.groups-page :is(.companions-board,.companion-communication){padding:22px;background:var(--rr-panel);border-color:var(--rr-line);border-radius:20px;color:var(--rr-ink);display:flex;flex-direction:column}
+.groups-page .companions-heading,.groups-page .companion-communication-heading{min-height:70px;margin-bottom:20px}
+.groups-page :is(.companions-heading h2,.companion-communication h2){font-size:21px;color:var(--rr-ink)}
+.groups-page .companions-heading h2>svg{background:var(--rr-mint);color:#22593f;border-radius:9px;padding:7px;box-sizing:content-box;width:21px;height:21px}
+.groups-page :is(.companions-heading p,.companion-subtitle){font-size:14px!important;color:var(--rr-muted);margin:9px 0 0!important}
+.groups-page .companions-capacity{font-size:12px;border-color:var(--rr-line);line-height:1.5;white-space:normal;max-width:155px;text-align:center;background:var(--rr-card)}
+.groups-page .companion-seats{gap:14px;max-height:500px;overflow:auto;overscroll-behavior:contain;padding:1px}
+.groups-page .companion-seat{padding:20px;min-height:245px;background:var(--rr-card);border-color:var(--rr-line);border-radius:15px}
+.groups-page .companion-self{background:var(--rr-self);border-color:#80b69d;box-shadow:inset 0 3px #86c9a8}
+.groups-page .companion-avatar{width:40px;height:40px;font-size:18px;background:var(--rr-slate);color:#335364;border-color:transparent}
+.groups-page .companion-self .companion-avatar{background:var(--rr-mint);color:#225a43}
+.groups-page .companion-person h3{font-size:16px;color:var(--rr-ink)}
+.groups-page :is(.companion-state,.companion-today,.companion-you,.companions-footer,.companions-explainer){color:var(--rr-muted)}
+.groups-page .companion-clock{color:var(--rr-ink);font-size:36px;margin-top:22px}
+.groups-page .companion-today{font-size:13px!important;margin-bottom:20px!important}
+.groups-page .companion-own-actions .primary{background:#287d66;color:#fff;border-color:#287d66}
+.groups-page .companion-reaction{background:var(--rr-panel);color:var(--rr-ink);border-color:var(--rr-line)}
+.groups-page .companion-reaction:not(:disabled):hover{background:var(--rr-amber);color:#68491b;border-color:#bf9c5f}
+.groups-page .companion-invite-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px dashed var(--rr-line);border-radius:12px;background:var(--rr-self);margin-top:16px;padding:13px 15px}
+.groups-page .companion-invite-bar>svg{flex-shrink:0;color:var(--rr-muted)}
+.groups-page .companion-invite-bar>div{flex:1;min-width:140px;display:grid;gap:2px}
+.groups-page .companion-invite-bar strong{font-size:14px}
+.groups-page .companion-invite-bar span{font-size:12px;color:var(--rr-muted)}
+.groups-page .companion-invite-bar .button{font-size:13px;min-height:40px;padding:8px 12px;border-color:var(--rr-line);color:var(--rr-ink);background:var(--rr-panel)}
+.groups-page .companions-footer{padding-top:18px;margin-top:auto;border-top:1px solid var(--rr-line);font-size:12px}
+.groups-page .companion-invite-bar+.companions-footer,.groups-page .companion-seats+.companions-footer{margin-top:20px}
+.groups-page .companions-explainer{margin-top:12px;font-size:12px}
+.groups-page .companions-explainer summary{min-height:34px}
+.groups-page .companion-recent{flex:1;min-height:150px;max-height:none;margin-bottom:18px;border-color:var(--rr-line);color:var(--rr-ink)}
+.groups-page .companion-recent time,.groups-page .companion-chat-empty{color:var(--rr-muted)}
+.groups-page .companion-chat-empty{height:100%;min-height:150px;justify-content:center}
+.groups-page .companion-recent p{font-size:14px!important}
+.groups-page .companion-quick-tabs{background:var(--rr-card);border:1px solid var(--rr-line);margin-top:0}
+.groups-page .companion-quick-tabs button{font-size:12px;color:var(--rr-muted)}
+.groups-page .companion-communication[data-message-group=status]{--message-tone:var(--rr-blue);--message-ink:#254c7a}
+.groups-page .companion-communication[data-message-group=encourage]{--message-tone:var(--rr-amber);--message-ink:#704d1c}
+.groups-page .companion-communication[data-message-group=invite]{--message-tone:var(--rr-mint);--message-ink:#245a43}
+.groups-page .companion-quick-tabs button[aria-pressed=true]{background:var(--message-tone);color:var(--message-ink);font-weight:600;box-shadow:inset 0 -2px color-mix(in srgb,var(--message-ink) 45%,transparent)}
+.groups-page .companion-quick-list .button{background:var(--rr-card);color:var(--rr-ink);border-color:var(--rr-line);font-size:13px;min-height:47px}
+.groups-page .companion-quick-list .button:hover:not(:disabled){background:var(--message-tone);color:var(--message-ink)}
+.groups-page .companion-text-lock{color:var(--rr-muted);border-color:var(--rr-line);font-size:12px!important;margin-top:16px!important;padding-top:13px}
+.groups-page .room-conversation-open{display:flex;align-items:center;gap:8px;width:100%;margin-top:16px;padding:15px 0 0;border-top:1px solid var(--rr-line);font-size:13px;min-height:44px;text-align:left;color:var(--rr-ink)}
+.groups-page .room-conversation-open svg:last-child{margin-left:auto}
+.room-conversation-dialog{width:650px}.room-conversation-dialog .community-messages{min-height:120px;max-height:340px;overflow:auto}.room-conversation-dialog .community-messages article{padding:16px 0;border-bottom:1px solid var(--line)}.room-conversation-dialog .community-messages header{display:flex;justify-content:space-between;gap:16px;font-size:14px}.room-conversation-dialog .community-messages .text-button{font-size:12px;margin:8px 13px 0 0}.room-conversation-dialog .community-messages time{color:var(--muted);font-size:12px}.room-conversation-dialog .study-chat-info{margin-top:22px;font-size:14px}.room-conversation-dialog .study-chat-info p{font-size:13px;line-height:1.7}
+.groups-page .room-reports-panel,.groups-page .room-account-link{border:1px solid var(--rr-line);border-radius:16px;background:var(--rr-panel);padding:20px;color:var(--rr-ink)}
+.groups-page .room-reports-panel .panel-title{margin:0;gap:20px}
+.groups-page .room-reports-panel h2{font-size:20px;margin:0}
+.groups-page .room-account-link{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.groups-page .room-account-link>div{flex:1;min-width:180px}
+.groups-page .room-account-link strong{font-size:16px}
+.groups-page .room-account-link p{font-size:13px;color:var(--rr-muted);margin:4px 0 0}
+.groups-page .room-context-help,.groups-page .groups-preferences-link{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:13px;padding:17px 0;border-top:1px solid var(--rr-line);color:var(--rr-muted)}
+.groups-page .room-context-help a,.groups-page .groups-preferences-link a{display:inline-flex;align-items:center;gap:8px}
+.groups-page .room-management-grid>.community-rules{margin:0}
+.groups-page .group-room-atmosphere{border-color:var(--rr-line);border-radius:16px}
+.groups-page .group-room-atmosphere .help{font-size:12px;margin:0!important}
+.groups-page .group-room-atmosphere>p{line-height:1.5!important}
+.groups-page .group-roster-controls{margin:0 0 16px}
+.groups-page .companion-no-results{font-size:14px;color:var(--rr-muted);padding:15px 0}
+@media(min-width:1500px){.groups-page .companion-seats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1100px){.groups-page .companions-layout{grid-template-columns:1fr}.groups-page .companion-recent{max-height:300px;min-height:140px;flex:auto}.groups-page .companion-seats{max-height:510px}.groups-page .companions-heading{min-height:0}.groups-page .companion-communication-heading{min-height:0;margin-bottom:15px}}
+@media(max-width:600px){.groups-page :is(.companions-board,.companion-communication){padding:18px 16px;border-radius:16px}.groups-page .room-workspace-tabs button{font-size:13px;justify-content:flex-start;padding:8px 10px;gap:7px}.groups-page .room-workspace-tabs button svg{width:16px;height:16px;padding:5px}.groups-page .companions-heading{align-items:flex-start;gap:10px}.groups-page .companions-heading h2{font-size:19px}.groups-page .companions-heading h2>svg{width:18px;height:18px;padding:6px}.groups-page .companions-capacity{max-width:110px;font-size:12px}.groups-page .companion-seats{max-height:530px}.groups-page .companion-seat{min-height:226px;padding:18px}.groups-page .companion-clock{font-size:36px}.groups-page .companion-invite-bar{padding:12px;gap:10px}.groups-page .companion-invite-bar .button{width:100%;justify-content:center}.groups-page .room-reports-panel,.groups-page .room-account-link{padding:17px}.groups-page .room-reports-panel .panel-title{align-items:flex-start;flex-wrap:wrap}.groups-page .room-account-link .button{width:100%}.groups-page .room-context-help{justify-content:flex-start}.groups-page .companion-communication h2{font-size:20px}}
+/* Public guide is separate from the room workspace and present in initial HTML. */
+.groups-page .groups-guide-refined{margin-top:56px}
+.group-guide-nav{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.groups-page .group-guide-nav a{font-size:13px;border:1px solid var(--rr-line);padding:9px 15px;min-height:40px;border-radius:24px;text-decoration:none;color:var(--rr-muted)}
+.groups-page .group-guide-nav a:hover{background:var(--rr-blue);color:#244f7a}
+.groups-page .groups-guide-refined .groups-section{margin-bottom:54px;scroll-margin-top:28px}
+.groups-page .groups-guide-refined p{font-size:16px;line-height:1.75;max-width:78ch}
+.groups-page .group-how-grid{list-style:none;padding:0;margin:24px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.group-how-grid li{position:relative;background:var(--rr-panel);border:1px solid var(--rr-line);border-radius:16px;padding:24px}
+.group-how-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--rr-mint);color:#285c46;margin-bottom:20px}
+.group-how-number{position:absolute;right:22px;top:29px;font-size:13px;color:var(--rr-muted)}
+.groups-page .group-how-grid h3{font-size:19px}
+.groups-page .group-how-grid p{font-size:15px;max-width:none;margin:0}
+.group-agenda-disclosure{border:1px solid var(--rr-line);border-radius:14px;overflow:hidden;margin-top:24px}
+.group-agenda-disclosure>summary{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;font-size:14px;font-weight:600;min-height:52px;cursor:pointer;background:var(--rr-card)}
+.group-agenda-disclosure[open]>summary svg{transform:rotate(180deg)}
+.groups-page .group-agenda-disclosure .groups-agenda{margin:0;border:0;border-top:1px solid var(--rr-line);border-radius:0;padding:24px;gap:30px}
+.group-benefit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:26px}
+.group-benefit-grid article,.group-access-grid article{border:1px solid var(--rr-line);border-top:3px solid var(--room-tone-line);border-radius:16px;padding:24px;background:var(--rr-panel);color:var(--rr-ink)}
+.group-benefit-grid header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+.group-benefit-grid .group-feature-mark{display:block;width:80px;height:72px;flex-shrink:0}
+.group-benefit-badge{font-size:12px;font-weight:600;line-height:1.4;padding:6px 9px;border-radius:20px;background:var(--room-tone,var(--rr-slate));color:var(--room-tone-ink,#385463)}
+.groups-page .group-benefit-grid h3{font-size:19px;line-height:1.4;margin-bottom:12px}
+.groups-page .group-benefit-grid p{font-size:15px;line-height:1.75;margin:0;max-width:none}
+.group-access-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:26px 0 20px}
+.groups-page .group-access-grid h3{font-size:24px;margin:22px 0 14px}
+.groups-page .group-access-grid p{font-size:16px;max-width:none}
+.group-access-grid strong{display:block;font-size:15px;border-top:1px solid var(--rr-line);padding-top:18px;color:var(--rr-ink)}
+.groups-page .group-access-note{font-size:14px;border-left:3px solid var(--rr-line);padding:4px 0 4px 18px;max-width:95ch}
+.group-scenario-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:28px}
+.group-scenario-grid article>svg{margin-bottom:15px;color:var(--rr-muted)}
+.groups-page .group-scenario-grid h3{font-size:19px}
+.groups-page .group-scenario-grid p{font-size:15px;max-width:none}
+.groups-page .groups-guide-refined .groups-faq{max-width:940px}
+.groups-page .groups-guide-refined .groups-faq summary{font-size:16px;min-height:60px}
+.groups-page .groups-guide-refined .groups-faq p{font-size:15px;max-width:85ch;line-height:1.8;padding:8px 35px 15px 0}
+.group-guide-next{border-top:1px solid var(--rr-line);padding-top:28px;margin-bottom:30px}
+.groups-page .group-guide-next h2{font-size:24px;margin:0 0 10px}
+.group-related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:22px 0}
+.groups-page .group-related-grid a{display:grid;gap:8px;border:1px solid var(--rr-line);border-radius:12px;padding:18px;background:var(--rr-panel);text-decoration:none}
+.group-related-grid strong{display:flex;justify-content:space-between;align-items:center;gap:9px;font-size:15px}
+.group-related-grid span{font-size:13px;color:var(--rr-muted)}
+.groups-page .group-guide-policy{font-size:13px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+@media(max-width:950px){.group-benefit-grid{grid-template-columns:1fr 1fr}.group-how-grid{gap:13px}.group-how-grid li{padding:20px}.group-scenario-grid{gap:18px}.group-related-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.groups-page .groups-guide-refined{margin-top:38px}.group-guide-nav{margin-bottom:30px;gap:8px}.group-how-grid,.groups-page .group-how-grid,.group-benefit-grid,.group-access-grid,.group-scenario-grid{grid-template-columns:1fr}.group-how-grid li,.group-benefit-grid article,.group-access-grid article{padding:21px}.groups-page .groups-guide-refined .groups-section{margin-bottom:40px}.groups-page .groups-guide-refined p{font-size:15px}.groups-page .group-agenda-disclosure .groups-agenda{padding:18px;grid-template-columns:1fr}.group-agenda-disclosure>summary{font-size:14px}.group-benefit-grid header{margin-bottom:18px}.group-related-grid{gap:10px}.groups-page .group-related-grid a{padding:15px}.group-related-grid strong{font-size:14px}}
+
+/* Neutralise global site-footer spacing inside the member panel. */
+.groups-page .companions-footer{width:100%;max-width:none;margin:20px 0 0;padding:16px 0 0;display:flex;align-items:center;justify-content:space-between}
+.groups-page+footer{max-width:1240px}
+.groups-page .group-kicker,.groups-page .group-report-stats span{font-size:12px}
+@media(max-width:480px){.groups-page .room-workspace-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.groups-page .room-workspace-tabs button{min-width:0;padding:8px;gap:6px;white-space:normal;font-size:13px}.groups-page .room-workspace-tabs button span{min-width:0}}

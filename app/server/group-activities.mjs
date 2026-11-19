@@ -1,3 +1,4 @@
+import {groupManagerSQL} from './community-entitlements.mjs';
 import {participationSQL,requireParticipation} from './room-access.mjs';
 import {body,fail,result,rateLimit} from './auth-shared.mjs';
 import {reviewAvailability,reviewChat,enforceLocalContent} from './chat-review.mjs';
@@ -5,7 +6,7 @@ import {activityInput,ACTIVITY_SUBJECTS,ACTIVITY_OUTCOMES,ROOM_NOTICES} from '..
 const q=(env,sql,...args)=>env.DB.prepare(sql).bind(...args);
 const rows=async s=>(await s.all()).results||[];
 const uuid=v=>typeof v==='string'&&/^[a-f0-9-]{36}$/.test(v);
-export const activityRecord=a=>({id:a.id,roomId:a.room_id,title:a.title,subject:a.subject,kind:a.kind,startsAt:a.starts_at,zone:a.zone,focusMinutes:a.focus_minutes,breakMinutes:a.break_minutes,status:a.status,startedAt:a.started_at,endedAt:a.ended_at,version:a.version});
+export const activityRecord=a=>({id:a.id,roomId:a.room_id,title:a.title,subject:a.subject,kind:a.kind,startsAt:a.starts_at,zone:a.zone,focusMinutes:a.focus_minutes,breakMinutes:a.break_minutes,status:a.status,startedAt:a.started_at,endedAt:a.ended_at,version:a.version,seriesId:a.series_id||null,seriesVersion:a.series_version||0});
 export function withdrawRoomActivities(env,roomId,profileId,at){return q(env,`UPDATE community_activity_members SET withdrawn_at=?,version=version+1 WHERE profile_id=? AND withdrawn_at=0 AND checked_out_at=0 AND activity_id IN (SELECT id FROM community_activities WHERE room_id=? AND status IN ('scheduled','running'))`,at,profileId,roomId).run();}
 export async function finishDueActivities(env,roomId,at,settle){
  const due=await rows(q(env,"SELECT * FROM community_activities WHERE room_id=? AND status='running' AND started_at+(focus_minutes+break_minutes)*60000<=?",roomId,at));
@@ -15,10 +16,12 @@ export async function activityTimerContext(env,id,profileId,roomId,at){
  const a=await q(env,'SELECT a.*,m.checked_out_at,m.withdrawn_at FROM community_activities a JOIN community_activity_members m ON m.activity_id=a.id WHERE a.id=? AND a.room_id=? AND m.profile_id=?',id,roomId,profileId).first();
  if(!a||a.status!=='running'||a.withdrawn_at||a.checked_out_at||at>=a.started_at+a.focus_minutes*60000)fail(409,'ACTIVITY_TIMER','Join an active focus activity before starting its timer.');return a;
 }
-export async function roomActivities({request,env,at,r,profile,requireProfile,isAdmin,activityId,operation,settle,signal,reviewFetch,reviewTimeoutMs,now=Date.now}){
+export async function roomActivities({request,env,at,r,profile,user,requireProfile,isAdmin,activityId,operation,settle,signal,reviewFetch,reviewTimeoutMs,now=Date.now}){
  requireProfile();if(!r.member)fail(403,'MEMBERSHIP','Join this room before opening its activities.');
  const roomId=r.room.id,method=request.method;
- const owner=()=>{if(r.room.owner_id!==profile.id&&!isAdmin)fail(403,'FORBIDDEN','Only the room owner can organise activities.');};
+ const manager=!!await q(env,`SELECT 1 FROM community_rooms r WHERE r.id=? AND ${groupManagerSQL('r',"'"+profile.id+"'",at)}`,roomId).first();
+ const owner=()=>{if(!manager&&!isAdmin)fail(403,'FORBIDDEN','Only the owner or a current co-host can organise activities.');};
+ const authority=()=>`EXISTS(SELECT 1 FROM sessions ss JOIN community_profiles ap ON ap.account_id=ss.account_id WHERE ap.id='${profile.id}' AND ss.token_hash=? AND ss.expires_at>?)`;
  const writable=()=>{if(r.room.closed_at)fail(409,'ROOM_CLOSED','This room is closed. Its retained activities are read only.');requireParticipation(r.access);};
  await finishDueActivities(env,roomId,at,settle);
  const get=async()=>{if(!uuid(activityId))fail(404,'NOT_FOUND','Activity unavailable.');const a=await q(env,'SELECT * FROM community_activities WHERE id=? AND room_id=?',activityId,roomId).first();if(!a)fail(404,'NOT_FOUND','Activity unavailable.');return a;};
@@ -36,7 +39,7 @@ export async function roomActivities({request,env,at,r,profile,requireProfile,is
   const prior=await q(env,'SELECT room_id FROM community_activities WHERE id=?',input.id).first();if(prior){if(prior.room_id!==roomId)fail(409,'CONFLICT','Use a new activity request ID.');return result({id:input.id});}
   const d=await validate(input);await rateLimit(env,'activity-create',profile.id,10,86400000,at);
   const created=await q(env,`INSERT INTO community_activities(id,room_id,title,subject,kind,starts_at,zone,focus_minutes,break_minutes,created_at,updated_at)
-   SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM community_rooms r WHERE r.id=? AND r.closed_at=0 AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))}) ON CONFLICT(id) DO NOTHING RETURNING id`,input.id,roomId,d.title,d.subject,d.kind,d.startsAt,d.zone,d.focusMinutes,d.breakMinutes,at,at,roomId).first();
+   SELECT ?,?,?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM community_rooms r WHERE r.id=? AND r.closed_at=0 AND ${isAdmin?'1':groupManagerSQL('r',"'"+profile.id+"'",Math.floor(now()))} AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))} AND ${authority()}) ON CONFLICT(id) DO NOTHING RETURNING id`,input.id,roomId,d.title,d.subject,d.kind,d.startsAt,d.zone,d.focusMinutes,d.breakMinutes,at,at,roomId,user.sessionHash,Math.floor(now())).first();
   if(!created)fail(409,'CONFLICT','Room or activity changed. Refresh before trying again.');await signal(roomId);return result({id:created.id},201);
  }
  const a=await get();
@@ -49,12 +52,12 @@ export async function roomActivities({request,env,at,r,profile,requireProfile,is
  writable();const input=await body(request);await rateLimit(env,'activity-action',profile.id,120,3600000,at);
  if(!operation&&method==='PATCH'){
   owner();version(input,a);if(a.status!=='scheduled')fail(409,'ACTIVITY_STATE','Only an activity that has not started can be edited.');const d=await validate(input,a);
-  const changed=await q(env,`UPDATE community_activities SET title=?,subject=?,kind=?,starts_at=?,zone=?,focus_minutes=?,break_minutes=?,version=version+1,updated_at=? WHERE id=? AND version=? AND status='scheduled' AND EXISTS(SELECT 1 FROM community_rooms r WHERE r.id=? AND r.closed_at=0 AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))}) RETURNING version`,d.title,d.subject,d.kind,d.startsAt,d.zone,d.focusMinutes,d.breakMinutes,at,a.id,a.version,roomId).first();if(!changed)fail(409,'CONFLICT','This activity changed. Refresh before saving.');await signal(roomId);return result({saved:true,version:changed.version});
+  const changed=await q(env,`UPDATE community_activities SET title=?,subject=?,kind=?,starts_at=?,zone=?,focus_minutes=?,break_minutes=?,version=version+1,updated_at=? WHERE id=? AND version=? AND status='scheduled' AND EXISTS(SELECT 1 FROM community_rooms r WHERE r.id=? AND r.closed_at=0 AND ${isAdmin?'1':groupManagerSQL('r',"'"+profile.id+"'",Math.floor(now()))} AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))} AND ${authority()}) RETURNING version`,d.title,d.subject,d.kind,d.startsAt,d.zone,d.focusMinutes,d.breakMinutes,at,a.id,a.version,roomId,user.sessionHash,Math.floor(now())).first();if(!changed)fail(409,'CONFLICT','This activity changed. Refresh before saving.');if(a.series_id)await q(env,'UPDATE community_activity_members SET withdrawn_at=?,version=version+1 WHERE activity_id=? AND withdrawn_at=0',at,a.id).run();await signal(roomId);return result({saved:true,version:changed.version});
  }
  if(['start','end','cancel'].includes(operation)&&method==='POST'){
   owner();const target={start:'running',end:'ended',cancel:'cancelled'}[operation];if(a.status===target)return result({saved:true,id:a.id});version(input,a);
   if(operation==='start'&&a.status!=='scheduled'||operation==='end'&&a.status!=='running'||operation==='cancel'&&a.status!=='scheduled')fail(409,'ACTIVITY_STATE','This action is no longer available for the activity.');
-  const changed=await q(env,`UPDATE community_activities SET status=?,started_at=CASE WHEN ?='running' THEN ? ELSE started_at END,ended_at=CASE WHEN ? IN ('ended','cancelled') THEN ? ELSE 0 END,updated_at=?,version=version+1 WHERE id=? AND version=? AND status=? AND EXISTS(SELECT 1 FROM community_rooms r WHERE r.id=? AND r.closed_at=0 AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))}) RETURNING id`,target,target,at,target,at,at,a.id,a.version,a.status,roomId).first();if(!changed)fail(409,'CONFLICT','This activity changed. Refresh it.');
+  const changed=await q(env,`UPDATE community_activities SET status=?,started_at=CASE WHEN ?='running' THEN ? ELSE started_at END,ended_at=CASE WHEN ? IN ('ended','cancelled') THEN ? ELSE 0 END,updated_at=?,version=version+1 WHERE id=? AND version=? AND status=? AND EXISTS(SELECT 1 FROM community_rooms r WHERE r.id=? AND r.closed_at=0 AND ${isAdmin?'1':groupManagerSQL('r',"'"+profile.id+"'",Math.floor(now()))} AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))} AND ${authority()}) RETURNING id`,target,target,at,target,at,at,a.id,a.version,a.status,roomId,user.sessionHash,Math.floor(now())).first();if(!changed)fail(409,'CONFLICT','This activity changed. Refresh it.');
   if(operation==='end')for(const timer of await rows(q(env,"SELECT * FROM community_timers WHERE activity_id=? AND status='running'",a.id)))await settle(timer,true);
   await signal(roomId);return result({saved:true,id:a.id});
  }
