@@ -172,3 +172,36 @@
 }
 .groups-goal-estimate{padding:20px;border:1px solid var(--rr-line);border-radius:12px;background:var(--rr-lavender);color:#3c2854;margin-bottom:20px}.groups-goal-estimate>span{font-size:14px}.groups-goal-estimate>strong{display:block;font-size:34px;line-height:1.3;margin:7px 0}.groups-goal-estimate p{margin:0 0 8px;font-size:16px}.groups-goal-estimate small{font-size:13px}.group-progress-public-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:26px 0}.group-progress-public-steps article{padding-top:18px;border-top:1px solid var(--rr-line)}.group-progress-public-steps svg{color:var(--rr-muted)}.group-progress-public-steps h3{font-size:18px;margin:10px 0}.group-progress-public-steps p{font-size:16px}.group-progress-public>p a{display:inline-flex;align-items:center;gap:7px}.groups-goal-estimate~.groups-agenda-total{font-size:16px}
 @media(max-width:700px){.group-progress-public-steps{grid-template-columns:1fr;gap:14px}.groups-goal-estimate{padding:17px}.groups-goal-estimate>strong{font-size:30px}}
+
+/* Public examples explain real controls without moving teaching above room tools. */
+.groups-guide-refined #group-how>.groups-agenda{margin:28px 0 0}
+.group-progress-example{margin:26px 0 30px;padding:24px;border:1px solid var(--rr-line);border-radius:12px;background:var(--rr-panel)}
+.group-progress-example figcaption{font-size:19px;font-weight:650;color:var(--rr-ink);line-height:1.5}
+.group-progress-example ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:20px 0;padding-left:22px}
+.group-progress-example li{padding-left:4px;font-size:15px;line-height:1.75;color:var(--rr-muted)}
+.group-progress-example li strong{display:block;margin-bottom:7px;color:var(--rr-ink)}
+.groups-guide-refined .group-progress-example>p{font-size:14px;margin:0;line-height:1.7}
+.groups-guide-refined .rp-examples{border-top:0;padding-top:0;margin-bottom:28px}
+.groups-guide-refined .rp-examples>p{font-size:16px;line-height:1.75;margin:0}
+.groups-guide-refined .rp-examples .rp-step-title h4{font-size:16px;line-height:1.5;margin:0;color:var(--rr-ink)}
+.groups-guide-refined .rp-example-copy p{font-size:14px;line-height:1.7;margin:8px 0 0}
+.groups-guide-refined .rp-example-copy .rp-example-note{font-size:13px;margin-top:12px}
+@media(max-width:700px){.group-progress-example{padding:18px}.group-progress-example ol{grid-template-columns:1fr;gap:16px;margin-block:16px}.groups-guide-refined .rp-examples>p{font-size:15px}}
+/* Five workspace destinations keep their functional colours in every room view. */
+.groups-room-open .room-workspace-tabs button[data-tone=study]{--nav-soft:#fff0e9;--nav-icon:#ffbea5;--nav-ink:#73321e;--nav-edge:#d98362}
+.groups-room-open .room-workspace-tabs button[data-tone=tasks]{--nav-soft:#fff6df;--nav-icon:#ffd57d;--nav-ink:#624515;--nav-edge:#b38a37}
+.groups-room-open .room-workspace-tabs button[data-tone=progress]{--nav-soft:#f1eaff;--nav-icon:#d3bdff;--nav-ink:#503477;--nav-edge:#a487cf}
+.groups-room-open .room-workspace-tabs button[data-tone=advanced]{--nav-soft:#e7f6fa;--nav-icon:#93d7e8;--nav-ink:#235665;--nav-edge:#649dac}
+.groups-room-open .room-workspace-tabs button[data-tone=manage]{--nav-soft:#fdebf3;--nav-icon:#f6b8d2;--nav-ink:#793653;--nav-edge:#be7c98}
+html:not([data-theme=light]) .groups-room-open .room-workspace-tabs button[data-tone=study]{--nav-soft:#30231f;--nav-ink:#ffd4c3}
+html:not([data-theme=light]) .groups-room-open .room-workspace-tabs button[data-tone=tasks]{--nav-soft:#30291c;--nav-ink:#ffe1a0}
+html:not([data-theme=light]) .groups-room-open .room-workspace-tabs button[data-tone=progress]{--nav-soft:#292237;--nav-ink:#e0d0ff}
+html:not([data-theme=light]) .groups-room-open .room-workspace-tabs button[data-tone=advanced]{--nav-soft:#1d2c32;--nav-ink:#b4e8f5}
+html:not([data-theme=light]) .groups-room-open .room-workspace-tabs button[data-tone=manage]{--nav-soft:#32212a;--nav-ink:#ffd0e3}
+.groups-room-open .room-workspace-tabs button[data-tone]{background:var(--nav-soft);color:var(--nav-ink);border:1px solid transparent;border-radius:10px;box-shadow:none}
+.groups-room-open .room-workspace-tabs button[data-tone] svg{background:var(--nav-icon);color:#34292e;border-radius:7px;padding:5px}
+.groups-room-open .room-workspace-tabs button[data-tone] span{color:inherit}
+.groups-room-open .room-workspace-tabs button[data-tone][aria-selected=true]{border-color:var(--nav-edge);box-shadow:inset 0 -3px var(--nav-edge);background:var(--nav-icon);color:#34292e}
+.groups-room-open .room-workspace-tabs button[data-tone][aria-selected=true] svg{background:rgba(255,255,255,.42)}
+.groups-room-open .room-workspace-tabs button[data-tone]:hover{border-color:var(--nav-edge)}
+.groups-room-open .room-workspace-tabs button[data-tone]:focus-visible{outline:3px solid var(--nav-edge);outline-offset:2px}

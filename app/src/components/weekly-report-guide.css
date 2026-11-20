@@ -1,0 +1,35 @@
+.weekly-guide,.weekly-next{--wg-ink:#242125;--wg-muted:#57535c;--wg-line:#d5d0d8;--wg-panel:#fff;--wg-soft:#f2edf8;color:var(--wg-ink);margin:30px 0 0;border-top:1px solid var(--wg-line);padding:26px 0 8px;min-width:0}
+html:not([data-theme=light]) :is(.weekly-guide,.weekly-next){--wg-ink:#f6f3f8;--wg-muted:#c8c2ce;--wg-line:#56505e;--wg-panel:#242129;--wg-soft:#322a3e}
+.groups-page :is(.weekly-guide,.weekly-next)>h3{font-size:22px;line-height:1.4;margin:0 0 9px;color:var(--wg-ink)}
+.groups-page :is(.weekly-guide,.weekly-next) p{font-size:14px;line-height:1.8;margin:0;color:var(--wg-muted)}
+.weekly-guide>ol{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;margin:24px 0 28px;padding:0}
+.weekly-guide>ol>li{min-width:0}
+.weekly-guide-step{display:flex;align-items:baseline;gap:9px;margin:0 0 13px}
+.weekly-guide-step>span{font-size:12px;color:var(--wg-muted);font-variant-numeric:tabular-nums}
+.groups-page .weekly-guide h4,.groups-page .weekly-next h4{font-size:16px;line-height:1.6;color:var(--wg-ink);margin:0}
+.weekly-guide-image{display:block;padding:0;background:var(--wg-panel);color:var(--wg-ink);border:1px solid var(--wg-line);border-radius:9px;overflow:hidden;width:100%;cursor:pointer;font:inherit;margin-bottom:15px}
+.weekly-guide-image img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;background:var(--wg-panel)}
+.weekly-guide-image>span{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border-top:1px solid var(--wg-line);font-size:13px}
+.weekly-guide-path{display:block;font-size:13px;line-height:1.7;color:var(--wg-ink);margin:0 0 9px}
+.groups-page .weekly-guide .weekly-guide-note{font-size:13px;margin-top:12px}
+.weekly-guide-answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding:22px;background:var(--wg-soft);border-radius:10px}
+.groups-page .weekly-guide-answers h4{margin-bottom:8px}
+.weekly-guide-more{display:inline-flex;align-items:center;gap:8px;font-size:14px;min-height:44px;margin-top:14px;color:var(--wg-ink)}
+.weekly-guide-dialog{width:min(1100px,calc(100vw - 32px))}
+.weekly-guide-dialog-body{padding:0 22px 20px}
+.weekly-guide-dialog img{display:block;box-sizing:border-box;width:100%;height:auto;border:1px solid var(--wg-line,#777);border-radius:8px}
+.weekly-guide-dialog p{margin:16px 0;font-size:15px;line-height:1.8}
+.weekly-next>div{display:flex;flex-wrap:wrap;gap:16px;margin-top:18px}
+.weekly-next article{flex:1 1 210px;min-width:0;padding:18px;border:1px solid var(--wg-line);border-radius:10px;background:var(--wg-panel)}
+.weekly-next article>svg{color:#8d4670;margin-bottom:8px}
+html:not([data-theme=light]) .weekly-next article>svg{color:#f4a0c6}
+.weekly-next article .button{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;margin-top:13px;max-width:100%;white-space:normal;text-align:left;min-height:44px;color:var(--wg-ink);border-color:var(--wg-line);background:transparent}
+.weekly-guide button:focus-visible,.weekly-next button:focus-visible,.weekly-guide-more:focus-visible{outline:3px solid var(--wg-ink);outline-offset:3px}
+.group-weekly-public>p{max-width:85ch}
+.group-weekly-compare{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:24px 0}
+.group-weekly-compare article{padding:20px;border:1px solid var(--rr-line);border-radius:10px;background:var(--rr-panel)}
+.groups-guide-refined .group-weekly-compare h3{font-size:19px;margin:0 0 9px}
+.groups-guide-refined .group-weekly-compare p{font-size:15px;line-height:1.8;margin:0}
+.group-weekly-public .weekly-guide{margin-top:24px}
+@media(max-width:800px){.weekly-guide>ol{grid-template-columns:1fr;gap:28px}.weekly-guide>ol>li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:20px}.weekly-guide-step{grid-column:1/-1}.weekly-guide-image{grid-column:1;grid-row:2/5;align-self:start}.weekly-guide-path,.weekly-guide li>p{grid-column:2}.weekly-guide-answers{grid-template-columns:1fr;gap:20px}.group-weekly-compare{grid-template-columns:1fr;gap:14px}}
+@media(max-width:550px){.weekly-guide>ol>li{display:block}.weekly-guide-image img{aspect-ratio:16/9}.weekly-guide-answers{padding:18px}.weekly-next article{flex-basis:100%}.groups-page :is(.weekly-guide,.weekly-next)>h3{font-size:20px}.weekly-guide-dialog{width:calc(100vw - 24px)}}

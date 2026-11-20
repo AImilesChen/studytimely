@@ -98,6 +98,7 @@ test('basic progress shows useful totals once, an accurate percentage and an hon
  const html=render(RoomProgress,{totals:{today_seconds:43,total_seconds:3670},goalMinutes:120,formatDuration:s=>s+' sec'});
  assert.match(html,/0.6%/);assert.match(html,/43 sec/);assert.match(html,/1 hr 1 min/);assert.match(html,/2 hr 0 min/);
  assert.equal((html.match(/<progress /g)||[]).length,1);assert.match(html,/Daily room records are retained/);assert.match(html,/midnight UTC/);assert.doesNotMatch(html,/room-progress-compact|Progress details/);
+ assert.doesNotMatch(html,/<details/);assert.match(html,/What does not add minutes/);assert.match(html,/Submitting a result does not add extra time/);
 });
 test('guide gives active owners useful shortcuts while guests and paused rooms get appropriate existing destinations',()=>{
  const owner=render(RoomStudyGuide,{canInvite:true,canPlan:true,canParticipate:true,activityOverview:{notice:null,loading:false,error:false}});
