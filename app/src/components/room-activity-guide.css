@@ -1,0 +1,137 @@
+/* Room navigation: short purposes stay visible; activity copy lives with its tools. */
+.groups-room-open .room-workspace-explained{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
+.groups-room-open .room-workspace-explained[data-active=tasks]{margin-bottom:24px}
+.groups-room-open .room-workspace-explained button{justify-content:flex-start;align-items:flex-start;text-align:left;white-space:normal;min-width:0;padding:10px}
+.groups-room-open .room-workspace-explained button>span{display:grid;gap:4px;white-space:normal}
+.room-workspace-explained strong{font-size:14px;line-height:1.4;font-weight:650}
+.room-workspace-explained small{font-size:12px;line-height:1.45;font-weight:400}
+.room-workspace-description{margin:10px 0 22px;color:var(--rr-muted);font-size:14px;line-height:1.6}
+
+/* The usable activity is the primary surface. Supporting records follow it. */
+.groups-page .ga-workspace-focused>.ga-heading{align-items:flex-start;margin-bottom:24px}
+.groups-page .ga-workspace-focused>.ga-heading h3{font-size:24px}
+.groups-page .ga-workspace-focused .ga-toolbar{gap:10px;justify-content:flex-end;flex-shrink:0}
+@media(max-width:650px){.groups-page .ga-workspace-focused .ga-toolbar{max-width:100%;flex-shrink:1}}
+.groups-page .ga-workspace-focused .ga-examples-link{display:inline-flex;align-items:center;gap:7px;min-height:44px;margin-right:8px;font-size:14px;color:var(--rr-muted);white-space:nowrap}
+.groups-page .ga-workspace-focused .ga-session-layout{display:block}
+.groups-page .ga-workspace-focused .ga-detail.ga-session{margin:0;padding:0;border-radius:12px;background:var(--rr-panel)}
+.groups-page .ga-workspace-focused .ga-session>.ga-live-clock{margin:8px 24px 16px;padding:16px 0}
+.groups-page .ga-workspace-focused .ga-session>.ga-task-disclosure{margin:16px 24px 0}
+.groups-page .ga-workspace-focused .ga-session>.ga-past-start,.groups-page .ga-workspace-focused .ga-session>.ga-phase-note{margin:16px 24px}
+@media(max-width:650px){.groups-page .ga-workspace-focused .ga-session>.ga-live-clock,.groups-page .ga-workspace-focused .ga-session>.ga-task-disclosure,.groups-page .ga-workspace-focused .ga-session>.ga-past-start,.groups-page .ga-workspace-focused .ga-session>.ga-phase-note{margin-inline:18px}}
+.groups-page .ga-workspace-focused .ga-session .ga-session-heading{padding:22px 24px;margin:0;border-bottom:1px solid var(--rr-line);background:transparent}
+.groups-page .ga-workspace-focused .ga-session .ga-session-identity h3{font-size:22px;margin:7px 0 9px}
+.groups-page .ga-workspace-focused .ga-session .ga-session-task{margin:20px 24px 8px;padding:10px 0;background:transparent;border-bottom:1px solid var(--rr-line);border-radius:0}
+.groups-page .ga-workspace-focused .ga-session .ga-result-card{margin:16px 24px 24px;padding:18px 0 0;border:0;border-radius:0;background:transparent}
+.groups-page .ga-workspace-focused .ga-session .ga-result-card[data-result=in-progress]{border-top:1px solid var(--rr-line)}
+.groups-page .ga-workspace-focused .ga-session .ga-result-card>header{align-items:center}
+.groups-page .ga-workspace-focused .ga-session .ga-result-intro{align-items:flex-start}
+.groups-page .ga-workspace-focused .ga-session .ga-result-intro h4{font-size:18px}
+.groups-page .ga-workspace-focused .ga-session .ga-personal-record{margin-top:10px}
+.groups-page .ga-workspace-focused .ga-session .ga-personal-record>strong{font-size:24px;font-weight:650}
+.groups-page .ga-workspace-focused .ga-entry-hint{font-size:14px;line-height:1.6;color:var(--rr-muted);margin:6px 0 10px;max-width:62ch}
+.groups-page .ga-workspace-focused .ga-manage>summary>span{display:grid;gap:4px;text-align:left}
+.ga-manage>summary small{display:block;font-size:12px;line-height:1.5;font-weight:400}
+.groups-page .ga-workspace-focused .ga-task-disclosure>summary{display:flex;align-items:center;gap:10px;min-height:68px!important}
+.ga-task-disclosure>summary>span:not(.ga-join-action){flex:1;min-width:0}
+.ga-task-disclosure>summary strong{font-size:15px;font-weight:600}
+.ga-task-disclosure>summary small{display:block;color:var(--rr-muted);font-size:13px;font-weight:400;line-height:1.6;margin-top:4px}
+.groups-page .ga-workspace-focused .ga-session-sidebar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);align-items:start;gap:40px;margin:24px 0 0;padding:24px 0 0;border-top:1px solid var(--rr-line)}
+.groups-page .ga-workspace-focused .ga-session-sidebar[data-directory=false]{grid-template-columns:minmax(0,1fr)}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-side-card{padding:0;border:0;border-radius:0;background:transparent}
+.groups-page .ga-workspace-focused .ga-session-sidebar h4{font-size:16px;margin:0 0 12px}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-side-card-heading{padding:0;border:0;margin:0}
+.ga-roster-preview{font-size:14px;line-height:1.6;color:var(--rr-ink);margin:8px 0;overflow-wrap:anywhere}
+.ga-session-timeline{display:grid;gap:8px;margin:16px 0;padding:12px 0;border-top:1px solid var(--rr-line)}
+.ga-session-timeline>div{display:grid;grid-template-columns:minmax(120px,.8fr) minmax(0,1.2fr);gap:12px;font-size:13px;line-height:1.6}
+.ga-session-timeline dt{color:var(--rr-muted)}
+.ga-session-timeline dd{margin:0;color:var(--rr-ink);overflow-wrap:anywhere}
+.ga-records-directory{display:grid;gap:24px;min-width:0}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-list{border:0;border-radius:0;background:transparent}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row{grid-template-columns:minmax(0,1fr) auto auto;gap:5px 12px;padding:10px 0;border-radius:0}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row-date{grid-column:1;grid-row:2}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row>.ga-status{grid-column:2;grid-row:1 / span 2}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row>svg{grid-column:3;grid-row:1 / span 2}
+.groups-page .ga-workspace-focused .ga-drop-in-inline{display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;margin:16px 0 0;padding:0;border:0;border-radius:0;background:transparent;font-size:14px;color:var(--rr-muted)}
+
+/* Examples are a separate reading section, not another layer of tool cards. */
+.groups-page .ga-workspace-focused .ga-walkthrough{margin:32px 0 0;padding:28px 0 0;border:0;border-top:1px solid var(--rr-line);border-radius:0;background:transparent;scroll-margin-top:24px}
+.ga-walkthrough-heading{margin-bottom:24px}
+.ga-guide-eyebrow{display:block;margin-bottom:8px;color:var(--rr-muted);font-size:11px;font-weight:650;letter-spacing:.1em}
+.ga-walkthrough-heading h4{margin:0;color:var(--rr-ink);font-size:21px;line-height:1.4;scroll-margin-top:24px}
+.ga-walkthrough-heading p{margin:8px 0 0;color:var(--rr-muted);font-size:15px;line-height:1.6}
+.ga-walkthrough-steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 40px;list-style:none;padding:0;margin:0}
+.ga-walkthrough-steps>li{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-content:start;align-items:start;gap:12px 20px;min-width:0;padding:0;border:0;background:transparent}
+.ga-step-heading{display:flex;grid-column:1/-1;align-items:baseline;gap:10px}
+.ga-step-number{color:var(--rr-muted);font-size:13px;font-variant-numeric:tabular-nums;font-weight:500}
+.ga-step-heading h5{margin:0;color:var(--rr-ink);font-size:17px;line-height:1.45;font-weight:600}
+.ga-example-button{display:block;width:100%;padding:0;overflow:hidden;border:1px solid var(--rr-line);border-radius:6px;background:var(--rr-panel);color:var(--rr-ink);font:inherit;cursor:pointer}
+.ga-example-button img{display:block;width:100%;height:135px;object-fit:contain;background:var(--rr-panel)}
+.ga-example-button>span{display:flex;align-items:center;justify-content:center;gap:6px;min-height:36px;font-size:12px}
+.ga-example-button:is(:hover,:focus-visible){outline:2px solid var(--rr-ink);outline-offset:3px}
+.ga-step-copy{display:grid;gap:7px;min-width:0}
+.ga-step-copy>strong{font-size:15px;line-height:1.45;color:var(--rr-ink)}
+.ga-step-opens{font-size:13px;line-height:1.5;color:var(--rr-muted)}
+.ga-step-copy p{font-size:14px;line-height:1.7;color:var(--rr-muted);margin:0}
+.ga-example-dialog{width:min(960px,calc(100vw - 32px));max-width:960px;box-sizing:border-box;background:var(--rr-panel);color:var(--rr-ink);border:1px solid var(--rr-line);border-radius:14px;padding:20px;max-height:90dvh;overflow:auto}
+.ga-example-dialog>img{display:block;width:100%;height:auto;border:1px solid var(--rr-line);border-radius:8px;box-sizing:border-box}
+.ga-example-caption{font-size:15px;line-height:1.65;color:var(--rr-muted);margin:12px 0}
+.ga-example-dialog .modal-head h2{font-size:21px}
+.groups-page .ga-workspace-focused .ga-help-visible{margin:40px 0 0;padding:24px 0 0;border:0;border-top:1px solid var(--rr-line);border-radius:0;background:transparent}
+.groups-page .ga-workspace-focused .ga-help-visible>h4{font-size:17px;margin-bottom:18px}
+.ga-help-visible .ga-help-topics{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;padding:0}
+.ga-help-visible .ga-help-topics>div{display:block}
+.ga-help-visible .ga-help-topics dt{font-size:14px;margin-bottom:6px}
+.ga-help-visible .ga-help-topics dd{font-size:14px;line-height:1.7}
+@media(max-width:1000px){.groups-room-open .room-workspace-explained{display:flex;overflow-x:auto}.groups-room-open .room-workspace-explained button{flex:0 0 auto}.groups-room-open .room-workspace-explained button>span{white-space:normal}.groups-page .ga-workspace-focused>.ga-heading{flex-wrap:wrap}.groups-page .ga-workspace-focused .ga-toolbar{justify-content:flex-start}.ga-walkthrough-steps{gap:28px}.ga-walkthrough-steps>li{grid-template-columns:1fr}.ga-step-heading{grid-column:1}.ga-example-button img{height:145px}}
+@media(max-width:650px){.groups-page .ga-workspace-focused .ga-session-sidebar{grid-template-columns:minmax(0,1fr);gap:24px}.groups-page .ga-workspace-focused .ga-session .ga-session-heading{padding:18px}.groups-page .ga-workspace-focused .ga-session .ga-session-task{margin:14px 18px 6px}.groups-page .ga-workspace-focused .ga-session .ga-result-card{margin:14px 18px 18px}.groups-page .ga-workspace-focused .ga-result-card>header{align-items:flex-start}.groups-page .ga-workspace-focused .ga-toolbar{gap:8px;flex-wrap:wrap}.groups-page .ga-workspace-focused .ga-examples-link{margin:0}.ga-walkthrough-steps{grid-template-columns:minmax(0,1fr);gap:28px}.ga-walkthrough-steps>li{grid-template-columns:minmax(80px,.85fr) minmax(0,1.15fr);gap:12px}.ga-step-heading{grid-column:1/-1}.ga-example-button img{height:110px}.ga-step-copy p{font-size:14px;line-height:1.6}.ga-step-opens{font-size:12px}.ga-example-button>span{font-size:11px;gap:3px}.ga-example-dialog{padding:14px}.ga-help-visible .ga-help-topics{grid-template-columns:minmax(0,1fr);gap:20px}.groups-page .ga-workspace-focused .ga-walkthrough{margin-top:32px;padding-top:24px}.ga-session-timeline>div{grid-template-columns:minmax(0,1fr)}.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row{grid-template-columns:minmax(0,1fr) auto}.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row>.ga-status{grid-column:1;grid-row:3}.groups-page .ga-workspace-focused .ga-session-sidebar .ga-session-row>svg{grid-column:2;grid-row:1 / span 2}.ga-entry-hint{overflow-wrap:anywhere}}
+
+/* Summary data is always visible in the same panel system as the activity. */
+.groups-page .ga-workspace-focused .ga-session-sidebar{border-top:0;padding-top:0}
+.groups-page .ga-workspace-focused .ga-session-sidebar .ga-side-card.ga-summary-panel{display:block;max-width:none;min-height:0;padding:24px;background:var(--rr-panel);border:1px solid var(--rr-line);border-radius:12px}
+.ga-summary-panel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.ga-summary-title{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.groups-page .ga-workspace-focused .ga-summary-title h4{display:flex;align-items:center;gap:8px;margin:0;font-size:18px;line-height:1.4}
+.groups-page .ga-workspace-focused .ga-summary-panel-heading p{font-size:14px;line-height:1.6;margin:7px 0 0;color:var(--rr-muted)}
+.ga-summary-panel-heading .ga-summary-actions{margin:0;justify-content:flex-end}
+.ga-summary-panel-heading .ga-summary-actions .button{font-size:13px;min-height:42px;padding:8px 12px}
+.ga-summary-panel{--summary-green-bg:#edf6ef;--summary-green-ink:#285b43;--summary-blue-bg:#e9f1fc;--summary-blue-ink:#224f7f;--summary-amber-bg:#fcf1e2;--summary-amber-ink:#805422;--summary-members-bg:#f2f7f3;--summary-schedule-bg:#f2f4f7}
+html:not([data-theme=light]) .ga-summary-panel{--summary-green-bg:#263f36;--summary-green-ink:#c0e6ce;--summary-blue-bg:#263d55;--summary-blue-ink:#bedcff;--summary-amber-bg:#463a2c;--summary-amber-ink:#f0d1a8;--summary-members-bg:#23352f;--summary-schedule-bg:#29333f}
+.ga-summary-metrics{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);gap:12px;margin:24px 0 18px;padding:0;border:0}
+.ga-summary-metrics>div{display:flex;flex-direction:column;justify-content:space-between;gap:12px;min-width:0;padding:18px;border:0;border-radius:8px;background:var(--metric-bg);color:var(--metric-ink)}
+.ga-summary-metrics [data-metric=members]{--metric-bg:var(--summary-green-bg);--metric-ink:var(--summary-green-ink)}
+.ga-summary-metrics [data-metric=time]{--metric-bg:var(--summary-blue-bg);--metric-ink:var(--summary-blue-ink)}
+.ga-summary-metrics [data-metric=results]{--metric-bg:var(--summary-amber-bg);--metric-ink:var(--summary-amber-ink)}
+.ga-summary-metrics [data-metric=results][data-complete=true]{--metric-bg:var(--summary-green-bg);--metric-ink:var(--summary-green-ink)}
+.ga-summary-metrics>div:first-child{padding:18px;border:0}
+.ga-summary-metrics dt{display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.5;color:var(--metric-ink)}
+.ga-summary-metrics dt svg{flex-shrink:0}
+.ga-summary-metrics dd{margin:0;color:var(--metric-ink);font-size:26px;line-height:1.25;font-weight:650;font-variant-numeric:tabular-nums}
+.ga-summary-metrics [data-metric=time] dd{font-size:30px}
+.ga-summary-metrics dd span{font-size:18px;font-weight:400;color:inherit}
+.ga-summary-columns{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px}
+.ga-summary-columns>section{min-width:0;padding:18px;border-radius:8px}
+.ga-summary-members{background:var(--summary-members-bg)}
+.ga-summary-schedule{background:var(--summary-schedule-bg)}
+.ga-summary-columns h5{display:flex;align-items:center;gap:8px;margin:0 0 14px;font-size:14px;line-height:1.5;font-weight:600;color:var(--rr-ink)}
+.ga-summary-members h5 svg{color:var(--summary-green-ink)}
+.ga-summary-schedule h5 svg{color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-summary-panel .ga-participants>li:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.groups-page .ga-workspace-focused .ga-summary-panel .ga-participants{padding:0;margin:0;border:0;list-style:none}
+.groups-page .ga-workspace-focused .ga-summary-panel .ga-participants>li{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:0 0 12px;margin:0 0 12px;border:0;border-bottom:1px solid var(--rr-line)}
+.ga-summary-panel .ga-participants>li>div{display:grid;gap:5px;min-width:0}
+.ga-summary-panel .ga-participants strong{font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.groups-page .ga-workspace-focused .ga-summary-panel .ga-participants span{font-size:13px;line-height:1.6;color:var(--rr-muted)}
+.ga-summary-panel .ga-session-timeline{border:0;margin:0;padding:0;gap:8px}
+.ga-summary-panel .ga-session-timeline>div{grid-template-columns:100px minmax(0,1fr);gap:12px}
+.groups-page .ga-workspace-focused .ga-summary-zone,.groups-page .ga-workspace-focused .ga-summary-export-note{margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-session-sidebar[data-directory=true] .ga-summary-panel-heading{flex-wrap:wrap}
+.groups-page .ga-workspace-focused .ga-session-sidebar[data-directory=true] .ga-summary-actions{justify-content:flex-start}
+.groups-page .ga-workspace-focused .ga-session-sidebar[data-directory=true] .ga-summary-columns{grid-template-columns:1fr;gap:24px}
+@media(max-width:750px){.ga-summary-panel-heading{flex-direction:column}.ga-summary-panel-heading .ga-summary-actions{justify-content:flex-start}.ga-summary-columns{grid-template-columns:1fr;gap:24px}.ga-summary-metrics>div{padding-inline:14px}.ga-summary-metrics dd{font-size:23px}}
+@media(max-width:400px){.groups-page .ga-workspace-focused .ga-session-sidebar .ga-side-card.ga-summary-panel{padding:18px}.ga-summary-metrics>div{padding-inline:10px}.ga-summary-metrics dt{font-size:12px}.ga-summary-metrics dd{font-size:21px}.ga-summary-panel-heading .ga-summary-actions{gap:8px}.ga-summary-panel .ga-session-timeline>div{grid-template-columns:82px minmax(0,1fr);gap:8px}}
+@media(max-width:360px){.ga-summary-metrics{grid-template-columns:1fr;gap:12px;padding:14px 0}.ga-summary-metrics>div{flex-direction:row;align-items:center;padding:0;border:0;gap:12px}.ga-summary-metrics dt{font-size:13px}.ga-summary-metrics dd{white-space:nowrap}}
+
+/* Narrow summaries retain the same colour roles without squeezing labels or values. */
+@media(max-width:750px){.ga-summary-metrics>div,.ga-summary-metrics>div:first-child{padding:14px}.ga-summary-metrics [data-metric=time] dd{font-size:26px}}
+@media(max-width:600px){.ga-summary-metrics{grid-template-columns:1fr;gap:8px;margin:20px 0 16px}.ga-summary-metrics>div,.ga-summary-metrics>div:first-child{flex-direction:row;align-items:center;gap:12px;padding:14px}.ga-summary-metrics dt{font-size:13px}.ga-summary-metrics dd{font-size:23px;white-space:nowrap}.ga-summary-metrics [data-metric=time] dd{font-size:26px}.ga-summary-columns{gap:12px}.ga-summary-columns>section{padding:16px}}

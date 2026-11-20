@@ -8,8 +8,9 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const root=path.resolve(import.meta.dirname,'..'),dir=await fs.mkdtemp(path.join(root,'.wrangler/room-ui-'));
 const file=path.join(dir,'components.mjs');
-await build({stdin:{contents:"export {RoomHeader} from './src/components/RoomHeader.jsx';export {ActivityCheckout} from './src/components/ActivityCheckout.jsx';export {ActivityClock} from './src/components/ActivityClock.jsx';export {StudyCompanions} from './src/components/StudyCompanions.jsx';export {RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress} from './src/components/RoomStudyAdditions.jsx';",resolveDir:root,loader:'jsx'},outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',loader:{'.css':'empty'},logLevel:'silent'});
+await build({stdin:{contents:"export {RoomHeader} from './src/components/RoomHeader.jsx';export {RoomActivities} from './src/components/RoomActivities.jsx';export {ActivityCheckout} from './src/components/ActivityCheckout.jsx';export {ActivityClock} from './src/components/ActivityClock.jsx';export {StudyCompanions} from './src/components/StudyCompanions.jsx';export {RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress} from './src/components/RoomStudyAdditions.jsx';",resolveDir:root,loader:'jsx'},outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',loader:{'.css':'empty'},logLevel:'silent'});
 const {RoomHeader,ActivityCheckout,ActivityClock,StudyCompanions,RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress}=await import(pathToFileURL(file).href);
+const {RoomActivities}=await import(pathToFileURL(file).href);
 const profile={id:'me'},room={id:'room',name:'Reading',capacity:4,invitationsOpen:true,closed:false,ownerId:'me'},access={roomActive:true,canParticipate:true,advancedActive:false,memberLimit:4,source:'free'};
 const selected={room,access,member:true,owner:true,joinLimit:4,members:[{id:'me',nickname:'Reader',last_seen:100000,readOnly:false,session_seconds:0,today_seconds:0}],messages:[],moderationAvailable:true,mutedUntil:0,entitlements:{freeText:false}};
 const render=(Component,props)=>renderToStaticMarkup(createElement(Component,props));
@@ -40,7 +41,7 @@ test('room footer exposes essential answers without nested disclosures and retai
  for(const answer of ['Start studying anytime','Understand the two clocks','Add a result and private reflection'])assert.ok(empty.indexOf(answer)>0&&empty.indexOf(answer)<firstDisclosure,answer);
  assert.equal((empty.match(/<details/g)||[]).length,4);assert.equal((empty.match(/<progress /g)||[]).length,1);
  assert.match(empty,/View group progress/);assert.match(empty,/Copy invitation/);assert.match(empty,/Go to my place/);assert.match(empty,/Plan next activity/);assert.match(empty,/Full study group guide/);
- assert.match(empty,/Your study time counts once/);assert.match(empty,/Saving ends your participation/);
+ assert.match(empty,/Your study time counts once/);assert.match(empty,/Add result/);assert.match(empty,/only you see your reflection/);
  const recorded=render(RoomStudyGuide,{totals:{today_seconds:43},goalMinutes:120});
  assert.match(recorded,/43 sec/);assert.match(recorded,/0.6% of the daily shared goal/);
 });
@@ -111,16 +112,31 @@ test('activity exposes one shared countdown and ordinary recorded time while pre
  assert.match(paused,/Your timer is paused/);assert.match(paused,/Resume study/);assert.doesNotMatch(paused,/00:00:46/);
  const closed=render(ActivityClock,{activity,timer,now:146000,joined:true,own:{seconds:0},readOnly:true});assert.doesNotMatch(closed,/<button/);
 });
-test('finish action is a named button with disclosure state and clear privacy and irreversible participation consequences',()=>{
+test('finishing during focus describes the timer consequence and opens only on request',()=>{
  const html=render(ActivityCheckout,{own:{checkedOutAt:0},phase:'focus'});
  assert.match(html,/<button[^>]*aria-expanded="false"[^>]*>Finish &amp; add result/);
- assert.match(html,/<form[^>]*hidden=""/);assert.match(html,/Your result is shared with members/);assert.match(html,/Your reflection is only visible to you/);assert.match(html,/cannot restart/);assert.match(html,/Finish study &amp; save result/);
+ assert.match(html,/<form[^>]*hidden=""/);assert.match(html,/cannot restart/);assert.match(html,/Finish study &amp; save result/);
 });
-test('break and ended activities reveal unsaved result forms; saved results expose an edit action instead of ending again',()=>{
- for(const phase of ['break','ended']){
-  const html=render(ActivityCheckout,{own:{checkedOutAt:0},phase});assert.match(html,/aria-expanded="true"/);assert.doesNotMatch(html,/<form[^>]*hidden/);assert.match(html,/Hide form/);
- }
+test('ended activity shows recorded minutes with a compact result action and supports direct opening',()=>{
+ const props={own:{checkedOutAt:0,seconds:150},phase:'ended'};
+ const closed=render(ActivityCheckout,props);
+ assert.match(closed,/Result pending/);assert.match(closed,/2 min 30 sec/);assert.match(closed,/aria-expanded="false"/);
+ assert.match(closed,/Add result/);assert.match(closed,/<form[^>]*hidden/);assert.match(closed,/>Save result</);
+ assert.doesNotMatch(closed,/Finish study &amp; save result|cannot restart/);
+ const requested=render(ActivityCheckout,{...props,openRequest:1});
+ assert.match(requested,/aria-expanded="true"/);assert.doesNotMatch(requested,/<form[^>]*hidden/);
+ const readOnly=render(ActivityCheckout,{...props,readOnly:true});
+ assert.match(readOnly,/This activity is read only/);assert.doesNotMatch(readOnly,/<button|<form/);
  const html=render(ActivityCheckout,{own:{checkedOutAt:123,outcome:'partial',reflection:'Private next step'},phase:'ended'});
  assert.match(html,/Edit result &amp; reflection/);assert.match(html,/Some progress/);assert.match(html,/Private reflection saved/);assert.match(html,/Save changes/);assert.doesNotMatch(html,/Finish &amp; add result|cannot restart/);
+});
+test('activity workspace shows next-step instructions and privacy before opening a form',()=>{
+ const html=render(RoomActivities,{room:{id:'room',ownerId:'host'},profile:{id:'guest'},auth:{csrf:'test'},members:[],view:'full'});
+ const guide=html.match(/<section class="ga-walkthrough"[^>]*>([\s\S]*?)<\/section>/)?.[1];
+ assert.ok(guide);
+ assert.doesNotMatch(guide,/<details|<summary|\shidden(?:[=\s>])/);
+ for(const instruction of ['Plan an activity','Confirm &amp; join','Start my study','Save result','Opens a booking window','Expands a form on this page'])assert.ok(guide.includes(instruction),instruction);
+ assert.equal((guide.match(/<img /g)||[]).length,4);
+ assert.ok(html.includes('Who can see my task or result?'));
 });
 test.after(async()=>{assert.ok(path.resolve(dir).startsWith(path.join(root,'.wrangler','room-ui-')));await fs.rm(dir,{recursive:true,force:true});});

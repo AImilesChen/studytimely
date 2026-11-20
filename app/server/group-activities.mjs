@@ -30,9 +30,14 @@ export async function roomActivities({request,env,at,r,profile,user,requireProfi
  const validate=async(input,previous)=>{let data;try{data=activityInput(input,at);}catch(e){fail(400,'INVALID',e.message);}enforceLocalContent(data.title);if(data.customTitle&&data.customTitle!==previous?.title)await reviewChat(data.customTitle,env,{at,fetcher:reviewFetch,timeoutMs:reviewTimeoutMs});return data;};
  if(!activityId&&method==='GET'){
   const list=await rows(q(env,`SELECT a.*, (SELECT count(*) FROM community_activity_members m WHERE m.activity_id=a.id AND m.withdrawn_at=0) AS reservations,
-   (SELECT count(*) FROM community_activity_members m WHERE m.activity_id=a.id AND m.profile_id=? AND m.withdrawn_at=0) AS joined
-   FROM community_activities a WHERE a.room_id=? AND MAX(a.starts_at,a.started_at,a.ended_at)>=? ORDER BY CASE WHEN a.status='running' THEN 0 WHEN a.status='scheduled' THEN 1 ELSE 2 END,CASE WHEN a.status='scheduled' THEN a.starts_at ELSE -a.created_at END,a.id LIMIT 100`,profile.id,roomId,at-90*86400000));
-  return result({activities:list.map(a=>({...activityRecord(a),reservations:a.reservations,joined:!!a.joined})),serverNow:at});
+   mine.profile_id IS NOT NULL AS joined, mine.checked_out_at
+   FROM community_activities a LEFT JOIN community_activity_members mine
+   ON mine.activity_id=a.id AND mine.profile_id=? AND mine.withdrawn_at=0
+   WHERE a.room_id=? AND MAX(a.starts_at,a.started_at,a.ended_at)>=? ORDER BY CASE WHEN a.status='running' THEN 0 WHEN a.status='scheduled' THEN 1 ELSE 2 END,CASE WHEN a.status='scheduled' THEN a.starts_at ELSE -a.created_at END,a.id LIMIT 100`,profile.id,roomId,at-90*86400000));
+  return result({activities:list.map(a=>({
+   ...activityRecord(a),reservations:a.reservations,joined:!!a.joined,
+   awaitingResult:a.status==='ended'&&!!a.joined&&a.checked_out_at===0
+  })),serverNow:at});
  }
  if(!activityId&&method==='POST'){
   owner();writable();const input=await body(request);if(!uuid(input.id))fail(400,'INVALID','Provide a new activity request ID.');
@@ -77,7 +82,7 @@ export async function roomActivities({request,env,at,r,profile,user,requireProfi
   const m=await mine();if(!m||m.withdrawn_at||!['running','ended'].includes(a.status))fail(409,'ACTIVITY_STATE','Join and start an activity before checking out.');if(m.version!==input.version)fail(409,'CONFLICT','Your result changed on another tab. Refresh it.');
   const reflection=typeof input.reflection==='string'?input.reflection.trim():'';if(!Object.hasOwn(ACTIVITY_OUTCOMES,input.outcome)||reflection.length>500)fail(400,'INVALID','Choose a completion status and keep your private note within 500 characters.');enforceLocalContent(reflection);
   const timer=await q(env,"SELECT * FROM community_timers WHERE activity_id=? AND profile_id=? AND status='running'",a.id,profile.id).first();if(timer)await settle(timer,true);
-  const saved=await q(env,`UPDATE community_activity_members SET outcome=?,reflection=?,checked_out_at=CASE WHEN checked_out_at=0 THEN ? ELSE checked_out_at END,version=version+1 WHERE activity_id=? AND profile_id=? AND version=? AND withdrawn_at=0 AND EXISTS(SELECT 1 FROM community_members m JOIN community_rooms r ON r.id=m.room_id JOIN community_activities a ON a.room_id=r.id WHERE a.id=? AND a.status IN ('running','ended') AND m.profile_id=? AND m.left_at=0 AND m.banned=0 AND r.closed_at=0 AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))}) RETURNING version`,input.outcome,reflection,at,a.id,profile.id,m.version,a.id,profile.id).first();if(!saved)fail(409,'CONFLICT','Your result or permissions changed. Refresh before saving.');await signal(roomId);return result({saved:true,version:saved.version});
+  const saved=await q(env,`UPDATE community_activity_members SET outcome=?,reflection=?,checked_out_at=CASE WHEN checked_out_at=0 THEN ? ELSE checked_out_at END,version=version+1 WHERE activity_id=? AND profile_id=? AND version=? AND withdrawn_at=0 AND EXISTS(SELECT 1 FROM community_members m JOIN community_rooms r ON r.id=m.room_id JOIN community_activities a ON a.room_id=r.id WHERE a.id=? AND a.status IN ('running','ended') AND m.profile_id=? AND m.left_at=0 AND m.banned=0 AND r.closed_at=0 AND ${participationSQL('r.id',"'"+profile.id+"'",Math.floor(now()))}) RETURNING version,checked_out_at,seconds`,input.outcome,reflection,at,a.id,profile.id,m.version,a.id,profile.id).first();if(!saved)fail(409,'CONFLICT','Your result or permissions changed. Refresh before saving.');await signal(roomId);return result({saved:true,version:saved.version,checkedOutAt:saved.checked_out_at,seconds:saved.seconds});
  }
  fail(405,'METHOD','This activity action is not supported.');
 }

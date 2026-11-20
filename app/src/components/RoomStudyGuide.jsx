@@ -72,7 +72,7 @@ export function RoomStudyGuide({
         </article>
         <article className="room-overview-card room-next-session" aria-labelledby="room-next-session-title">
           <h3 id="room-next-session-title">
-            <CalendarBlank size={19} aria-hidden="true"/> {activity?.state === 'scheduled' ? 'Next activity' : activity ? 'Your activity' : 'Study activities'}
+            <CalendarBlank size={19} aria-hidden="true"/> {activity?.awaitingStart ? 'Activity awaiting start' : activity?.state === 'scheduled' ? 'Next activity' : activity ? 'Your activity' : 'Study activities'}
           </h3>
           <div className="room-overview-content">
             <strong className="room-next-session-name" role={activityLoading ? 'status' : undefined}>{activityTitle}</strong>
@@ -107,7 +107,7 @@ export function RoomStudyGuide({
             </article>
             <article>
               <h4>Add a result and private reflection</h4>
-              <p>Open the activity you joined and choose <strong>Finish &amp; add result</strong>. Saving ends your participation. Members see your result and only you see your reflection.</p>
+              <p>Open the activity you joined and choose <strong>Add result</strong> after it ends. Members see your result and only you see your reflection.</p>
               <button type="button" className="room-guide-link" onClick={onActivities}>
                 Go to study activities <ArrowRight size={15} aria-hidden="true"/>
               </button>

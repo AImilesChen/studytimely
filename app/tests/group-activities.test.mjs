@@ -24,8 +24,14 @@ test('two members reserve, start their own timers, check out and receive a priva
  let d=await detail(s,r,id,host);assert.equal(d.summary.attended,0);assert.equal(d.summary.seconds,0);assert.equal(d.own.task,'Host private task');assert.ok(!JSON.stringify(d).includes('Learner private task'));assert.equal(s.db.prepare('SELECT count(*) n FROM community_timers').get().n,0);
  const timer1=await s.call('/timer/start','POST',{roomId:r.id,activityId:id},host);assert.equal(timer1.status,200);s.advance(30000);assert.equal((await s.call('/timer/heartbeat','POST',{lease:timer1.timer.lease},host)).status,200);
  const timer2=await s.call('/timer/start','POST',{roomId:r.id,activityId:id},learner);assert.equal(timer2.status,200);s.advance(30000);
- const checked=await s.call(route(r,id,'/checkout'),'POST',{version:1,outcome:'partial',reflection:'Private result',seconds:999999},learner);assert.equal(checked.status,200);assert.equal((await s.call('/timer/start','POST',{roomId:r.id,activityId:id},learner)).status,409);
+ const checked=await s.call(route(r,id,'/checkout'),'POST',{version:1,outcome:'partial',reflection:'Private result',seconds:999999},learner);assert.equal(checked.status,200);assert.equal(checked.seconds,30);assert.equal(checked.checkedOutAt,s.now);assert.equal((await s.call('/timer/start','POST',{roomId:r.id,activityId:id},learner)).status,409);
  assert.equal((await s.call(route(r,id,'/end'),'POST',{version:2},host)).status,200);d=await detail(s,r,id,host);assert.equal(d.activity.status,'ended');assert.equal(d.summary.seconds,90);assert.equal(d.summary.attended,2);assert.equal(d.summary.checkedOut,1);assert.ok(!JSON.stringify(d).includes('Private result'));
+ const listRoute='/rooms/'+r.id+'/activities';
+ const hostList=await s.call(listRoute,'GET',undefined,host);
+ const learnerList=await s.call(listRoute,'GET',undefined,learner);
+ assert.equal(hostList.activities.find(item=>item.id===id).awaitingResult,true);
+ assert.equal(learnerList.activities.find(item=>item.id===id).awaitingResult,false);
+ assert.doesNotMatch(JSON.stringify(learnerList),/Private result|Host private task/);
  const own=await detail(s,r,id,learner);assert.equal(own.own.reflection,'Private result');assert.equal(own.own.seconds,30);assert.equal((await s.call(route(r,id,'/checkout'),'POST',{version:2,outcome:'completed',reflection:'Updated private result'},learner)).status,200);assert.equal((await detail(s,r,id,host)).summary.seconds,90);
  assert.equal(s.db.prepare('SELECT sum(seconds) n FROM community_daily').get().n,90);assert.equal(s.db.prepare('SELECT sum(seconds) n FROM community_room_daily').get().n,90);
  }finally{s.close();}

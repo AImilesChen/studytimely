@@ -138,6 +138,9 @@
 
 .groups-guide-refined .group-study-overview{max-width:82ch}
 .groups-guide-refined .group-study-overview>p{font-size:16px;line-height:1.8;color:var(--rr-muted);margin:12px 0 0}
+.group-activity-scheduling{margin-top:22px}
+.group-activity-scheduling h4{margin:0 0 8px;font-size:19px;line-height:1.45;color:var(--rr-ink);scroll-margin-top:8rem}
+.groups-guide-refined .group-activity-scheduling>p{margin:0;max-width:76ch;font-size:15px;line-height:1.7;color:var(--rr-muted)}
 .groups-guide-refined .group-revision-example{margin:22px 0 0;padding:22px;background:var(--rr-panel);border:1px solid var(--rr-line);border-radius:12px}
 .group-revision-example figcaption{font-size:18px;font-weight:650;line-height:1.5;color:var(--rr-ink)}
 .groups-guide-refined .group-revision-example>p{font-size:14px;color:var(--rr-muted);margin:6px 0 18px;line-height:1.7}
