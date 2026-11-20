@@ -1,0 +1,365 @@
+.groups-room-open .room-study-guide {
+  --room-guide-accent: #92612b;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rr-line);
+  color: var(--rr-ink);
+}
+
+html:not([data-theme=light]) .groups-room-open .room-study-guide {
+  --room-guide-accent: #e5b879;
+}
+
+.room-study-guide h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.room-study-guide h3,
+.room-study-guide h4 {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.room-study-guide p {
+  margin: 0;
+  color: var(--rr-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.room-study-guide svg {
+  flex-shrink: 0;
+}
+
+.room-session-overview,
+.room-study-help-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.room-study-guide .room-overview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+  padding: clamp(16px, 2vw, 24px);
+  border: 1px solid var(--rr-line);
+  border-radius: 12px;
+  background: var(--rr-panel);
+}
+
+.room-overview-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.room-today-summary h3 svg {
+  color: var(--room-guide-accent);
+}
+
+.room-overview-content {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.room-overview-card dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 32px;
+  margin: 0;
+}
+
+.room-overview-card dt,
+.room-overview-card p {
+  font-size: 13px;
+  color: var(--rr-muted);
+}
+
+.room-overview-card dd {
+  margin: 2px 0 0;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.room-study-guide .room-next-session-name {
+  display: block;
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.room-overview-card progress {
+  display: block;
+  width: 100%;
+  height: 5px;
+  border: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--rr-line);
+  accent-color: var(--room-guide-accent);
+}
+
+.room-overview-card progress::-webkit-progress-bar {
+  background: var(--rr-line);
+}
+
+.room-overview-card progress::-webkit-progress-value {
+  background: var(--room-guide-accent);
+}
+
+.room-overview-card progress::-moz-progress-bar {
+  background: var(--room-guide-accent);
+}
+
+.groups-room-open .room-study-guide .room-overview-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--rr-line);
+  border-radius: 8px;
+  background: var(--rr-card);
+  color: var(--rr-ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.room-overview-card .room-overview-action {
+  margin-top: auto;
+}
+
+.groups-room-open .room-study-guide .room-routine-tip {
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.room-study-help-section {
+  margin-top: 32px;
+}
+
+.room-study-help-section > h3 {
+  margin-bottom: 14px;
+  font-size: 20px;
+}
+
+.room-study-help-layout {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+}
+
+.room-essential-answers {
+  display: grid;
+  gap: 12px;
+}
+
+.room-essential-answers h4 {
+  margin-bottom: 4px;
+}
+
+.room-essential-answers p,
+.room-help-more p {
+  max-width: 66ch;
+}
+
+.room-essential-answers p strong {
+  font-weight: 650;
+  color: var(--rr-ink);
+}
+
+.groups-room-open .room-study-guide .room-guide-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  min-height: 44px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--rr-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.groups-room-open .room-study-guide .room-guide-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.room-study-guide .room-help-more {
+  min-width: 0;
+  padding: 14px 18px 5px;
+  border-radius: 10px;
+  background: var(--rr-card);
+}
+
+.room-study-guide .room-help-more > h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.room-study-guide .room-help-more details + details {
+  border-top: 1px solid var(--rr-line);
+}
+
+.room-study-guide .room-help-more summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 0;
+  font-size: 14px;
+  line-height: 1.45;
+  list-style: none;
+  cursor: pointer;
+}
+
+.room-study-guide .room-help-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.room-study-guide .room-help-more details[open] summary {
+  font-weight: 600;
+}
+
+.room-study-guide .room-help-more details[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.room-study-guide .room-help-more details p {
+  padding-bottom: 12px;
+  font-size: 14px;
+}
+
+.room-study-guide .room-guide-invitation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 20px;
+  margin-top: 28px;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--rr-line);
+}
+
+.room-guide-invitation h3 {
+  font-size: 16px;
+  margin-bottom: 3px;
+}
+
+.room-guide-invitation p {
+  font-size: 14px;
+}
+
+.room-guide-invitation .room-guide-feedback {
+  flex-basis: 100%;
+  color: var(--rr-ink);
+}
+
+.room-study-guide .room-guide-tools {
+  margin-top: 26px;
+}
+
+.room-guide-tools ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0;
+  margin: 10px 0 0;
+  list-style: none;
+}
+
+.groups-room-open .room-guide-tools li > a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 72px;
+  padding: 12px 14px;
+  border: 1px solid var(--rr-line);
+  border-radius: 10px;
+  background: var(--rr-panel);
+  color: var(--rr-ink);
+  text-decoration: none;
+}
+
+.groups-room-open .room-guide-tools li > a:is(:hover, :focus-visible) {
+  background: var(--rr-card);
+  border-color: var(--room-guide-accent);
+}
+
+.room-guide-tools li > a > svg {
+  box-sizing: content-box;
+  padding: 8px;
+  border-radius: 7px;
+  background: var(--rr-card);
+  color: var(--rr-ink);
+}
+
+.room-guide-tool-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.room-guide-tool-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  justify-self: start;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.45;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.room-guide-tool-copy small {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--rr-muted);
+}
+
+.groups-room-open .room-study-guide :is(button, a, summary):focus-visible {
+  outline: 2px solid var(--room-guide-accent);
+  outline-offset: 3px;
+}
+
+.groups-room-open .room-context-help[data-view=study] {
+  justify-content: flex-start;
+  border-top: 0;
+}
+
+@media (max-width: 700px) {
+  .room-session-overview,
+  .room-study-help-layout,
+  .room-guide-tools ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .room-study-help-layout,
+  .room-essential-answers {
+    gap: 16px;
+  }
+
+}

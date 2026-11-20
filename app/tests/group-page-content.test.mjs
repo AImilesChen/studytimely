@@ -15,3 +15,14 @@ test('public guide gives concrete room/activity paths without exposing private t
  assert.ok(!html.includes('Under Activities &amp; tasks'));
  assert.ok(!html.includes('room-workspace-header')&&!html.includes('room-preview-note'));
 });
+
+test('public guide has a concrete five-step example, real allowance comparison and visible essential answers in initial HTML',async()=>{
+ const html=await fs.readFile(new URL('../dist/client/study-groups/index.html',import.meta.url),'utf8');
+ assert.match(html,/A free online study room for your small group/);
+ const figure=html.match(/<figure class="group-revision-example">([\s\S]*?)<\/figure>/)?.[1];assert.ok(figure);
+ assert.equal((figure.match(/<li>/g)||[]).length,5);assert.match(figure,/illustrative routine/);assert.match(figure,/No timer starts automatically/);
+ const table=html.match(/<table>([\s\S]*?)<\/table>/)?.[1];assert.ok(table);assert.match(table,/scope="col"/);assert.match(table,/1 active room/);assert.match(table,/Up to 24 members/);assert.match(table,/Single study activities/);assert.match(table,/Single and repeating activities/);
+ const essentials=html.match(/<div class="group-faq-essentials">([\s\S]*?)<\/div>/)?.[1];assert.ok(essentials);assert.equal((essentials.match(/<article>/g)||[]).length,3);assert.doesNotMatch(essentials,/<details|<summary/);
+ assert.match(essentials,/Do I need to book a session/);assert.match(essentials,/Are online study groups free/);
+ assert.doesNotMatch(html,/QA Free Host|QA Learner|room-next-session-name/);
+});

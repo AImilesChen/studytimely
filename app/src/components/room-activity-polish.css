@@ -64,32 +64,11 @@
 .groups-page .room-progress-explanation>summary svg:last-child{margin-left:auto}
 .groups-page .room-progress-explanation[open]>summary svg:last-child{transform:rotate(180deg)}
 .groups-page .room-progress-explanation p{font-size:14px;line-height:1.75;color:var(--rr-muted);max-width:90ch;margin:8px 0}
-.groups-page .room-study-guide{padding-top:28px;margin-top:30px}
-.groups-page .room-guide-steps{gap:16px;margin:20px 0}
-.groups-page .room-guide-steps article{display:flex;flex-direction:column;gap:14px;padding:20px;background:var(--rr-panel);border-top:3px solid #76a2dc}
-.groups-page .room-guide-steps article[data-step=study]{border-top-color:#5dba98}
-.groups-page .room-guide-steps article[data-step=meet]{border-top-color:#e5b165}
-.groups-page .room-guide-step-title{display:flex;gap:11px;align-items:center}
-.groups-page .room-guide-step-title>span{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:9px;background:var(--rr-blue);color:#214c82;font-size:13px;font-weight:700}
-.groups-page .room-guide-step-title h3{font-size:16px;line-height:1.4;margin:0}
-.groups-page .room-guide-steps p{margin:0;line-height:1.7;flex:1}
-.groups-page .room-guide-steps .button{align-self:flex-start;display:inline-flex;gap:8px;align-items:center;min-height:44px;font-size:14px;font-weight:600;background:var(--rr-blue);color:#214c82;border-color:transparent;border-radius:9px}
-.groups-page .room-guide-steps [data-step=study] :is(.button,.room-guide-step-title>span){background:var(--rr-mint);color:#185541}
-.groups-page .room-guide-steps [data-step=meet] :is(.button,.room-guide-step-title>span){background:var(--rr-amber);color:#6a4516}
 .groups-page .room-guide-feedback{padding:12px 16px;background:var(--rr-mint);color:#185541;border-radius:10px;font-size:14px}
-.groups-page .room-guide-questions{max-width:none;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.groups-page .room-guide-questions details{padding:0;border:1px solid var(--rr-line);border-radius:10px;background:var(--rr-panel);align-self:start;overflow:hidden}
-.groups-page .room-guide-questions summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;padding:14px 16px;min-height:52px;line-height:1.5}
-.groups-page .room-guide-questions summary svg{flex-shrink:0}
-.groups-page .room-guide-questions details[open]{background:var(--rr-card)}
-.groups-page .room-guide-questions details[open] summary{box-shadow:inset 3px 0 #7c9d95;font-weight:600}
-.groups-page .room-guide-questions details[open] summary svg{transform:rotate(180deg)}
-.groups-page .room-guide-questions p{margin:0;padding:4px 16px 18px}
-.groups-page :is(.room-guide-questions,.room-progress-explanation) summary::-webkit-details-marker{display:none}
-.groups-page :is(.room-study-guide,.room-progress-card) :is(button,summary,a):focus-visible{outline:2px solid #5684be;outline-offset:3px}
-.groups-page .room-study-guide nav{padding:20px 0 8px}
-@media(max-width:850px){.groups-page .room-progress-metrics{gap:10px}.groups-page .room-guide-steps{gap:10px}.groups-page .room-guide-steps article{padding:16px}}
-@media(max-width:650px){.groups-page .ga-workspace{padding:16px 12px;border-radius:16px}.groups-page .ga-workspace .ga-detail{padding:14px 12px}.groups-page .ga-workspace .ga-heading{gap:14px}.groups-page .ga-workspace .ga-manage[open]{min-width:0;width:100%}.groups-page .ga-workspace :is(.ga-task-form,.ga-checkout){padding:14px 12px}.groups-page .ga-workspace summary{overflow-wrap:anywhere}.groups-page .room-progress-card{padding:18px 14px}.groups-page .room-progress-metrics{grid-template-columns:1fr}.groups-page .room-progress-metrics>div{grid-template-columns:1fr auto;align-items:center}.groups-page .room-progress-metrics small{grid-column:1/-1}.groups-page .room-progress-metrics strong{font-size:23px}.groups-page .room-progress-title{gap:10px}.groups-page .room-progress-title>span{font-size:15px}.groups-page .room-progress-title>strong{font-size:21px;padding:6px 10px}.groups-page .room-guide-steps,.groups-page .room-guide-questions{grid-template-columns:1fr}.groups-page .room-guide-steps article{padding:18px}.groups-page .room-guide-steps .button{align-self:stretch;justify-content:center}.groups-page .room-study-guide h2{font-size:23px}}
+.groups-page .room-progress-explanation summary::-webkit-details-marker{display:none}
+.groups-page .room-progress-card :is(button,summary,a):focus-visible{outline:2px solid #5684be;outline-offset:3px}
+@media(max-width:850px){.groups-page .room-progress-metrics{gap:10px}}
+@media(max-width:650px){.groups-page .ga-workspace{padding:16px 12px;border-radius:16px}.groups-page .ga-workspace .ga-detail{padding:14px 12px}.groups-page .ga-workspace .ga-heading{gap:14px}.groups-page .ga-workspace .ga-manage[open]{min-width:0;width:100%}.groups-page .ga-workspace :is(.ga-task-form,.ga-checkout){padding:14px 12px}.groups-page .ga-workspace summary{overflow-wrap:anywhere}.groups-page .room-progress-card{padding:18px 14px}.groups-page .room-progress-metrics{grid-template-columns:1fr}.groups-page .room-progress-metrics>div{grid-template-columns:1fr auto;align-items:center}.groups-page .room-progress-metrics small{grid-column:1/-1}.groups-page .room-progress-metrics strong{font-size:23px}.groups-page .room-progress-title{gap:10px}.groups-page .room-progress-title>span{font-size:15px}.groups-page .room-progress-title>strong{font-size:21px;padding:6px 10px}}
 
 /* Keep activity timing above task editing and use the existing server timer. */
 .groups-page .ga-live-clock{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;border:1px solid var(--rr-line);border-radius:14px;overflow:hidden;background:var(--rr-panel)}

@@ -135,3 +135,35 @@
 .groups-guide-refined .group-session-example .group-session-example-note{margin:16px 0 0;font-size:15px;line-height:1.75}
 .group-session-example-note strong{color:var(--rr-ink);font-weight:600}
 @media(max-width:650px){.group-session-example dl>div{grid-template-columns:1fr;gap:7px}.groups-guide-refined .group-session-example{padding:20px 0}.groups-guide-refined .group-session-example h3{font-size:20px}}
+
+.groups-guide-refined .group-study-overview{max-width:82ch}
+.groups-guide-refined .group-study-overview>p{font-size:16px;line-height:1.8;color:var(--rr-muted);margin:12px 0 0}
+.groups-guide-refined .group-revision-example{margin:22px 0 0;padding:22px;background:var(--rr-panel);border:1px solid var(--rr-line);border-radius:12px}
+.group-revision-example figcaption{font-size:18px;font-weight:650;line-height:1.5;color:var(--rr-ink)}
+.groups-guide-refined .group-revision-example>p{font-size:14px;color:var(--rr-muted);margin:6px 0 18px;line-height:1.7}
+.group-revision-example ol{list-style:decimal;padding-left:24px;margin:0;display:grid;gap:14px}
+.group-revision-example li{padding-left:5px;color:var(--rr-muted);font-size:15px;line-height:1.7}
+.group-revision-example li::marker{font-size:13px;color:var(--rr-ink);font-weight:600}
+.group-revision-example li strong{display:block;color:var(--rr-ink);font-weight:600}
+.group-access-comparison>h3{font-size:22px;color:var(--rr-ink);margin:20px 0 8px;line-height:1.5}
+.group-access-comparison>p{font-size:16px;line-height:1.75;color:var(--rr-muted);margin:0 0 16px}
+.group-access-table-wrap{border:1px solid var(--rr-line);border-radius:12px;overflow:hidden;background:var(--rr-panel)}
+.group-access-comparison table{width:100%;border-collapse:collapse;table-layout:fixed;color:var(--rr-ink)}
+.group-access-comparison caption{text-align:left;font-size:14px;padding:16px 18px;color:var(--rr-muted);border-bottom:1px solid var(--rr-line)}
+.group-access-comparison :is(th,td){text-align:left;vertical-align:top;padding:16px 18px;font-size:15px;line-height:1.65;overflow-wrap:anywhere}
+.group-access-comparison thead th{background:var(--rr-card);font-weight:650;border-bottom:1px solid var(--rr-line)}
+.group-access-comparison thead th:first-child{width:23%}
+.group-access-comparison tbody th{font-weight:600}
+.group-access-comparison td{color:var(--rr-muted)}
+.group-access-comparison tbody tr+tr :is(th,td){border-top:1px solid var(--rr-line)}
+.groups-guide-refined .group-faq-essentials{margin:18px 0 0}
+.groups-guide-refined .group-faq-essentials article{padding:20px 0;border-bottom:1px solid var(--rr-line);max-width:82ch}
+.groups-guide-refined .group-faq-essentials h3{font-size:18px;line-height:1.55;color:var(--rr-ink);margin:0 0 8px}
+.groups-page .groups-guide-refined .groups-faq .group-faq-essentials p{font-size:16px;line-height:1.8;color:var(--rr-muted);margin:0;padding:0}
+@media(max-width:600px){
+ .groups-guide-refined .group-revision-example{padding:18px}
+ .group-access-comparison :is(th,td){padding:12px 9px;font-size:13px}
+ .group-access-comparison thead th:first-child{width:24%}
+ .group-access-comparison caption{padding:12px;font-size:13px}
+ .groups-guide-refined .group-faq-essentials h3{font-size:17px}
+}

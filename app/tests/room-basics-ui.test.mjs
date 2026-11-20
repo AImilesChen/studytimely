@@ -31,14 +31,51 @@ test('compact room identity retains the real free allowance and owner/member act
  assert.match(advanced,/Advanced preview · 24 places/);
 });
 
-test('room footer uses real recorded time and closed help while retaining original invitation and timer shortcuts',()=>{
- const empty=render(RoomStudyGuide,{canInvite:true,canPlan:true,canParticipate:true,totals:{today_seconds:0}});
- assert.match(empty,/Arranging an activity is optional/);assert.doesNotMatch(empty,/0 sec recorded|0 min recorded|room-guide-steps/);
- assert.match(empty,/<details class="room-study-help"><summary>/);assert.match(empty,/View group progress/);assert.match(empty,/Copy invitation/);assert.match(empty,/Go to my place/);assert.match(empty,/Plan next activity/);
- assert.match(empty,/same personal room timer/);assert.match(empty,/Where can I add my result/);
- const recorded=render(RoomStudyGuide,{totals:{today_seconds:43}});
- assert.match(recorded,/43 sec recorded together today · UTC/);assert.match(recorded,/View activities/);
+test('room footer exposes essential answers without nested disclosures and retains permission-aware shortcuts',()=>{
+ const empty=render(RoomStudyGuide,{canInvite:true,canPlan:true,canParticipate:true,totals:{today_seconds:0},goalMinutes:120,activityOverview:{notice:null,loading:false,error:false}});
+ assert.match(empty,/No activity arranged/);assert.match(empty,/0 sec/);assert.match(empty,/120 min/);
+ assert.doesNotMatch(empty,/<details class="room-study-help"|room-guide-steps|role="timer"/);
+ assert.ok(empty.indexOf('room-session-overview')<empty.indexOf('room-routine-tip'));
+ const firstDisclosure=empty.indexOf('<details');
+ for(const answer of ['Start studying anytime','Understand the two clocks','Add a result and private reflection'])assert.ok(empty.indexOf(answer)>0&&empty.indexOf(answer)<firstDisclosure,answer);
+ assert.equal((empty.match(/<details/g)||[]).length,4);assert.equal((empty.match(/<progress /g)||[]).length,1);
+ assert.match(empty,/View group progress/);assert.match(empty,/Copy invitation/);assert.match(empty,/Go to my place/);assert.match(empty,/Plan next activity/);assert.match(empty,/Full study group guide/);
+ assert.match(empty,/Your study time counts once/);assert.match(empty,/Saving ends your participation/);
+ const recorded=render(RoomStudyGuide,{totals:{today_seconds:43},goalMinutes:120});
+ assert.match(recorded,/43 sec/);assert.match(recorded,/0.6% of the daily shared goal/);
 });
+
+test('unknown totals, unset goals and activity errors never appear as fabricated study or empty appointments',()=>{
+ const unknown=render(RoomStudyGuide,{activityOverview:{error:true,loading:false,notice:null}});
+ assert.match(unknown,/Not available/);assert.match(unknown,/Not set/);assert.match(unknown,/Activity details are unavailable/);
+ assert.doesNotMatch(unknown,/No activity arranged|0 sec|120 min|<progress/);
+ const loading=render(RoomStudyGuide,{activityOverview:{notice:null,loading:true,error:false}});
+ assert.match(loading,/role="status"/);assert.match(loading,/Loading your room/);assert.doesNotMatch(loading,/No activity arranged/);
+});
+
+test('activity overview displays the existing appointment as text, including read-only and stale-update states',()=>{
+ const notice={title:'Reading <together>',state:'scheduled',description:'20 Nov 2026, 18:00 · Europe/London · 25 min study'};
+ const html=render(RoomStudyGuide,{activityOverview:{notice,error:false,loading:false},canPlan:false});
+ assert.match(html,/Next activity/);assert.match(html,/Reading &lt;together&gt;/);assert.match(html,/Europe\/London/);assert.match(html,/View activities/);
+ assert.doesNotMatch(html,/Plan next activity|role="timer"|<form|Start activity/);
+ const stale=render(RoomStudyGuide,{activityOverview:{notice,error:true,loading:false}});
+ assert.match(stale,/Updates are unavailable/);assert.match(stale,/Reading &lt;together&gt;/);assert.doesNotMatch(stale,/No activity arranged/);
+});
+
+test('viewing an existing activity does not trigger the owner plan form, while a known empty room can plan',()=>{
+ const text=node=>Array.isArray(node)?node.map(text).join(''):typeof node==='string'?node:node?.props?text(node.props.children):'';
+ const find=(node,label)=>{if(Array.isArray(node)){for(const child of node){const match=find(child,label);if(match)return match;}}else if(node?.props){if(node.type==='button'&&text(node).trim()===label)return node;return find(node.props.children,label);}};
+ let planned=0,viewed=0;
+ const actions={canPlan:true,onPlan:()=>planned++,onActivities:()=>viewed++};
+ const existing=RoomStudyGuide({...actions,activityOverview:{notice:{title:'Reading',state:'scheduled',description:'Tomorrow'}}});
+ find(existing,'View activities').props.onClick();assert.equal(viewed,1);assert.equal(planned,0);
+ const empty=RoomStudyGuide({...actions,activityOverview:{notice:null,loading:false,error:false}});
+ find(empty,'Plan next activity').props.onClick();assert.equal(planned,1);assert.equal(viewed,1);
+ const unavailable=RoomStudyGuide({...actions,activityOverview:{notice:null,error:true}});
+ find(unavailable,'View activities').props.onClick();assert.equal(viewed,2);assert.equal(planned,1);
+ const html=render(RoomStudyGuide,actions);assert.match(html,/<a[^>]*href="\/study-groups#group-how" target="_blank" rel="noopener noreferrer"/);
+});
+
 test('inactive free room retains four-place presentation but does not invite or start a timer',()=>{
  const html=render(StudyCompanions,{selected:{...selected,access:{...access,canParticipate:false,roomActive:false},members:[{...selected.members[0],readOnly:true}]},profile,me:{},now:100000,connection:'Live'});
  assert.equal((html.match(/companion-empty-place/g)||[]).length,3);assert.doesNotMatch(html,/Start studying|>Invite a partner</);assert.match(html,/review room access above/);
@@ -62,8 +99,8 @@ test('basic progress shows useful totals once, an accurate percentage and an hon
  assert.equal((html.match(/<progress /g)||[]).length,1);assert.match(html,/not a lifetime total/);assert.match(html,/midnight UTC/);assert.doesNotMatch(html,/room-progress-compact|Progress details/);
 });
 test('guide gives active owners useful shortcuts while guests and paused rooms get appropriate existing destinations',()=>{
- const owner=render(RoomStudyGuide,{canInvite:true,canPlan:true,canParticipate:true});
- assert.match(owner,/Copy invitation/);assert.match(owner,/Go to my place/);assert.match(owner,/Plan next activity/);assert.doesNotMatch(owner,/Full study group guide/);
+ const owner=render(RoomStudyGuide,{canInvite:true,canPlan:true,canParticipate:true,activityOverview:{notice:null,loading:false,error:false}});
+ assert.match(owner,/Copy invitation/);assert.match(owner,/Go to my place/);assert.match(owner,/Plan next activity/);assert.match(owner,/Full study group guide/);
  const guest=render(RoomStudyGuide,{});assert.match(guest,/View members/);assert.match(guest,/Review room access/);assert.match(guest,/View activities/);assert.doesNotMatch(guest,/Copy invitation|Plan next activity/);
 });
 test('activity exposes one shared countdown and ordinary recorded time while preserving personal timer controls',()=>{

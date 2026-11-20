@@ -14,7 +14,7 @@ const subjectOptions=Object.entries(ACTIVITY_SUBJECTS).map(([id,label])=><option
 const phaseLabel={scheduled:'Scheduled',focus:'Focus time',break:'Break & check-out',ended:'Ended',cancelled:'Cancelled'};
 const zones=['UTC','Europe/London','Europe/Paris','Europe/Berlin','America/New_York','America/Chicago','America/Los_Angeles','America/Toronto','America/Vancouver','Asia/Shanghai','Asia/Tokyo','Asia/Seoul','Asia/Singapore','Asia/Kolkata','Asia/Dubai','Australia/Sydney','Australia/Adelaide','Pacific/Auckland'];
 export {RoomHome} from './RoomHome.jsx';
-export function RoomActivities({room,auth,profile,canOrganize,members,revision,now,chatReviewAvailable,timer,live,studying,onStart,onPause,refresh,confirm,view='full',onOpen}){
+export function RoomActivities({room,auth,profile,canOrganize,members,revision,now,chatReviewAvailable,timer,live,studying,onStart,onPause,refresh,confirm,view='full',onOpen,onOverview}){
  const [list,setList]=useState(null),[id,setId]=useState(''),[detail,setDetail]=useState(null),[form,setForm]=useState(null),[pending,setPending]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[formError,setFormError]=useState('');
  const detailPanel=useRef(null),taskEditor=useRef(null),scrollPending=useRef(false),current=useRef(''),alive=useRef(true),requestVersion=useRef(0),listVersion=useRef(0),createId=useRef('');current.current=id;
  const [checkoutRequest,setCheckoutRequest]=useState({activityId:'',value:0});
@@ -34,6 +34,8 @@ export function RoomActivities({room,auth,profile,canOrganize,members,revision,n
  useEffect(()=>{if(detail&&scrollPending.current&&view==='full'){scrollPending.current=false;detailPanel.current?.scrollIntoView({block:'start'});detailPanel.current?.focus({preventScroll:true});}},[detail,view]);
  const a=detail?.activity,own=detail?.own,joined=!!own&&!own.withdrawnAt,phase=a?activityPhase(a,now):'',phaseOpen=['scheduled','focus'].includes(phase),future=(list||[]).filter(a=>['scheduled','running'].includes(a.status)),past=(list||[]).filter(a=>['ended','cancelled'].includes(a.status));
  const shortcut=roomActivityNotice(list||[],detail,now,room.closed||room.readOnly);
+ // Reuse this list/detail subscription for the room footer; phase changes never start a timer.
+ useEffect(()=>{onOverview?.({roomId:room.id,notice:shortcut,loading:list===null&&!error,error:!!error});},[room.id,list,detail,error,room.closed,room.readOnly,shortcut?.id,shortcut?.state,shortcut?.title,shortcut?.description,onOverview]);
  function openNotice(item){if(item?.id&&item.id!==id)select(item.id);if(item?.action==='result')setCheckoutRequest(previous=>({activityId:item.id,value:previous.value+1}));onOpen?.();}
  function editTask(){if(!taskEditor.current)return;taskEditor.current.open=true;taskEditor.current.scrollIntoView({block:'center'});taskEditor.current.querySelector('select,input')?.focus({preventScroll:true});}
  async function transition(operation){return run(()=>api('/'+id+'/'+operation,'POST',{version:a.version}));}

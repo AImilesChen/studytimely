@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {ArrowRight,BookOpen,CalendarBlank,ChartBar,MusicNotes,UsersThree,ShieldCheck,Clock,Target,Archive,Info,CaretDown,Play,Copy} from '@phosphor-icons/react';
+import {ArrowRight,BookOpen,CalendarBlank,ChartBar,MusicNotes,UsersThree,ShieldCheck,Clock,Target,Archive,Info,CaretDown} from '@phosphor-icons/react';
 import {GroupTools} from './GroupTools.jsx';
 import {roomAccessNotice,roomGoalProgress} from '../lib/room-presentation.mjs';
 import {activityDuration} from '../lib/group-activities.mjs';
@@ -38,26 +38,4 @@ export function RoomProgress({totals,goalMinutes,formatDuration}){
  </section>;
 }
 
-export function RoomStudyGuide({navigate,canInvite=false,canPlan=false,canParticipate=false,onInvite,onMembers,onStudy,onPlan,onAccess,onProgress,totals,feedback='',busy=false}){
- const today=Math.max(0,Number(totals?.today_seconds)||0);
- return <section className="room-study-guide" aria-labelledby="room-study-guide-title">
-  <header><h2 id="room-study-guide-title">Your next step</h2><p>{today>0?`${activityDuration(today)} recorded together today · UTC. Review your progress or arrange your next session.`:'Study straight away from your own place. Arranging an activity is optional.'}</p></header>
-  <div className="room-next-actions"><button className="button" onClick={onProgress}><ChartBar size={17}/>View group progress<ArrowRight size={16}/></button><button className="button" disabled={busy} onClick={onPlan}><CalendarBlank size={17}/>{canPlan?'Plan next activity':'View activities'}<ArrowRight size={16}/></button></div>
-  {feedback&&<p className="room-guide-feedback" role="status">{feedback}</p>}
-  <details className="room-study-help"><summary><span><Info size={18}/>Room help &amp; common questions</span><CaretDown size={18}/></summary><div className="room-help-body">
-  <div className="room-help-shortcuts">
-   <div><span><strong>Bring a partner</strong><small>Offline members keep their places.</small></span><button className="text-button" disabled={busy} onClick={canInvite?onInvite:onMembers}>{canInvite?<Copy size={17}/>:<UsersThree size={17}/>} {canInvite?'Copy invitation':'View members'}</button></div>
-   <div><span><strong>Find your timer</strong><small>Each person starts and pauses their own study.</small></span><button className="text-button" onClick={canParticipate?onStudy:onAccess}><Play size={17}/>{canParticipate?'Go to my place':'Review room access'}</button></div>
-  </div>
-  <div className="room-guide-questions">
-   <details><summary>Do I need to join an activity first?<CaretDown size={18}/></summary><p>No. In Study together, use Start studying on your own place whenever you are ready. Study activities is optional: use it to agree a time, bring a private task and add a result afterwards. The host starts the shared schedule; each person still starts their own timer.</p></details>
-   <details><summary>Why do room and activity timers show different times?<CaretDown size={18}/></summary><p>Your place shows your own elapsed study time. Study activities shows how much time remains in the shared study or break interval. Pausing yourself does not pause the group schedule. Both views use the same personal room timer; recorded activity time is not added twice.</p></details>
-   <details><summary>Where can I add my result and private reflection?<CaretDown size={18}/></summary><p>Open Study activities, select the activity you joined and choose Finish &amp; add result. Your selected result is shared with members; your optional reflection is private. Saving stops your participation in that activity. Opening or cancelling the form does not submit it.</p></details>
-   <details><summary>What do the learning states mean?<CaretDown size={18}/></summary><p>Studying means a connected room timer is running. Ready, break, check-in needed and offline describe timer or connection state; none proves attention. Reading away from the keyboard is still learning.</p></details>
-   <details><summary>What remains free?<CaretDown size={18}/></summary><p>One active owned room with four places, personal room timers, quick messages and stickers, gentle interactions, single activities, basic progress and essential member management. Advanced tools add to these features.</p></details>
-   <details><summary>How do we communicate and stay safe?<CaretDown size={18}/></summary><p>Use fixed updates and study stickers, or a silent tap or cheer when the member allows it. Open All messages &amp; safety to review, report or hide messages. Free text has separate access and safety-review requirements.</p></details>
-   <details><summary>Can the owner remove someone, and can I leave?<CaretDown size={18}/></summary><p>Members can leave through the Members and room-action controls. Owners can remove members, mute messages or prevent rejoining. These essential controls do not require an advanced preview.</p></details>
-  </div></div></details>
-  <nav aria-label="Tools for your next study session">{[['/','Study Timer'],['/study-planner','Personal study plan'],['/study-tracker','Personal study analytics']].map(([href,label])=><a key={href} href={href} onClick={navigate}>{label}<ArrowRight size={15}/></a>)}</nav>
- </section>;
-}
+export {RoomStudyGuide} from './RoomStudyGuide.jsx';
