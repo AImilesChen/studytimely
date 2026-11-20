@@ -42,7 +42,12 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  const out=new Headers(response.headers);for(const [key,value] of Object.entries(headers))out.set(key,value);
  if(path==='/analytics-frame.html'||path==='/analytics-frame.js'||missing)out.set('X-Robots-Tag','noindex, nofollow');
  if(path.startsWith('/assets/')||musicAsset||sceneVideos.has(path))out.set('Cache-Control','public, max-age=31536000, immutable');else out.set('Cache-Control','no-cache');
- if(path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity')))out.set('Cache-Control','no-store');
+ if(path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity'))){out.set('Cache-Control','no-store');out.delete('Content-Length');out.delete('ETag');}
+ if(path==='/study-groups'&&(url.searchParams.has('room')||url.searchParams.has('invite')||url.searchParams.has('activity'))&&request.method!=='HEAD'&&out.get('Content-Type')?.includes('text/html')) {
+  const html=await response.text();
+  response=new Response(html.replace(/(<meta\b[^>]*\bname=["']robots["'][^>]*\bcontent=["'])[^"']*(["'])/i,'$1noindex,nofollow$2'),{status:response.status});
+  out.delete('Content-Length');out.delete('ETag');
+ }
  const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com":'';
  out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${config.communityEnabled&&path==='/study-groups'?' '+(url.protocol==='https:'?'wss://':'ws://')+url.host:''}${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});

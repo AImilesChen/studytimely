@@ -22,7 +22,8 @@ export async function groupPreview(request,env){
  }
  const advanced=env.FIXTURE_GROUP_ADVANCED==='true'&&role!=='free',owner=await prepare(role==='free'?'free-owner':'owner');
  async function call(path,method,data){const response=await api(new Request(url.origin+'/api/community'+path,{method,headers:{origin:url.origin,'Content-Type':'application/json',cookie:owner.session.cookie.split(';')[0],'X-CSRF-Token':owner.session.csrf},body:JSON.stringify(data)}),env,true);if(!response.ok)throw Error('Synthetic preview preparation failed');return response.json();}
- if(advanced)await call('/group-preview','POST',{enabled:true});else if(role==='free')await call('/group-preview','POST',{enabled:false});
+ const preview=await env.DB.prepare('SELECT enabled FROM community_group_previews WHERE account_id=(SELECT account_id FROM community_profiles WHERE id=?)').bind(owner.profileId).first();
+ if(advanced&&!preview?.enabled)await call('/group-preview','POST',{enabled:true});else if(role==='free'&&preview?.enabled)await call('/group-preview','POST',{enabled:false});
  let room=await env.DB.prepare('SELECT id,invite_token FROM community_rooms WHERE owner_id=? AND closed_at=0 ORDER BY created_at LIMIT 1').bind(owner.profileId).first();
  if(!room){const id=crypto.randomUUID();await call('/rooms','POST',{id,name:'Preview study group',visibility:'private',capacity:advanced?8:4,goalMinutes:120});room=await env.DB.prepare('SELECT id,invite_token FROM community_rooms WHERE id=?').bind(id).first();}
  let activity=await env.DB.prepare("SELECT id FROM community_activities WHERE room_id=? ORDER BY CASE WHEN status='ended' THEN 0 WHEN status='running' THEN 1 WHEN status='scheduled' THEN 2 ELSE 3 END,created_at DESC LIMIT 1").bind(room.id).first();

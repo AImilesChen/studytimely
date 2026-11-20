@@ -24,13 +24,13 @@ export function readCommunityEntry(storage,now=Date.now()){
  try{
   const data=JSON.parse(storage.getItem(COMMUNITY_ENTRY_KEY)||'null');
   if(!data||!['create','join'].includes(data.action)||!Number.isFinite(data.expires)||data.expires<=now||data.expires>now+lifetime){storage.removeItem(COMMUNITY_ENTRY_KEY);return null;}
-  return {action:data.action,expires:data.expires,...(typeof data.topic==='string'?{topic:data.topic.replace(/[\r\n\t]/g,' ').trim().slice(0,60)}:{}),...(typeof data.code==='string'&&/^[A-Za-z0-9_-]{12,80}$/.test(data.code)?{code:data.code}:{}),...(/^[a-f0-9-]{36}$/.test(data.roomId||'')?{roomId:data.roomId}:{})};
+  return {action:data.action,expires:data.expires,...(data.action==='create'&&Number.isInteger(data.goalMinutes)&&data.goalMinutes>=1&&data.goalMinutes<=11520?{goalMinutes:data.goalMinutes}:{}),...(typeof data.topic==='string'?{topic:data.topic.replace(/[\r\n\t]/g,' ').trim().slice(0,60)}:{}),...(typeof data.code==='string'&&/^[A-Za-z0-9_-]{12,80}$/.test(data.code)?{code:data.code}:{}),...(/^[a-f0-9-]{36}$/.test(data.roomId||'')?{roomId:data.roomId}:{})};
  }catch{return null;}
 }
-export function saveCommunityEntry(storage,{action,topic,code,roomId},now=Date.now()){
+export function saveCommunityEntry(storage,{action,topic,code,roomId,goalMinutes},now=Date.now()){
  try{
   if(!['create','join'].includes(action))return false;
-  storage.setItem(COMMUNITY_ENTRY_KEY,JSON.stringify({action,expires:now+lifetime,...(topic?{topic:String(topic).slice(0,60)}:{}),...(code?{code}:{}),...(roomId?{roomId}:{} )}));return true;
+  storage.setItem(COMMUNITY_ENTRY_KEY,JSON.stringify({action,expires:now+lifetime,...(action==='create'&&Number.isInteger(goalMinutes)&&goalMinutes>=1&&goalMinutes<=11520?{goalMinutes}:{}),...(topic?{topic:String(topic).slice(0,60)}:{}),...(code?{code}:{}),...(roomId?{roomId}:{} )}));return true;
  }catch{return false;}
 }
 export function clearCommunityEntry(storage){try{storage.removeItem(COMMUNITY_ENTRY_KEY);}catch{}}

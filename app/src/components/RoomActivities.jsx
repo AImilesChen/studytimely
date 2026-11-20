@@ -9,6 +9,7 @@ import {ActivityWalkthrough} from './ActivityWalkthrough.jsx';
 import {RoomActivityNotice} from './RoomActivityNotice.jsx';
 import {initialRoomActivity, roomActivityNotice} from '../lib/room-activity-navigation.mjs';
 import {Dialog} from './Dialog.jsx';
+import {recentRoomActivities} from '../lib/room-progress.mjs';
 import {accountRequest} from '../lib/sync.mjs';
 import {downloadJSON} from '../lib/storage.mjs';
 import {zonedFormatter} from '../lib/time-zones.mjs';
@@ -25,7 +26,7 @@ export {RoomHome} from './RoomHome.jsx';
 
 export function RoomActivities({
   room, auth, profile, canOrganize, members, revision, now, chatReviewAvailable, timer, live,
-  studying, onStart, onPause, refresh, confirm, view = 'full', onOpen, onStudyTogether, onOverview
+  studying, onStart, onPause, refresh, confirm, view = 'full', onOpen, onStudyTogether, onOverview, navigationRequest
 }) {
   const [list, setList] = useState(null);
   const [id, setId] = useState('');
@@ -38,6 +39,7 @@ export function RoomActivities({
   const [formError, setFormError] = useState('');
   const [checkoutRequest, setCheckoutRequest] = useState({activityId: '', value: 0});
 
+  const handledNavigation = useRef(0);
   const detailPanel = useRef(null);
   const taskEditor = useRef(null);
   const scrollPending = useRef(false);
@@ -197,8 +199,15 @@ export function RoomActivities({
   }, [selected, view]);
 
   useEffect(() => {
-    onOverview?.({roomId: room.id, notice: shortcut, loading: list === null && !error, error: Boolean(error)});
+    onOverview?.({roomId: room.id, notice: shortcut, recent: list?recentRoomActivities(items,now):[], loading: list === null && !error, error: Boolean(error)});
   }, [room.id, list, selected, error, readOnly, shortcut?.id, shortcut?.state, shortcut?.title, shortcut?.description, onOverview]);
+
+  useEffect(() => {
+    if (!navigationRequest || navigationRequest.roomId !== room.id || navigationRequest.request === handledNavigation.current || !list) return;
+    if (!list.some(item => item.id === navigationRequest.activityId)) return;
+    handledNavigation.current = navigationRequest.request;
+    openNotice({id:navigationRequest.activityId,action:navigationRequest.action});
+  }, [navigationRequest, list, room.id]);
 
   function openNotice(item) {
     if (item?.id && item.id !== id) select(item.id);

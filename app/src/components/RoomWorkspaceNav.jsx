@@ -24,6 +24,6 @@ export function RoomWorkspaceNav({value,onChange}) {
     <div className="room-workspace-tabs room-workspace-explained" role="tablist" aria-label="Room workspace" data-active={value}>
       {tabs.map(([id,label,short,,Icon],index)=><button type="button" role="tab" key={id} id={'room-tab-'+id} data-tone={id} aria-label={label} aria-describedby={'room-tab-description-'+id} aria-selected={value===id} aria-controls={['study','tasks','progress'].includes(id)?'room-panel-basic':'room-panel-'+id} tabIndex={value===id?0:-1} onClick={()=>choose(id)} onKeyDown={event=>onKeyDown(event,index)}><Icon size={19} aria-hidden="true"/><span><strong>{label}</strong><small id={'room-tab-description-'+id}>{short}</small></span></button>)}
     </div>
-    {value!=='tasks'&&<p className="room-workspace-description">{tabs.find(tab=>tab[0]===value)?.[3]}</p>}
+    {!['tasks','progress'].includes(value)&&<p className="room-workspace-description">{tabs.find(tab=>tab[0]===value)?.[3]}</p>}
   </>;
 }
