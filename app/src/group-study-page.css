@@ -123,3 +123,15 @@
  .groups-action-dialog .switch-row{gap:14px}
  .groups-page .groups-account-area{padding-inline:15px}
 }
+/* Concrete public guidance stays on the indexable entrance, not inside a private room. */
+.groups-guide-refined .group-session-example{margin:28px 0;padding:24px 0;border-top:1px solid var(--rr-line);border-bottom:1px solid var(--rr-line)}
+.groups-guide-refined .group-session-example h3{font-size:21px;line-height:1.4;margin:0 0 10px;color:var(--rr-ink)}
+.groups-guide-refined .group-session-example>p{font-size:16px;line-height:1.75;max-width:78ch;margin:0 0 18px;color:var(--rr-muted)}
+.group-session-example dl{margin:0}
+.group-session-example dl>div{display:grid;grid-template-columns:minmax(160px,.6fr) minmax(0,1.8fr);gap:24px;padding:16px 0;border-top:1px solid var(--rr-line)}
+.group-session-example dt{font-size:15px;font-weight:600;line-height:1.6;color:var(--rr-ink)}
+.group-session-example dd{margin:0;display:grid;gap:6px;font-size:15px;line-height:1.7;color:var(--rr-muted)}
+.group-session-example dd strong{font-size:14px;font-weight:600;color:var(--rr-ink)}
+.groups-guide-refined .group-session-example .group-session-example-note{margin:16px 0 0;font-size:15px;line-height:1.75}
+.group-session-example-note strong{color:var(--rr-ink);font-weight:600}
+@media(max-width:650px){.group-session-example dl>div{grid-template-columns:1fr;gap:7px}.groups-guide-refined .group-session-example{padding:20px 0}.groups-guide-refined .group-session-example h3{font-size:20px}}

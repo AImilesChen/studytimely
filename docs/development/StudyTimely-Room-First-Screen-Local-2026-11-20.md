@@ -1,0 +1,25 @@
+# Compact room header and useful supporting content — local, 20 November 2026
+
+The user approved moving the free room's actual workspace higher, reducing empty space and replacing repetitive bottom-of-room introductions with useful actions/help. This builds on the separate Study together, Study activities and Group progress views. It is local only; production remains V2.38.0.
+
+## Implemented
+
+- New RoomHeader combines room name, privacy, theme, current free/advanced allowance, the original Members/settings/leave controls and attendance into one responsive header. The permission-aware RoomToolbar and all its callbacks are reused. The standalone eyebrow/title/actions stack is removed.
+- The room's local synthetic preview disclosure now shares a compact location row with Back to all rooms. It is not hidden, and still identifies synthetic accounts; a title preserves the no-real-Google/no-external-review explanation. The public preview landing keeps its existing notice. Production has no synthetic preview disclosure.
+- Scoped room-first-screen.css reduces main top padding to 116px (92px at <=480px, below the existing 104/80px site header), removes the additional outer room panel padding, compacts header/tab/activity-shortcut spacing and keeps the existing shared 1280px page edges. The four seats and interaction board are unchanged. At <=700px the existing room tabs become a horizontally scrollable single row with the same keyboard handlers and 44px controls, rather than stacking three tab rows above the seats.
+- Bottom-of-room Your next step has direct Group progress and plan/view activity actions. A single true recorded-time sentence appears only when the API has today_seconds >0; an empty room gets useful start-now guidance rather than invented statistics. Progress navigation changes tabs and focuses/scrolls to the real existing report heading.
+- The original invitation/member shortcut and Go to my place/access shortcut remain in the collapsed Room help & common questions disclosure. Seven answered questions cover optional activities, elapsed versus shared remaining time, result/private reflection location, presence, free access, messaging/safety and leaving/removal. The three large repeated introduction cards are replaced by compact rows; existing related-tool links remain. Footer/room bottom spacing is reduced locally, without changing other tools' layout.
+- Public /study-groups gets a concrete workflow comparison for studying immediately, scheduling a shared session and adding a result, followed by an explicitly illustrative 25-minute revision example. Two FAQ answers address whether booking is necessary and where tasks/results/reflections live. An outdated Activities & tasks reference now points to Advanced tools. Existing hero, six feature illustrations, entitlement facts, scenarios, public directory, privacy wording and real entry actions are preserved.
+- No long SEO article is inserted in a private room. Existing room/invite/activity URL noindex,no-store handling is unchanged; public canonical/metadata/routes/Sitemap policy is unchanged. No new pages, structured-data promises, tracking or account declarations were added.
+
+## Verification
+
+- Build passed: 56 routes plus 404, local noindex mode; PWA 7d1e0ef80131ecb7, 76 resources. Existing dynamic-import/chunk-size advisories remain.
+- Final 19 focused tests passed: free/advanced/guest header semantics, actual-time/empty footer/help state, preserved free four places and shortcuts, clock/result regression, public rendered content, private noindex/no-store and shared navigation. Earlier 21 targeted room/navigation tests in this pass also passed. These overlapping runs are not counted as 40 distinct tests.
+- 62 local HTTP/asset/robots/Sitemap/license checks passed. Public guide assertions read the built initial HTML, not just JSX source.
+- Earlier full workspace verification (677 tests and six local compiled activity integration scenario groups) is recorded in the preceding workspace handoff; it is not represented as a new full-suite run for this header/content pass. No backend, schema, timer/accounting, API, entitlement, dependencies, protected adapters or production data changed.
+- Fresh browser geometry, first-screen visibility at 1280x800, mobile overflow and pointer/keyboard interaction remain **unverified** because the in-app browser control runtime is unavailable. The first-screen target is a design target, not a measured browser result. User-supplied screenshots are the before-state reference; no generated image is presented as implementation proof.
+
+Preview remains http://127.0.0.1:4308/__test/group-preview (free-host synthetic entry). Refresh the existing room to load the new frontend. No audio or production account activity was initiated. Never deploy any fixture Worker or synthetic sign-in route.
+
+Uncommitted/unpushed/undeployed, with package/production V2.38.0 unchanged. The earlier local workspace edits and pre-existing unrelated FocusGuide.jsx status are preserved. This scope does not include publication, GSC/Bing/GA4 configuration, or claims of SEO ranking/conversion improvement.

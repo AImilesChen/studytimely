@@ -8,8 +8,8 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const root=path.resolve(import.meta.dirname,'..'),dir=await fs.mkdtemp(path.join(root,'.wrangler/room-ui-'));
 const file=path.join(dir,'components.mjs');
-await build({stdin:{contents:"export {ActivityCheckout} from './src/components/ActivityCheckout.jsx';export {ActivityClock} from './src/components/ActivityClock.jsx';export {StudyCompanions} from './src/components/StudyCompanions.jsx';export {RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress} from './src/components/RoomStudyAdditions.jsx';",resolveDir:root,loader:'jsx'},outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',loader:{'.css':'empty'},logLevel:'silent'});
-const {ActivityCheckout,ActivityClock,StudyCompanions,RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress}=await import(pathToFileURL(file).href);
+await build({stdin:{contents:"export {RoomHeader} from './src/components/RoomHeader.jsx';export {ActivityCheckout} from './src/components/ActivityCheckout.jsx';export {ActivityClock} from './src/components/ActivityClock.jsx';export {StudyCompanions} from './src/components/StudyCompanions.jsx';export {RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress} from './src/components/RoomStudyAdditions.jsx';",resolveDir:root,loader:'jsx'},outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',loader:{'.css':'empty'},logLevel:'silent'});
+const {RoomHeader,ActivityCheckout,ActivityClock,StudyCompanions,RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress}=await import(pathToFileURL(file).href);
 const profile={id:'me'},room={id:'room',name:'Reading',capacity:4,invitationsOpen:true,closed:false,ownerId:'me'},access={roomActive:true,canParticipate:true,advancedActive:false,memberLimit:4,source:'free'};
 const selected={room,access,member:true,owner:true,joinLimit:4,members:[{id:'me',nickname:'Reader',last_seen:100000,readOnly:false,session_seconds:0,today_seconds:0}],messages:[],moderationAvailable:true,mutedUntil:0,entitlements:{freeText:false}};
 const render=(Component,props)=>renderToStaticMarkup(createElement(Component,props));
@@ -18,6 +18,26 @@ test('free room renders four places, real timer controls and usable fixed messag
  assert.equal((html.match(/companion-empty-place/g)||[]).length,3);assert.match(html,/Start studying/);assert.match(html,/1\/4 members/);
  assert.match(html,/<button[^>]*>[^<]*<svg[\s\S]*?Starting study/);assert.doesNotMatch(html,/Advanced tools are read only/);
  const quick=html.match(/<button class="button"[^>]*>[\s\S]*?<span>Starting study<\/span><\/button>/);assert.ok(quick);assert.doesNotMatch(quick[0].split('>')[0],/disabled/);
+});
+
+test('compact room identity retains the real free allowance and owner/member actions without changing access',()=>{
+ const header=render(RoomHeader,{selected:{...selected,room:{...room,visibility:'private'}}});
+ assert.match(header,/<h1>Reading<\/h1>/);assert.equal((header.match(/<h1/g)||[]).length,1);
+ assert.match(header,/Free room · 4 places/);assert.match(header,/Private room/);assert.match(header,/Room settings/);assert.match(header,/Room actions/);
+ assert.doesNotMatch(header,/Advanced room|Advanced preview/);
+ const guest=render(RoomHeader,{selected:{...selected,owner:false}});
+ assert.match(guest,/Leave room/);assert.doesNotMatch(guest,/Room settings/);
+ const advanced=render(RoomHeader,{selected:{...selected,access:{...access,advancedActive:true,source:'preview',memberLimit:24}}});
+ assert.match(advanced,/Advanced preview · 24 places/);
+});
+
+test('room footer uses real recorded time and closed help while retaining original invitation and timer shortcuts',()=>{
+ const empty=render(RoomStudyGuide,{canInvite:true,canPlan:true,canParticipate:true,totals:{today_seconds:0}});
+ assert.match(empty,/Arranging an activity is optional/);assert.doesNotMatch(empty,/0 sec recorded|0 min recorded|room-guide-steps/);
+ assert.match(empty,/<details class="room-study-help"><summary>/);assert.match(empty,/View group progress/);assert.match(empty,/Copy invitation/);assert.match(empty,/Go to my place/);assert.match(empty,/Plan next activity/);
+ assert.match(empty,/same personal room timer/);assert.match(empty,/Where can I add my result/);
+ const recorded=render(RoomStudyGuide,{totals:{today_seconds:43}});
+ assert.match(recorded,/43 sec recorded together today · UTC/);assert.match(recorded,/View activities/);
 });
 test('inactive free room retains four-place presentation but does not invite or start a timer',()=>{
  const html=render(StudyCompanions,{selected:{...selected,access:{...access,canParticipate:false,roomActive:false},members:[{...selected.members[0],readOnly:true}]},profile,me:{},now:100000,connection:'Live'});
@@ -46,12 +66,12 @@ test('guide gives active owners useful shortcuts while guests and paused rooms g
  assert.match(owner,/Copy invitation/);assert.match(owner,/Go to my place/);assert.match(owner,/Plan next activity/);assert.doesNotMatch(owner,/Full study group guide/);
  const guest=render(RoomStudyGuide,{});assert.match(guest,/View members/);assert.match(guest,/Review room access/);assert.match(guest,/View activities/);assert.doesNotMatch(guest,/Copy invitation|Plan next activity/);
 });
-test('running activity shows live interval and shared countdown above task editing without credit claims',()=>{
+test('activity exposes one shared countdown and ordinary recorded time while preserving personal timer controls',()=>{
  const activity={id:'a',roomId:'r',status:'running',startedAt:100000,focusMinutes:25,breakMinutes:5},timer={activity_id:'a',room_id:'r',status:'running',last_at:100000,check_at:1600000,credited_seconds:0};
  const html=render(ActivityClock,{activity,timer,now:146000,joined:true,own:{seconds:0},studying:true});
- assert.match(html,/00:00:46/);assert.match(html,/00:24:14/);assert.match(html,/Pause my activity timer/);assert.match(html,/0 sec verified/);assert.match(html,/role="timer"/);
+ assert.doesNotMatch(html,/00:00:46|This study interval/);assert.match(html,/00:24:14/);assert.match(html,/Pause study/);assert.match(html,/0 sec recorded/);assert.equal((html.match(/role="timer"/g)||[]).length,1);
  const paused=render(ActivityClock,{activity,timer:{...timer,status:'paused',credited_seconds:46},now:160000,joined:true,own:{seconds:46}});
- assert.match(paused,/Your timer is paused/);assert.match(paused,/Resume my activity timer/);
+ assert.match(paused,/Your timer is paused/);assert.match(paused,/Resume study/);assert.doesNotMatch(paused,/00:00:46/);
  const closed=render(ActivityClock,{activity,timer,now:146000,joined:true,own:{seconds:0},readOnly:true});assert.doesNotMatch(closed,/<button/);
 });
 test('finish action is a named button with disclosure state and clear privacy and irreversible participation consequences',()=>{

@@ -1,0 +1,81 @@
+/* Room views share the existing theme; only the current task and main action stand out. */
+.groups-page [hidden]{display:none!important}
+.groups-page .room-base-activity,.groups-page .room-base-progress{margin-top:0;padding-top:0;border-top:0}
+.groups-page .room-activity-notice{display:flex;align-items:center;gap:14px;padding:14px 18px;margin:0 0 20px;border:1px solid var(--rr-line);border-radius:14px;background:var(--rr-panel);color:var(--rr-ink)}
+.groups-page .room-activity-notice>svg{color:var(--rr-muted);flex-shrink:0}
+.groups-page .room-activity-notice>div{display:grid;gap:4px;flex:1;min-width:0;overflow-wrap:anywhere}
+.groups-page .room-activity-notice strong{font-size:14px;font-weight:600}
+.groups-page .room-activity-notice span{font-size:13px;line-height:1.5;color:var(--rr-muted)}
+.groups-page .room-activity-notice .button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:8px 14px;font-size:14px;background:transparent;border:1px solid var(--rr-line);color:var(--rr-ink);white-space:nowrap}
+.groups-page .ga-workspace-focused{--activity-primary:#ffd0a1;--activity-primary-ink:#49321f;--activity-task:#f6f1e8;--activity-task-ink:#3c342b;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--rr-ink)}
+.groups-page .ga-workspace-focused>.ga-heading{align-items:center;gap:18px;margin-bottom:20px}
+.groups-page .ga-workspace-focused>.ga-heading h3{font-size:23px;line-height:1.3;margin:0}
+.groups-page .ga-workspace-focused .ga-view-intro{font-size:14px;margin:8px 0 0;line-height:1.6;color:var(--rr-muted);max-width:65ch}
+.groups-page .ga-workspace-focused .ga-detail{padding:24px;margin-top:16px;border-radius:20px;background:var(--rr-panel);border-color:var(--rr-line)}
+.groups-page .ga-workspace-focused .ga-detail h3{font-size:23px;margin:10px 0;line-height:1.35;overflow-wrap:anywhere}
+.groups-page .ga-workspace-focused .ga-detail>.ga-heading{padding-bottom:16px}
+.groups-page .ga-workspace-focused .ga-detail>.ga-heading p{font-size:14px}
+.groups-page .ga-workspace-focused .ga-duration-meta{margin-top:8px;gap:8px 18px;font-size:14px}
+.groups-page .ga-workspace-focused .button{min-height:44px;font-size:14px;font-weight:600;border-radius:9px}
+.groups-page .ga-workspace-focused :is(.ga-action-plan,.ga-action-save,.ga-action-end,.ga-result-toggle){background:transparent;color:var(--rr-ink);border:1px solid var(--rr-line);box-shadow:none}
+.groups-page .ga-workspace-focused :is(.ga-action-start,.ga-action-join){background:var(--activity-primary);color:var(--activity-primary-ink);border-color:var(--activity-primary);box-shadow:none}
+.groups-page .ga-workspace-focused :is(.ga-action-start,.ga-action-join):hover:not(:disabled){background:#ffbd7d;border-color:#ffbd7d}
+.groups-page .ga-workspace-focused .ga-action-refresh{background:transparent;border-color:var(--rr-line);color:var(--rr-muted);width:44px;height:44px}
+.groups-page .ga-workspace-focused .ga-status{display:inline-flex;align-items:center;gap:7px;padding:0;background:transparent;border:0;color:var(--rr-muted);font-size:13px;font-weight:500}
+.groups-page .ga-workspace-focused .ga-status::before{content:'';width:6px;height:6px;background:currentColor;border-radius:50%;flex-shrink:0}
+.groups-page .ga-workspace-focused .ga-status[data-phase=focus]{color:#22684f}
+.groups-page .ga-workspace-focused .ga-status[data-phase=break]{color:#81571e}
+html:not([data-theme=light]) .groups-page .ga-workspace-focused .ga-status[data-phase=focus]{color:var(--rr-mint)}
+html:not([data-theme=light]) .groups-page .ga-workspace-focused .ga-status[data-phase=break]{color:var(--rr-amber)}
+.groups-page .ga-workspace-focused .ga-manage{background:transparent;color:var(--rr-ink);border-color:var(--rr-line);min-width:112px}
+.groups-page .ga-workspace-focused .ga-manage>.community-row{border-color:var(--rr-line)}
+html:not([data-theme=light]) .groups-page .ga-workspace-focused .ga-action-danger{color:#ffb3b8}
+.groups-page .ga-workspace-focused .ga-task-summary{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 18px;align-items:center;padding:18px 20px;margin:20px 0;background:var(--activity-task);color:var(--activity-task-ink);border-radius:12px;overflow-wrap:anywhere}
+.groups-page .ga-workspace-focused .ga-task-summary>span{display:flex;align-items:center;gap:8px;font-size:13px;grid-column:1}
+.groups-page .ga-workspace-focused .ga-task-summary>strong{font-size:20px;line-height:1.5;font-weight:600;grid-column:1}
+.groups-page .ga-workspace-focused .ga-task-summary>.text-button{grid-column:2;grid-row:1 / span 2;min-height:44px;font-size:14px;color:inherit;text-decoration:underline;text-underline-offset:4px;white-space:nowrap}
+.groups-page .ga-workspace-focused .ga-live-clock{grid-template-columns:minmax(180px,.9fr) minmax(0,1.1fr);gap:24px;padding:18px 0;margin:0 0 16px;border:0;border-bottom:1px solid var(--rr-line);border-radius:0;background:transparent}
+.groups-page .ga-workspace-focused .ga-live-clock>div{padding:0;gap:10px}
+.groups-page .ga-workspace-focused .ga-live-clock-shared{background:transparent;color:var(--rr-ink)}
+.groups-page .ga-workspace-focused .ga-live-clock span{font-size:14px;font-weight:500;color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-live-clock strong{font-size:clamp(40px,4.5vw,56px);font-weight:600;color:var(--rr-ink)}
+.groups-page .ga-workspace-focused .ga-live-clock small{font-size:13px;color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-personal-state{font-weight:600;color:var(--rr-ink)}
+.groups-page .ga-workspace-focused .ga-recorded-study{font-size:14px;color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-live-clock-actions{margin-top:4px}
+.groups-page .ga-workspace-focused :is(.ga-task-disclosure,.ga-summary,.ga-help){border:0;border-top:1px solid var(--rr-line);border-radius:0;margin:16px 0 0;background:transparent;overflow:visible}
+.groups-page .ga-workspace-focused :is(.ga-task-disclosure,.ga-summary,.ga-help)>summary{padding:12px 0!important;min-height:48px;font-size:14px;font-weight:500;background:transparent;color:var(--rr-ink);box-shadow:none}
+.groups-page .ga-workspace-focused :is(.ga-task-disclosure,.ga-summary,.ga-help)[open]>summary{box-shadow:none;border-bottom:0}
+.groups-page .ga-workspace-focused :is(.ga-task-form,.ga-checkout){padding:16px 0;background:transparent;border-color:var(--rr-line)}
+.groups-page .ga-workspace-focused .ga-task-disclosure .field{font-size:14px}
+.groups-page .ga-workspace-focused .ga-result-card{padding:18px 0;margin:16px 0;border:0;border-top:1px solid var(--rr-line);border-radius:0;background:transparent}
+.groups-page .ga-workspace-focused .ga-result-card>header{gap:12px}
+.groups-page .ga-workspace-focused .ga-result-intro{gap:10px;flex-basis:200px}
+.groups-page .ga-workspace-focused .ga-result-icon{width:24px;height:28px;border-radius:0;background:transparent;color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-result-card h4{font-size:16px;line-height:1.5;margin:0}
+.groups-page .ga-workspace-focused .ga-result-card p{font-size:14px;line-height:1.65}
+.groups-page .ga-workspace-focused .ga-result-form{display:grid;gap:14px;margin-top:16px;padding:16px 0 0}
+.groups-page .ga-workspace-focused :is(.ga-result-privacy,.ga-result-consequence){margin:0!important}
+.groups-page .ga-workspace-focused .ga-disclosure-action{border:0;padding:4px 0 4px 8px;min-height:32px;background:transparent;color:var(--rr-muted);font-size:13px}
+.groups-page .ga-workspace-focused .ga-progress-overview{font-size:13px;color:var(--rr-muted);padding:12px 0}
+.groups-page .ga-workspace-focused .ga-feedback{background:transparent;color:var(--rr-ink);border:0;border-left:3px solid var(--rr-line);border-radius:0;padding:8px 12px;font-size:14px}
+.groups-page .ga-workspace-focused .ga-updating{font-size:13px;color:var(--rr-muted)}
+.groups-page .ga-workspace-focused .ga-help p{font-size:14px;line-height:1.75}
+.groups-page .ga-workspace-focused :is(button,summary,a):focus-visible,.groups-page .room-activity-notice button:focus-visible{outline:2px solid #b47a3c;outline-offset:4px}
+@media(max-width:700px){
+ .groups-page .room-activity-notice{flex-wrap:wrap;padding:14px;gap:10px}
+ .groups-page .room-activity-notice>div{flex-basis:calc(100% - 36px)}
+ .groups-page .room-activity-notice .button{margin-left:31px;white-space:normal}
+ .groups-page .ga-workspace-focused>.ga-heading{align-items:flex-start}
+ .groups-page .ga-workspace-focused .ga-detail{padding:18px 16px;border-radius:16px}
+ .groups-page .ga-workspace-focused .ga-detail h3{font-size:21px}
+ .groups-page .ga-workspace-focused .ga-task-summary{padding:16px;grid-template-columns:1fr;gap:10px}
+ .groups-page .ga-workspace-focused .ga-task-summary>strong{font-size:18px}
+ .groups-page .ga-workspace-focused .ga-task-summary>.text-button{grid-column:1;grid-row:auto;justify-self:start}
+ .groups-page .ga-workspace-focused .ga-live-clock{grid-template-columns:1fr;gap:18px}
+ .groups-page .ga-workspace-focused .ga-live-clock strong{font-size:48px}
+ .groups-page .ga-workspace-focused .ga-live-clock-actions{width:100%}
+ .groups-page .ga-workspace-focused .ga-live-clock-actions>.button{width:100%}
+ .groups-page .ga-workspace-focused .ga-result-intro{flex-basis:100%}
+ .groups-page .ga-workspace-focused .ga-result-toggle{width:100%}
+}
