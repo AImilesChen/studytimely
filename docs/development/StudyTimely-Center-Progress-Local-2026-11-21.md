@@ -1,5 +1,7 @@
 # Study Center Progress — local implementation, 21 November 2026
 
+Publication update: this local work and its visual/header follow-ups are now included in [V2.48.0](StudyTimely-V2.48.0-Release.md). The historical local statuses below describe the stages before that verified deployment.
+
 ## Scope and status
 
 Implemented the user's approved review workspace for `/account?view=progress`, using practical-visual-design. This is a local change after the published V2.47.0 release, not another production deployment. Package version stays 2.47.0. The unrelated pre-existing FocusGuide.jsx working-copy status is preserved.
