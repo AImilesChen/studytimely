@@ -14,6 +14,7 @@ function render(section,day,now){slot=0;view=section;date=day;return mod.exports
 test('all four loaded account sections render for the real signed-in identity shape',()=>{
  for(const section of ['overview','progress','community','settings']){
   const html=render(section,'2026-11-21',new Date('2026-11-21T12:00:00').getTime());assert.ok(html.includes('My Study Center'),section);assert.equal((html.match(/<main /g)||[]).length,1,section);
+  assert.equal((html.match(/class="sc-tab-emoji"/g)||[]).length,4);assert.ok(!html.includes('sc-sync-status'));assert.equal(html.includes('Open timer without a task'),section==='overview');
  }
 });
 test('loaded storage cannot trigger reports against the initial zero clock or an unreconciled date',()=>{

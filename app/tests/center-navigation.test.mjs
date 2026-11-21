@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {build} from 'esbuild';
+import {createRequire} from 'node:module';
+import {fileURLToPath} from 'node:url';
+import {emptyState} from '../src/lib/model.mjs';
+const require=createRequire(import.meta.url);
+const compiled=await build({entryPoints:['src/components/StudyCenter.jsx'],absWorkingDir:fileURLToPath(new URL('../',import.meta.url)),bundle:true,platform:'node',format:'cjs',jsx:'automatic',external:['react','react/jsx-runtime'],loader:{'.css':'empty'},write:false,logLevel:'silent'});
+const all=tree=>tree==null||typeof tree!=='object'?[]:Array.isArray(tree)?tree.flatMap(all):[tree,...all(tree.props?.children)];
+test('cancelling departure from a dirty Progress review keeps the account tab and URL unchanged',()=>{
+ const cells=['progress','2026-11-21'];let cursor=0,allow=false;const writes=[],location={href:'http://local/account?view=progress'},history={replaceState(_a,_b,url){writes.push(url);location.href=new URL(url,location.href).href;}};
+ const hooks={useState(initial){const i=cursor++;if(!(i in cells))cells[i]=initial;return[cells[i],v=>cells[i]=typeof v==='function'?v(cells[i]):v];},useRef(initial){return cells[cursor++]??={current:initial};},useMemo(fn){return fn();},useEffect(){}};
+ const mod={exports:{}};new Function('require','module','exports','window','location','history',compiled.outputFiles[0].text)(id=>id==='react'?{...require('react'),...hooks}:require(id),mod,mod.exports,{confirm:()=>allow},location,history);
+ const store={ready:true,data:emptyState('test'),cloudSync:{authChecked:true}};
+ const render=()=>{cursor=0;return mod.exports.StudyCenter({store,now:Date.parse('2026-11-21T12:00:00Z'),loaded:true,settings:null});};
+ let tree=render();all(tree).find(n=>n.props?.onDirty).props.onDirty(true);
+ all(tree).find(n=>n.props?.id==='center-tab-settings').props.onClick();assert.equal(cells[0],'progress');assert.equal(writes.length,0);assert.equal(cells[2],false);
+ tree=render();all(tree).find(n=>n.props?.id==='center-tab-overview').props.onClick();assert.equal(cells[0],'progress');assert.equal(writes.length,0);
+ allow=true;tree=render();all(tree).find(n=>n.props?.id==='center-tab-settings').props.onClick();assert.equal(cells[0],'settings');assert.equal(cells[2],false);assert.equal(new URL(location.href).searchParams.get('view'),'settings');
+});

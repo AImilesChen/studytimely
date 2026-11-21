@@ -26,8 +26,13 @@ html[data-theme=light] .study-center{--sc-card:#fffdf8;--sc-tint:#f9eadd;--sc-ac
 .study-center .button.primary{background:var(--sc-accent);border-color:var(--sc-accent);color:var(--sc-on-accent);font-weight:600}
 .study-center .button:not(:disabled):hover{border-color:var(--sc-accent);box-shadow:0 0 0 1px var(--sc-accent)}
 .study-center :is(button,a,input,select,[tabindex]):focus-visible{outline:2px solid var(--sc-accent);outline-offset:4px}
-.study-center .sc-heading{margin-bottom:12px;gap:18px}
-.study-center .sc-heading h1{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.035em;font-size:36px;margin:0 0 8px}
+.study-center .sc-heading{margin-bottom:20px;gap:10px 24px;align-items:baseline;flex-wrap:wrap}
+.study-center .sc-heading h1{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.035em;font-size:30px;margin:0}
+.study-center .sc-heading-source{font-size:12px;line-height:1.7;margin:0;color:var(--muted)}
+.sc-tab-emoji{font-size:20px;line-height:1;flex-shrink:0}
+.sc-start-row{display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.sc-start-row p{font-size:12px;line-height:1.8;margin:0;color:var(--muted);flex:1 1 220px}
+.sc-start-row .button{font-size:13px}
 .sc-heading p{font-size:15px}
 .sc-local-status{margin:0 0 18px;align-items:center;gap:8px 20px}
 .sc-local-status .sc-sync-status{min-height:44px;text-align:left;padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sc-card);color:var(--fg);font-size:13px}

@@ -1,7 +1,7 @@
 export const chartColour=name=>{let hash=0;for(const c of name)hash=(hash*31+c.charCodeAt(0))>>>0;return ['#79e1bd','#78b7ff','#b8a0ff','#ffc775','#6cd5e5','#f69ac5'][hash%6];};
 
-export function trendGroups(series,previous=[]){
- const step=Math.max(1,Math.ceil(series.length/31)),groups=[];
+export function trendGroups(series,previous=[],maxGroups=31){
+ const step=Math.max(1,Math.ceil(series.length/maxGroups)),groups=[];
  for(let i=0;i<series.length;i+=step){const days=series.slice(i,i+step);groups.push({start:days[0].date,end:days.at(-1).date,value:days.reduce((n,d)=>n+d.seconds,0),previous:i<previous.length?previous.slice(i,i+step).reduce((n,d)=>n+d.seconds,0):null});}
  return groups;
 }
