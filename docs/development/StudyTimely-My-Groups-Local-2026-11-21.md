@@ -1,5 +1,7 @@
 # My groups — local implementation, 21 November 2026
 
+Publication update: this local handoff and its room-selector follow-up were published in V2.49.0 on 21 November 2026. See [verified release record](StudyTimely-V2.49.0-Release.md). The local-only status below records the earlier handoff, not the current production status.
+
 ## Scope and status
 
 Implemented the user-approved My groups plan at `/account?view=community`, applying practical-visual-design to the existing Study Center. This is local development after V2.48.0; production and the package version remain unchanged. No publishing, migration or production-user operation was performed. Preserve the unrelated FocusGuide.jsx working-copy status.
