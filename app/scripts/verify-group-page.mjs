@@ -6,7 +6,7 @@ const response=await fetch(base+'/study-groups'),html=await response.text();
 assert.equal(response.status,200);assert.equal((html.match(/<h1(?:\s|>)/g)||[]).length,1);assert.ok(html.includes('Online study groups'));
 assert.ok(html.includes(`name="robots" content="${release?'index,follow':'noindex,nofollow'}"`));
 assert.ok(html.includes('rel="canonical" href="https://studytimely.com/study-groups"'));
-for(const text of ['Create a free room','Join with a code','Browse public rooms','Make a plan before you meet','A shared place for individual progress','Study group questions','The room timer is separate'])assert.ok(html.includes(text),text);
+for(const text of ['Create a free room','Join with a code','Browse public rooms','Make a plan before you meet','Online study tools for your group','Study group questions','What counts towards your group’s progress?','Access, privacy and common questions'])assert.ok(html.includes(text),text);
 checks.push('public introduction, actions, agenda and FAQs are in the initial HTML');
 const known=new Set(ROUTES.map(r=>r.path));
 for(const [,href] of html.matchAll(/href="(\/[^"?#]*)(?:[?#][^"]*)?"/g))if(!/\.[a-z0-9]+$/i.test(href))assert.ok(known.has(href),href);

@@ -24,3 +24,56 @@ test('editing a preset task can change its subject without changing the title',a
 test('a preview end time bounds timer credit at the policy deadline',async()=>{const s=await fixture();try{s.advance(1000);const extra=await s.createRoom(s.owner,'private',8),end=s.now+20000;s.db.prepare('UPDATE community_group_policy SET ends_at=?').run(end);const t=(await s.call('/timer/start','POST',{roomId:extra.id},s.owner)).timer;s.advance(10000);await s.call('/timer/heartbeat','POST',{lease:t.lease},s.owner);s.advance(20000);const ended=await s.call('/timer/heartbeat','POST',{lease:t.lease},s.owner);assert.equal(ended.timer.credited_seconds,20);assert.equal(ended.timer.status,'paused');}finally{s.close();}});
 
 test('recurrence materialisation keeps the next local evening across a UTC date boundary',async()=>{const s=await fixture();try{s.setTime(Date.UTC(2026,10,14,1));const saved=await s.call(s.path+'/series','POST',{id:id(),subject:'general',kind:'focus',date:'2026-11-13',time:'18:00',zone:'America/Los_Angeles',fold:'earlier',weekdays:[5],focusMinutes:25,breakMinutes:5},s.owner);assert.equal(saved.status,200,JSON.stringify(saved));assert.equal(s.db.prepare('SELECT min(starts_at) at FROM community_activities').get().at,Date.UTC(2026,10,14,2));}finally{s.close();}});
+
+
+test('updating a group goal preserves its start date and accumulated study time', async () => {
+ const s=await fixture();
+ try {
+  const goal=id();
+  assert.equal((await s.call(s.path+'/challenge','POST',{id:goal,kind:'minutes',goal:60,endDay:'2026-11-20',version:0},s.owner)).status,200);
+  s.db.prepare('INSERT INTO community_room_daily(room_id,profile_id,day,seconds) VALUES(?,?,?,?)').run(s.room.id,s.guest.profileId,'2026-11-13',150);
+  s.advance(86400000);
+  const update=await s.call(s.path+'/challenge','POST',{id:goal,kind:'minutes',goal:120,endDay:'2026-11-27',version:1},s.owner);
+  assert.equal(update.status,200,JSON.stringify(update));assert.equal(update.version,2);
+  const current=(await s.call(s.path,'GET',undefined,s.guest)).challenge;
+  assert.equal(current.id,goal);assert.equal(current.start_day,'2026-11-13');assert.equal(current.end_day,'2026-11-27');
+  assert.equal(current.goal,120);assert.equal(current.progress,2);assert.equal(current.version,2);
+  assert.equal(s.db.prepare('SELECT seconds FROM community_room_daily').get().seconds,150);
+  assert.equal((await s.call(s.path+'/challenge','POST',{id:goal,archive:true,version:2},s.owner)).status,200);
+  assert.equal((await s.call(s.path+'/challenge','POST',{id:id(),kind:'activities',goal:3,endDay:'2026-11-27',version:0},s.owner)).status,200);
+ } finally { s.close(); }
+});
+
+test('goal changes reject stale saves, metric changes, cross-room requests and ordinary members', async () => {
+ const s=await fixture();
+ try {
+  const goal=id(),draft={id:goal,kind:'minutes',goal:60,endDay:'2026-11-20',version:0};
+  assert.equal((await s.call(s.path+'/challenge','POST',draft,s.owner)).status,200);
+  const edit={...draft,goal:90,version:1};
+  assert.equal((await s.call(s.path+'/challenge','POST',edit,s.guest)).status,403);
+  assert.equal((await s.call(s.path+'/challenge','POST',{...edit,kind:'activities',goal:3},s.owner)).status,400);
+  const other=await s.createRoom(s.owner,'private',8);
+  assert.equal((await s.call('/rooms/'+other.id+'/advanced/challenge','POST',edit,s.owner)).status,409);
+  assert.equal((await s.call(s.path+'/challenge','POST',edit,s.owner)).status,200);
+  assert.equal((await s.call(s.path+'/challenge','POST',{...edit,goal:120},s.owner)).status,409);
+  assert.equal((await s.call(s.path+'/challenge','POST',draft,s.owner)).status,409);
+  assert.equal((await s.call(s.path+'/challenge','POST',{id:goal,archive:true,version:1},s.owner)).status,409);
+  assert.equal((await s.call(s.path,'GET',undefined,s.owner)).challenge.goal,90);
+  assert.equal((await s.call(s.path+'/challenge','POST',{id:goal,archive:true,version:2},s.owner)).status,200);
+  assert.equal((await s.call(s.path+'/challenge','POST',{...edit,version:3},s.owner)).status,409);
+ } finally { s.close(); }
+});
+
+test('goal editing keeps advanced access and validation enforced on the server', async () => {
+ const s=await fixture();
+ try {
+  const goal=id(),draft={id:goal,kind:'minutes',goal:60,endDay:'2026-11-20',version:0};
+  await s.call(s.path+'/challenge','POST',draft,s.owner);
+  for(const invalid of [{goal:0},{goal:120001},{endDay:'2026-11-12'},{endDay:'2027-12-01'}]) {
+   assert.equal((await s.call(s.path+'/challenge','POST',{...draft,version:1,...invalid},s.owner)).status,400);
+  }
+  await s.call('/group-preview','POST',{enabled:false},s.owner);
+  assert.equal((await s.call(s.path+'/challenge','POST',{...draft,goal:90,version:1},s.owner)).status,403);
+  assert.equal(s.db.prepare('SELECT goal FROM community_group_challenges WHERE id=?').get(goal).goal,60);
+ } finally { s.close(); }
+});

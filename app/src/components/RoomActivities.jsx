@@ -199,7 +199,11 @@ export function RoomActivities({
   }, [selected, view]);
 
   useEffect(() => {
-    onOverview?.({roomId: room.id, notice: shortcut, recent: list?recentRoomActivities(items,now):[], loading: list === null && !error, error: Boolean(error)});
+    onOverview?.({
+      roomId: room.id, notice: shortcut, recent: list ? recentRoomActivities(items, now) : [],
+      recurring: list?.filter(item => item.seriesId && item.status === 'scheduled') ?? null,
+      loading: list === null && !error, error: Boolean(error)
+    });
   }, [room.id, list, selected, error, readOnly, shortcut?.id, shortcut?.state, shortcut?.title, shortcut?.description, onOverview]);
 
   useEffect(() => {
@@ -210,7 +214,7 @@ export function RoomActivities({
   }, [navigationRequest, list, room.id]);
 
   function openNotice(item) {
-    if (item?.id && item.id !== id) select(item.id);
+    if (item?.id && (item.id !== id || item.action === 'view')) select(item.id);
     if (item?.action === 'result') setCheckoutRequest(previous => ({activityId: item.id, value: previous.value + 1}));
     onOpen?.();
   }

@@ -92,7 +92,21 @@ export async function groupAdvanced({request,env,at,r,profile,user,endpoint='',i
   else if(!old){if(input.status==='done')fail(409,'TASK_STATE','Join this task before marking your part done.');changed=await q(env,`INSERT INTO community_group_task_claims(task_id,profile_id,status,updated_at) SELECT ?,?,?,? WHERE ${taskGuard} ON CONFLICT DO NOTHING RETURNING version`,input.id,profile.id,input.status,at,user.sessionHash).first();}
   else changed=await q(env,`UPDATE community_group_task_claims SET status=?,updated_at=?,version=version+1 WHERE task_id=? AND profile_id=? AND version=? AND ${taskGuard} RETURNING version`,input.status,at,input.id,profile.id,version,user.sessionHash).first();
  }else if(endpoint==='challenge'){
-  manage();validId(input.id);if(input.archive===true)changed=await q(env,`UPDATE community_group_challenges SET archived=1,version=version+1 WHERE id=? AND room_id=? AND version=? AND ${guard(room,profile.id,fresh(),true)} RETURNING version`,input.id,room,version,user.sessionHash).first();else{let d;try{d=challengeInput(input,at);}catch(e){fail(400,'INVALID',e.message);}changed=await q(env,`INSERT INTO community_group_challenges(id,room_id,kind,goal,start_day,end_day,created_at) SELECT ?,?,?,?,?,?,? WHERE ${guard(room,profile.id,fresh(),true)} ON CONFLICT(id) DO NOTHING RETURNING version`,input.id,room,d.kind,d.goal,d.startDay,d.endDay,at,user.sessionHash).first();}
+  manage();validId(input.id);
+  if(input.archive===true){
+   changed=await q(env,`UPDATE community_group_challenges SET archived=1,version=version+1 WHERE id=? AND room_id=? AND version=? AND archived=0 AND ${guard(room,profile.id,fresh(),true)} RETURNING version`,input.id,room,version,user.sessionHash).first();
+  }else{
+   let d;try{d=challengeInput(input,at);}catch(e){fail(400,'INVALID',e.message);}
+   const prior=await q(env,'SELECT * FROM community_group_challenges WHERE id=?',input.id).first();
+   if(prior){
+    if(prior.room_id!==room||prior.archived||!Number.isInteger(version)||version<1)fail(409,'CONFLICT','This goal changed. Refresh before saving.');
+    if(d.kind!==prior.kind)fail(400,'INVALID','Keep the current counting method. End this goal before choosing another.');
+    changed=await q(env,`UPDATE community_group_challenges SET goal=?,end_day=?,version=version+1 WHERE id=? AND room_id=? AND version=? AND archived=0 AND ${guard(room,profile.id,fresh(),true)} RETURNING version`,d.goal,d.endDay,input.id,room,version,user.sessionHash).first();
+   }else{
+    if(Number.isFinite(version)&&version!==0)fail(409,'CONFLICT','This goal is no longer available. Refresh before saving.');
+    changed=await q(env,`INSERT INTO community_group_challenges(id,room_id,kind,goal,start_day,end_day,created_at) SELECT ?,?,?,?,?,?,? WHERE ${guard(room,profile.id,fresh(),true)} ON CONFLICT(id) DO NOTHING RETURNING version`,input.id,room,d.kind,d.goal,d.startDay,d.endDay,at,user.sessionHash).first();
+   }
+  }
  }else if(endpoint==='series-preview'){
   manage();try{return result(seriesDates(input,at));}catch(e){fail(400,'INVALID',e.message);}
  }else if(endpoint==='series'){

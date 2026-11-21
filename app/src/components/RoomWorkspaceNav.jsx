@@ -4,7 +4,7 @@ const tabs = [
   ['study','Study together','Timers & partners','Start your own timer and study alongside your partners. No activity booking is needed.',UsersThree],
   ['tasks','Study activities','Book, join & review','Arrange a group session, bring your own task and record your result afterwards.',CalendarBlank],
   ['progress','Group progress','Study time & goals','See confirmed room study time and progress towards your shared daily goal.',ChartBar],
-  ['advanced','Advanced tools','Extra group features','Explore shared tasks, repeating activities, weekly reports and room atmosphere. Access depends on the room.',SquaresFour],
+  ['advanced','Group tools','Tasks, routines & atmosphere','Open a shared task, recurring activity, challenge or room atmosphere. Each tool explains its access and next step.',SquaresFour],
   ['manage','Manage','Room access & settings','Review room access, theme, invitations and community preferences. Owner controls depend on your role.',GearSix]
 ];
 
@@ -24,6 +24,6 @@ export function RoomWorkspaceNav({value,onChange}) {
     <div className="room-workspace-tabs room-workspace-explained" role="tablist" aria-label="Room workspace" data-active={value}>
       {tabs.map(([id,label,short,,Icon],index)=><button type="button" role="tab" key={id} id={'room-tab-'+id} data-tone={id} aria-label={label} aria-describedby={'room-tab-description-'+id} aria-selected={value===id} aria-controls={['study','tasks','progress'].includes(id)?'room-panel-basic':'room-panel-'+id} tabIndex={value===id?0:-1} onClick={()=>choose(id)} onKeyDown={event=>onKeyDown(event,index)}><Icon size={19} aria-hidden="true"/><span><strong>{label}</strong><small id={'room-tab-description-'+id}>{short}</small></span></button>)}
     </div>
-    {!['tasks','progress'].includes(value)&&<p className="room-workspace-description">{tabs.find(tab=>tab[0]===value)?.[3]}</p>}
+    {!['tasks','progress','advanced'].includes(value)&&<p className="room-workspace-description">{tabs.find(tab=>tab[0]===value)?.[3]}</p>}
   </>;
 }

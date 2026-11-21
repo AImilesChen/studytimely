@@ -8,8 +8,8 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const root=path.resolve(import.meta.dirname,'..'),dir=await fs.mkdtemp(path.join(root,'.wrangler/room-ui-'));
 const file=path.join(dir,'components.mjs');
-await build({stdin:{contents:"export {RoomHeader} from './src/components/RoomHeader.jsx';export {RoomActivities} from './src/components/RoomActivities.jsx';export {ActivityCheckout} from './src/components/ActivityCheckout.jsx';export {ActivityClock} from './src/components/ActivityClock.jsx';export {StudyCompanions} from './src/components/StudyCompanions.jsx';export {RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress} from './src/components/RoomStudyAdditions.jsx';",resolveDir:root,loader:'jsx'},outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',loader:{'.css':'empty'},logLevel:'silent'});
-const {RoomHeader,ActivityCheckout,ActivityClock,StudyCompanions,RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress}=await import(pathToFileURL(file).href);
+await build({stdin:{contents:"export {RoomAtmosphere,GroupGoal,ChallengeForm} from './src/components/GroupTools.jsx';export {RoomHeader} from './src/components/RoomHeader.jsx';export {RoomActivities} from './src/components/RoomActivities.jsx';export {ActivityCheckout} from './src/components/ActivityCheckout.jsx';export {ActivityClock} from './src/components/ActivityClock.jsx';export {StudyCompanions} from './src/components/StudyCompanions.jsx';export {RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress} from './src/components/RoomStudyAdditions.jsx';",resolveDir:root,loader:'jsx'},outfile:file,bundle:true,platform:'node',format:'esm',packages:'external',jsx:'automatic',loader:{'.css':'empty'},logLevel:'silent'});
+const {RoomAtmosphere,GroupGoal,ChallengeForm,RoomHeader,ActivityCheckout,ActivityClock,StudyCompanions,RoomAdvancedArea,RoomAccessNotice,RoomStudyGuide,RoomProgress}=await import(pathToFileURL(file).href);
 const {RoomActivities}=await import(pathToFileURL(file).href);
 const profile={id:'me'},room={id:'room',name:'Reading',capacity:4,invitationsOpen:true,closed:false,ownerId:'me'},access={roomActive:true,canParticipate:true,advancedActive:false,memberLimit:4,source:'free'};
 const selected={room,access,member:true,owner:true,joinLimit:4,members:[{id:'me',nickname:'Reader',last_seen:100000,readOnly:false,session_seconds:0,today_seconds:0}],messages:[],moderationAvailable:true,mutedUntil:0,entitlements:{freeText:false}};
@@ -83,11 +83,41 @@ test('inactive free room retains four-place presentation but does not invite or 
 });
 test('free advanced area explains optional additions instead of rendering disabled environment and task controls',()=>{
  const html=render(RoomAdvancedArea,{selected,me:{entitlements:{source:'free',previewAvailable:true}},view:'tasks'});
- assert.match(html,/Try advanced groups/);assert.match(html,/no payment or subscription/);assert.doesNotMatch(html,/Play music|Use scene|Add shared task/);
+ assert.match(html,/Enable free preview/);assert.match(html,/No payment or subscription/);assert.doesNotMatch(html,/<button[^>]*>\s*(?:Play music|Use scene|Add shared task)/);
 });
 test('free guests in an eligible advanced room are not asked to activate their own group preview',()=>{
  const html=render(RoomAdvancedArea,{selected:{...selected,owner:false,access:{...access,advancedActive:true}},me:{entitlements:{source:'free',previewAvailable:true}},view:'tasks'});
- assert.doesNotMatch(html,/Try advanced groups|room-advanced-feature-grid/);assert.match(html,/Loading shared tools/);
+ assert.doesNotMatch(html,/Enable free preview|room-advanced-feature-grid/);assert.match(html,/Loading shared tools/);
+});
+
+test('group tools render exactly the selected workspace and matching lesson with room permissions',()=>{
+ const me={entitlements:{source:'free',previewAvailable:true}};
+ const html=render(RoomAdvancedArea,{selected:{...selected,owner:false},me,view:'tasks',onManage(){}});
+ for(const label of ['Shared tasks','Work on the same study task','Recurring activities','Set a regular time to study','Group goal','Track a goal together','Room atmosphere','Use a scene or music'])assert.ok(html.includes(label),label);
+ assert.match(html,/class="tools-layout".*class="tools-sidebar".*class="tools-workspace"/);
+ assert.equal((html.match(/aria-pressed="true"/g)||[]).length,1);
+ for(const id of ['tasks','series','challenge','study']){
+  const pane=render(RoomAdvancedArea,{selected,me,initialTool:id});
+  assert.match(pane,new RegExp('id="tools-workspace-title-'+id+'"'));
+  assert.equal((pane.match(/id="tools-workspace-title-/g)||[]).length,1);
+  assert.equal((pane.match(/class="tools-lesson"/g)||[]).length,1);
+  assert.match(pane,new RegExp('aria-label="How to use '+(id==='tasks'?'shared tasks':id==='series'?'recurring activities':id==='challenge'?'group goal':'room atmosphere')+'"'));
+ }
+ assert.doesNotMatch(html,/tools-open-tool|href="#group-tool-/);
+ assert.doesNotMatch(html,/tools-guide-example|Weekly reports|Back to studying/);
+ assert.match(html,/The room owner controls advanced access/);assert.doesNotMatch(html,/Enable free preview|<details|<button[^>]*>\s*Add shared task/);
+ const closed=render(RoomAdvancedArea,{selected:{...selected,room:{...room,closed:true}},me,view:'tasks'});
+ assert.match(closed,/This room is closed/);assert.doesNotMatch(closed,/Enable free preview/);
+ const owner=render(RoomAdvancedArea,{selected,me,view:'tasks'});
+ assert.match(owner,/save shared changes for your group/);assert.equal((owner.match(/Enable free preview/g)||[]).length,1);
+ assert.doesNotMatch(owner,/<button[^>]*>\s*Add shared task/);
+ assert.equal((owner.match(/class="tools-lesson"/g)||[]).length,1);
+ assert.match(owner,/<\/section><\/div><section class="tools-lesson"/);
+ for(const text of ['Three ways to study together','What counts towards your group’s progress?','Access, privacy and common questions'])assert.ok(owner.includes(text),text);
+ assert.match(owner,/tasks-art.jpg/);assert.match(owner,/Illustrative example/);
+ const recurring=render(RoomAdvancedArea,{selected,me,initialTool:'series'});
+ assert.match(recurring,/<h3 id="tools-workspace-title-series"[^>]*>Recurring activities<\/h3>/);
+ assert.match(recurring,/Check the next three dates/);
 });
 test('inactive owner sees an explicit free-room switch and useful retained room guidance remains available',()=>{
  const html=render(RoomAccessNotice,{selected:{...selected,access:{...access,roomActive:false,canParticipate:false,freeRoomId:'other'}},me:{rooms:[{id:'other',name:'Maths'}]}});
@@ -141,3 +171,46 @@ test('activity workspace shows next-step instructions and privacy before opening
  assert.ok(html.includes('Who can see my task or result?'));
 });
 test.after(async()=>{assert.ok(path.resolve(dir).startsWith(path.join(root,'.wrangler','room-ui-')));await fs.rm(dir,{recursive:true,force:true});});
+
+
+test('personal atmosphere controls stay visible and enabled without an advanced grant', () => {
+ const data={active:false,environment:{scene:'mist-lake',music:'meditation-01',quiet_chat:1,version:0}};
+ const music={ready:true,volume:35,status:'paused',trackId:'meditation-01'};
+ const html=render(RoomAtmosphere,{data,music,canUse:true,canPrepare:false,onScene:()=>{}});
+ assert.equal((html.match(/<select/g)||[]).length,2);
+ for(const label of ['Use scene','Play music']) {
+  const button=html.match(new RegExp('<button[^>]*>'+label+'</button>'));
+  assert.ok(button,label);assert.doesNotMatch(button[0],/disabled/);
+ }
+ assert.match(html,/type="range"[^>]*value="35"/);
+ assert.doesNotMatch(html,/Edit recommendation|Enable free preview|Save as room recommendation/);
+ const organiser=render(RoomAtmosphere,{data,music,canUse:true,canPrepare:true,onScene:()=>{},workspace:{previewActive:false,renderAccess:()=>createElement('p',null,'Enable free preview')}});
+ assert.match(organiser,/Enable free preview/);
+ assert.match(organiser,/<button[^>]*disabled=""[^>]*>Save as room recommendation/);
+ const paused=render(RoomAtmosphere,{data,music,canUse:false});
+ assert.match(paused,/<select disabled=""/);
+ assert.match(paused,/<button[^>]*disabled=""[^>]*>Use scene/);
+ assert.match(paused,/active room place is needed/);
+});
+
+test('an existing group goal exposes progress and editable settings together without ending it', () => {
+ const challenge={id:'goal',kind:'minutes',goal:600,start_day:'2026-11-13',end_day:'2026-11-27',progress:150,version:2};
+ const data={active:true,challenge,serverNow:Date.UTC(2026,10,21)};
+ const html=render(GroupGoal,{data,manage:true,canPrepare:true,inline:true,canInvite:true,onInvite:async()=>true,permitted:true});
+ assert.match(html,/150 \/ 600/);assert.match(html,/Group goal progress/);
+ assert.match(html,/Goal settings/);assert.match(html,/value="600"/);assert.match(html,/value="2026-11-27"/);
+ assert.match(html,/Save goal changes/);assert.match(html,/End current goal/);assert.match(html,/Invite members to this goal/);
+ assert.doesNotMatch(html,/<select|Finish challenge|Start shared challenge/);
+ assert.ok(html.indexOf('150 / 600')<html.indexOf('Goal settings'));
+ const member=render(GroupGoal,{data,inline:true,manage:false});
+ assert.match(member,/150 \/ 600/);assert.doesNotMatch(member,/<form|Save goal changes|End current goal|Invite members/);
+ const draft=render(GroupGoal,{data:{...data,active:false},inline:true,canPrepare:true,manage:false,renderAccess:()=>createElement('p',null,'Enable free preview')});
+ assert.match(draft,/value="600"/);assert.match(draft,/Enable free preview/);assert.match(draft,/<button[^>]*disabled=""[^>]*>Save goal changes/);
+});
+
+test('an empty group goal opens the creation fields directly and keeps the two counting methods clear', () => {
+ const html=render(GroupGoal,{data:{challenge:null,serverNow:Date.UTC(2026,10,21)},manage:true,canPrepare:true,inline:true,permitted:true});
+ assert.match(html,/Set your first group goal/);assert.match(html,/What should count/);
+ assert.match(html,/Recorded study minutes together/);assert.match(html,/Activities with attendance/);assert.match(html,/Create group goal/);
+ assert.doesNotMatch(html,/End current goal|Invite members to this goal/);
+});
