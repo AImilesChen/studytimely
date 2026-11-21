@@ -10,8 +10,8 @@ test('default account leads with today tasks, a single section navigation and an
  assert.ok(!html.includes('sc-sync-status'));assert.ok(!html.includes('Automatic sync off'));assert.equal((html.match(/class="sc-tab-emoji"/g)||[]).length,4);const header=html.match(/<header class="sc-heading">([\s\S]*?)<\/header>/)?.[1];assert.ok(header);assert.ok(!/<(?:button|a)\b/.test(header));
  assert.ok(!html.includes('SETTINGS_ONLY'));assert.ok(!html.includes('Historical backups'));assert.ok(!html.includes('Community preferences</summary>'));assert.ok(!html.includes('sc-bar-track'));assert.equal((html.match(/role="tablist"/g)||[]).length,1);assert.ok(html.includes('Loading this browser’s tasks'));
 });
-test('unconfigured sync has one backup download and a compact introduction, without vacant recovery columns',()=>{
- const html=ui.sync();assert.ok(html.includes('Saved on this device'));assert.ok(html.includes('sync-intro'));assert.ok(!html.includes('Historical backups'));assert.ok(!html.includes('sync-preview-panel'));assert.ok(!html.includes('role="alert"'));assert.equal((html.match(/>Download backup</g)||[]).length,1);
+test('local-only data exposes real backup/import controls and truthful unavailable recovery states',()=>{
+ const html=ui.sync();assert.ok(html.includes('Saved on this device'));assert.ok(html.includes('Choose backup file'));assert.ok(html.includes('Historical backups'));assert.ok(html.includes('No saved versions yet'));assert.ok(html.includes('No cloud workspace is connected'));assert.ok(!html.includes('sync-preview-panel'));assert.ok(!html.includes('sync-intro'));assert.ok(!html.includes('role="alert"'));assert.equal((html.match(/>Download learning backup</g)||[]).length,1);assert.ok(!html.includes('<details'));assert.ok(!html.includes('sync-tabs'));
 });
 test('configured but empty recovery omits the blank preview panel until a version is selected',()=>{
  const html=ui.sync({account:'account-a',generation:'gen',enabled:true,lastSuccess:123},'synced');assert.ok(html.includes('Historical backups'));assert.ok(html.includes('is-browsing'));assert.ok(!html.includes('sync-preview-panel'));assert.ok(html.includes('All changes synced'));

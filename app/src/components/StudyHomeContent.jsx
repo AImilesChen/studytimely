@@ -81,7 +81,7 @@ export function StudyHomeContent({navigate,onFocus,pwa,locked}){
    <h2 id="study-records-heading">Keep a useful record of your study time</h2>
    <div className="study-copy-grid study-records-grid">
     <div><h3>Review completed study time</h3><p>A daily goal is a reference for your plan, not time already completed. Saved study sessions add actual study time to your total; pauses, Pomodoro breaks and planned schedule blocks do not. Reviewing subjects and recent sessions can help you decide where to put your next study block.</p></div>
-    <div><h3>Keep a backup</h3><p>Settings → Data lets you export a JSON backup or a sessions CSV, and import a compatible JSON backup. Clearing site data, private browsing or losing a device can remove local records. An optional account gives you manual sync and an explicit automatic-sync option; signing in alone does not upload your study history.</p></div>
+    <div><h3>Keep a backup</h3><p>Settings → Data lets you export a JSON backup or a sessions CSV, and import a compatible JSON backup. Clearing site data, private browsing or losing a device can remove local records. Open Account &amp; data to download or import a learning backup and choose optional automatic sync. Signing in alone does not upload your study history. <a href="/help/sync-and-backup">Learn how to sync, back up and restore study data</a>.</p></div>
    </div>
   </section>
   <PwaStatus pwa={pwa} locked={locked} compact/>

@@ -48,11 +48,11 @@ export function createRepository({indexedDB=globalThis.indexedDB,makeId=uuid,not
           outcome=change(existing,sync,store);
           if(!outcome.sync){
            outcome.sync=sync;
-           if(existing&&sync.enabled){
+           if(existing){
             const before=packDocument(backupOf(existing)),after=packDocument(backupOf(outcome.state));
             if(!same(before,after)){
              if(Object.values(diffRecords(before,after)).some(v=>v===null||v?.deletedAt)||outcome.event==='imported')protect(sync,before,'Before import or deletion');
-             sync.pending=pendingFor(sync,after,makeId);sync.changedAt=Date.now();
+             if(sync.enabled){sync.pending=pendingFor(sync,after,makeId);sync.changedAt=Date.now();}
             }
            }
           }

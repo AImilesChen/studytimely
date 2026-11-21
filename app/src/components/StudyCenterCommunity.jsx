@@ -12,7 +12,7 @@ export function StudyCenterCommunity({auth,loaded,navigate,onAccount,mode='rooms
   setPending(true);accountRequest('/api/community/me').then(me=>{if(!disposed)setData({me,accountId});}).catch(()=>{if(!disposed)setError('Your community details could not be loaded.');}).finally(()=>{if(!disposed)setPending(false);});
   return()=>{disposed=true;};
  },[accountId,auth?.user?.googleLinked,retry]);
- const preferences=mode==='preferences',compact=mode==='summary',title=preferences?'Your personal preferences':compact?'Your study groups':'Your rooms';
+ const preferences=mode==='preferences',compact=mode==='summary',title=preferences?'Your name and public profile':compact?'Your study groups':'Your rooms';
  const current=!!data&&!!accountId&&data.accountId===accountId&&auth?.user?.googleLinked&&!pending,me=current?data.me:null;
  return <section id={preferences?'community-preferences':undefined} tabIndex={preferences?-1:undefined} className={'sc-panel sc-community-summary'+(compact?' sc-community-compact':'')} aria-label={title}>
  <div className="sc-section-heading"><h2>{title}</h2>{!preferences&&<a className="button" href={compact?'/account?view=community':'/study-groups'} onClick={navigate}>{compact?'My groups':'Find or create a room'} →</a>}</div>

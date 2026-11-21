@@ -46,7 +46,7 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
  {syncState.tone==='warning'&&!store.memory&&!store.hasPending&&<p className="sc-feedback" role="status">{syncState.label}. Review Account &amp; data for details.</p>}
  <nav className="sc-tabs" aria-label="Study center sections" role="tablist" onKeyDown={tabKey}>{tabs.map(([id,label,emoji])=><button id={'center-tab-'+id} key={id} role="tab" aria-selected={view===id} aria-controls="center-panel" tabIndex={view===id?0:-1} onClick={()=>choose(id)}><span className="sc-tab-emoji" aria-hidden="true">{emoji}</span><span>{label}</span></button>)}</nav>
  {store.memory&&<p className="session-notice">Temporary storage: this overview can disappear when this tab closes. Use Account & data → Download backup to keep a copy.</p>}
- <div ref={panel} id="center-panel" role="tabpanel" aria-labelledby={'center-tab-'+view} tabIndex={0}>{!['progress','community'].includes(view)&&<p className="sc-view-help">{viewHelp[view]}</p>}{(store.error||store.hasPending)&&<p className="field-error" role="alert">{store.error?.message||'A local save needs attention. Resolve it before making more changes.'}</p>}
+ <div ref={panel} id="center-panel" role="tabpanel" aria-labelledby={'center-tab-'+view} tabIndex={0}>{!['progress','community','settings'].includes(view)&&<p className="sc-view-help">{viewHelp[view]}</p>}{(store.error||store.hasPending)&&<p className="field-error" role="alert">{store.error?.message||'A local save needs attention. Resolve it before making more changes.'}</p>}
  {view==='overview'&&<>
  <div className="sc-overview-grid">
  <section className="sc-metrics" aria-label="Saved personal learning"><div><span>Saved today</span><strong>{ready?duration(report.day.total):'—'}</strong><small>Pauses and breaks excluded</small></div><div><span>Saved this week</span><strong>{ready?duration(report.week.total):'—'}</strong><small>Monday through today · local dates</small></div><DailyGoal store={store} ready={ready} minutes={report?.dailyGoal||0} seconds={report?.day.total||0}/></section>
@@ -62,6 +62,6 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
  </>}
  {view==='progress'&&<StudyCenterProgress key={(store.cloudSync?.info?.account||'local')+':'+store.data.epoch} store={store} now={now} ready={ready} onDirty={value=>{progressDirty.current=value;}} studyAction={link(timerPath,unfinished?'Return to current timer':'Open study timer')}/>}
  {view==='community'&&<MyGroups key={auth?.user?.syncAccountId||'guest'} auth={auth} loaded={loaded} navigate={navigate} onAccount={()=>choose('settings')}/>}
- {view==='settings'&&<><StudyCenterCommunity mode="preferences" auth={auth} loaded={loaded} navigate={navigate} onAccount={()=>{document.querySelector('.sc-account-settings')?.scrollIntoView({block:'start'});}}/>{settings}</>}
+ {view==='settings'&&settings}
  </div><p className="sc-source">Saved personal learning in this browser · local calendar dates. Plans and task completion do not create study time. Sync is optional and managed in Account & data.</p></main>;
 }
