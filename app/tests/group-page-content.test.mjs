@@ -39,3 +39,12 @@ test('public guide has a concrete five-step example, real allowance comparison a
  assert.match(html,/110 \/ 120 minutes, or 91.7%/);assert.match(html,/Illustrative example, not live room data/);
  assert.doesNotMatch(html,/QA Free Host|QA Learner|room-next-session-name/);
 });
+
+
+test('initial public HTML explains room management and separates owner controls from personal preferences',async()=>{
+ const html=await fs.readFile(new URL('../dist/client/study-groups/index.html',import.meta.url),'utf8');
+ const section=html.match(/<section id="group-room-management"[\s\S]*?(?=<section id="group-tools-guide")/)?.[0];
+ assert.ok(section);for(const text of ['How to invite partners and manage a study room','Copy invitation link','Choose who can study','Handle member problems','Closing a room is permanent','custom text review is paused'])assert.ok(section.includes(text),text);
+ assert.equal((section.match(/<figure/g)||[]).length,3);assert.doesNotMatch(section,/sample-invitation-code|<input|<button|<details/);
+ assert.ok(html.includes('href="#group-room-management"'));
+});
