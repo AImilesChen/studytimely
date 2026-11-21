@@ -1,5 +1,7 @@
 # Account & data — local implementation, 21 November 2026
 
+Publication update: this implementation and its responsive refinements were published in V2.50.0 on 21 November 2026. See [verified release record](StudyTimely-V2.50.0-Release.md). Local-only statements below describe the earlier handoff, not current production status.
+
 Implemented under the approved account/data plan and practical-visual-design skill. Local only: no commit, push or deployment. Production and package version remain V2.49.0. Preserve the unrelated FocusGuide.jsx working-copy status.
 
 ## Behaviour and layout
