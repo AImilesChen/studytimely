@@ -1,10 +1,12 @@
+import {readGroupsReturn} from '../lib/group-center-draft.mjs';
+import {MyGroups} from './MyGroups.jsx';
 import {StudyCenterProgress} from './StudyCenterProgress.jsx';
 import {StudyCenterGuide} from './StudyCenterGuide.jsx';
 import {StudyCenterPlans} from './StudyCenterPlans.jsx';
 import {DailyGoal,TodayTasks,SavedTrend} from './StudyCenterActions.jsx';
 import {syncPresentation} from '../lib/sync-view.mjs';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {ArrowRight,UsersThree} from '@phosphor-icons/react';
+import {ArrowRight} from '@phosphor-icons/react';
 import {dayKey,hasProgress} from '../lib/model.mjs';
 import {toolFor} from '../lib/routes.mjs';
 import {studyCenterReport} from '../lib/study-center.mjs';
@@ -25,6 +27,7 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
   enter();window.addEventListener('studytimely:account-entry',enter);window.addEventListener('popstate',enter);return()=>{window.removeEventListener('studytimely:account-entry',enter);window.removeEventListener('popstate',enter);};
  },[]);
  useEffect(()=>{if(settingsSignal)setView('settings');},[settingsSignal]);
+ useEffect(()=>{if(loaded&&auth?.user?.googleLinked&&auth.user.syncAccountId&&['settings','signin'].includes(new URL(location.href).searchParams.get('view'))&&readGroupsReturn(auth.user.syncAccountId)){setView('community');const url=new URL(location.href);url.searchParams.set('view','community');history.replaceState({},'',url.pathname+url.search+url.hash);}},[loaded,auth?.user?.syncAccountId,auth?.user?.googleLinked]);
  const report=useMemo(()=>ready?studyCenterReport(store.data,minute*60000):null,[ready,today,minute,store.data.sessions,store.data.workspace,store.data.dailyGoal]);
  const active=store.data.timer,unfinished=hasProgress(active),timerPath=unfinished?toolFor(active.mode).path:'/';
  function choose(id){if(id!==view&&progressDirty.current&&!window.confirm('Discard unsaved review changes?'))return false;setView(id);setJumpSync(false);setJumpPreferences(false);const url=new URL(location.href);if(id==='overview')url.searchParams.delete('view');else url.searchParams.set('view',id);history.replaceState({},'',url.pathname+url.search+url.hash);return true;}
@@ -38,12 +41,12 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
  const syncState=syncPresentation(store.cloudSync);
  const viewHelp={overview:'Choose today’s work, then save a session to see your progress.',progress:'Review your saved study time, subjects and habits.',community:'Return to your rooms or find study partners. Room credit stays separate.',settings:'Manage your account, personal preferences, backups and optional sync.'};
  const recent=<section className="sc-panel">{header('Recent study','/study-tracker?view=records','All records')}{!ready?<p role="status">Loading saved sessions…</p>:report.latest.length?<ul className="sc-records">{report.latest.map(s=><li key={s.id}><div><strong>{s.taskTitle||s.chapterTitle||s.subject||'Unlabelled study'}</strong><span>{s.subject||'No subject'} · {new Date(s.endedAt).toLocaleDateString('en-GB')} · {s.mode}</span></div><strong>{duration(s.durationSeconds)}</strong></li>)}</ul>:<p className="sc-help">Saved Study, Focus and Pomodoro records will appear here. General timers do not add learning time.</p>}</section>;
- return <main id="main-content" className="workspace management study-center"><header className="sc-heading"><h1>My Study Center</h1><p className="sc-heading-source">{store.memory?'Temporary tab · export before leaving':'Personal study saved in this browser'}{today?' · '+plannerDate(today,{weekday:'short',year:'numeric'}):''}</p></header>
+ return <main id="main-content" className="workspace management study-center"><header className="sc-heading"><h1>My Study Center</h1><p className="sc-heading-source">{view==='community'?'Community rooms · online account':store.memory?'Temporary tab · export before leaving':'Personal study saved in this browser'}{today?' · '+plannerDate(today,{weekday:'short',year:'numeric'}):''}</p></header>
  {accountNotice&&<p className="sc-feedback" role="status">{accountNotice}</p>}
  {syncState.tone==='warning'&&!store.memory&&!store.hasPending&&<p className="sc-feedback" role="status">{syncState.label}. Review Account &amp; data for details.</p>}
  <nav className="sc-tabs" aria-label="Study center sections" role="tablist" onKeyDown={tabKey}>{tabs.map(([id,label,emoji])=><button id={'center-tab-'+id} key={id} role="tab" aria-selected={view===id} aria-controls="center-panel" tabIndex={view===id?0:-1} onClick={()=>choose(id)}><span className="sc-tab-emoji" aria-hidden="true">{emoji}</span><span>{label}</span></button>)}</nav>
  {store.memory&&<p className="session-notice">Temporary storage: this overview can disappear when this tab closes. Use Account & data → Download backup to keep a copy.</p>}
- <div ref={panel} id="center-panel" role="tabpanel" aria-labelledby={'center-tab-'+view} tabIndex={0}>{view!=='progress'&&<p className="sc-view-help">{viewHelp[view]}</p>}{(store.error||store.hasPending)&&<p className="field-error" role="alert">{store.error?.message||'A local save needs attention. Resolve it before making more changes.'}</p>}
+ <div ref={panel} id="center-panel" role="tabpanel" aria-labelledby={'center-tab-'+view} tabIndex={0}>{!['progress','community'].includes(view)&&<p className="sc-view-help">{viewHelp[view]}</p>}{(store.error||store.hasPending)&&<p className="field-error" role="alert">{store.error?.message||'A local save needs attention. Resolve it before making more changes.'}</p>}
  {view==='overview'&&<>
  <div className="sc-overview-grid">
  <section className="sc-metrics" aria-label="Saved personal learning"><div><span>Saved today</span><strong>{ready?duration(report.day.total):'—'}</strong><small>Pauses and breaks excluded</small></div><div><span>Saved this week</span><strong>{ready?duration(report.week.total):'—'}</strong><small>Monday through today · local dates</small></div><DailyGoal store={store} ready={ready} minutes={report?.dailyGoal||0} seconds={report?.day.total||0}/></section>
@@ -58,7 +61,7 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
 
  </>}
  {view==='progress'&&<StudyCenterProgress key={(store.cloudSync?.info?.account||'local')+':'+store.data.epoch} store={store} now={now} ready={ready} onDirty={value=>{progressDirty.current=value;}} studyAction={link(timerPath,unfinished?'Return to current timer':'Open study timer')}/>}
- {view==='community'&&<><StudyCenterCommunity mode="rooms" auth={auth} loaded={loaded} navigate={navigate} onAccount={()=>choose('settings')}/><div className="sc-link-grid">{[['/study-groups','Study with others','Find public rooms, use an invitation or create a quiet space.'],['/leaderboard','Your community ranking','Review participation, room credit and private daily results. Public ranking is optional.']].map(([href,title,description])=><a key={href} href={href} onClick={navigate}><UsersThree size={24}/><h2>{title}</h2><p>{description}</p><span>Open <ArrowRight size={16}/></span></a>)}<p className="sc-help">Community room credit is separate from this browser’s personal study history. These totals are not added together. Rankings use UTC; this overview uses local dates.</p></div></>}
+ {view==='community'&&<MyGroups key={auth?.user?.syncAccountId||'guest'} auth={auth} loaded={loaded} navigate={navigate} onAccount={()=>choose('settings')}/>}
  {view==='settings'&&<><StudyCenterCommunity mode="preferences" auth={auth} loaded={loaded} navigate={navigate} onAccount={()=>{document.querySelector('.sc-account-settings')?.scrollIntoView({block:'start'});}}/>{settings}</>}
  </div><p className="sc-source">Saved personal learning in this browser · local calendar dates. Plans and task completion do not create study time. Sync is optional and managed in Account & data.</p></main>;
 }

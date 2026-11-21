@@ -12,6 +12,7 @@ import {legacyStudyMessage,studyMessage} from '../src/lib/study-messages.mjs';
 import {reviewBudgetStatus} from './review-budget.mjs';
 import {publicRanking,personalRanking} from './leaderboard.mjs';
 import {roomActivities,saveRoomHome,finishDueActivities,activityTimerContext,withdrawRoomActivities} from './group-activities.mjs';
+import {ACTIVITY_SUBJECTS} from '../src/lib/group-activities.mjs';
 const uuid=value=>typeof value==='string'&&/^[a-f0-9-]{36}$/.test(value);
 const admins=env=>(env.COMMUNITY_ADMIN_EMAILS||'').toLowerCase().split(/[\s,;]+/).filter(Boolean);
 const q=(env,sql,...args)=>env.DB.prepare(sql).bind(...args);
@@ -62,7 +63,7 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
    }
    const requireMember=r=>{requireProfile();if(!r.member||r.room.closed_at)fail(403,'MEMBERSHIP','Join an open room to use this action.');};
    if(path==='/me'&&method==='GET'){
-    const mine=profile?await rows(q(env,`SELECT r.id,r.name,r.visibility,r.owner_id,r.closed_at,r.capacity,${roomActiveSQL('r',at)} AS room_active,${participationSQL('r.id','m.profile_id',at)} AS can_participate,(SELECT count(*) FROM community_members rm WHERE rm.room_id=r.id AND rm.banned=0 AND rm.left_at=0) AS member_count FROM community_rooms r JOIN community_members m ON m.room_id=r.id WHERE m.profile_id=? AND m.banned=0 AND m.left_at=0 ORDER BY (r.closed_at>0) ASC,r.created_at DESC LIMIT 30`,profile.id)):[];
+    const mine=profile?await rows(q(env,`SELECT r.id,r.name,r.visibility,r.owner_id,r.closed_at,r.capacity,r.study_subject AS subject,r.custom_theme AS customTheme,r.created_at,MIN(r.capacity,${groupLimitSQL('r.owner_id',at)}) AS place_limit,${roomActiveSQL('r',at)} AS room_active,${participationSQL('r.id','m.profile_id',at)} AS can_participate,(SELECT count(*) FROM community_members rm WHERE rm.room_id=r.id AND rm.banned=0 AND rm.left_at=0) AS member_count FROM community_rooms r JOIN community_members m ON m.room_id=r.id WHERE m.profile_id=? AND m.banned=0 AND m.left_at=0 ORDER BY (r.closed_at>0) ASC,r.created_at DESC LIMIT 30`,profile.id)):[];
     const history=profile?await rows(q(env,'SELECT day,rank,seconds FROM community_rank_history WHERE profile_id=? ORDER BY day DESC LIMIT 30',profile.id)):[];
     const blocks=profile?await rows(q(env,'SELECT b.blocked_id AS id,p.nickname FROM community_blocks b JOIN community_profiles p ON p.id=b.blocked_id WHERE b.blocker_id=?',profile.id)):[];
     const entitlements=await permissions();
@@ -89,18 +90,19 @@ export function createCommunityApi({now=Date.now,reviewFetch=fetch,reviewTimeout
    }
    if(path==='/rooms'&&method==='POST'){
     requireProfile();const input=await body(request),data=roomInput(input);enforceLocalContent(data.name);if(!uuid(input.id))fail(400,'INVALID','Provide a new room request ID.');
+    const subject=input.subject??'general';if(!Object.hasOwn(ACTIVITY_SUBJECTS,subject))fail(400,'INVALID','Choose a supported room study theme.');
     const exists=await q(env,'SELECT owner_id FROM community_rooms WHERE id=?',input.id).first();if(exists){if(exists.owner_id!==profile.id)fail(409,'CONFLICT','Choose a new room request.');return result({id:input.id});}
     const entitlements=await permissions();
     if((await q(env,'SELECT count(*) AS n FROM community_rooms WHERE owner_id=? AND closed_at=0',profile.id).first()).n>=entitlements.roomLimit)fail(409,'ROOM_LIMIT','Your open-room limit is reached. Free accounts can own one room; active subscriptions allow up to ten. Open an existing room or close one before creating another.');
     checkRoomCapacity(data.capacity,entitlements);
     await rateLimit(env,'room-create',profile.id,10,86400000,at);await rateLimit(env,'room-create-ip',request.headers.get('cf-connecting-ip')||'local',20,86400000,at);
-    await env.DB.batch([q(env,'INSERT INTO community_rooms(id,owner_id,name,visibility,goal_minutes,capacity,invite_token,created_at) VALUES(?,?,?,?,?,?,?,?)',input.id,profile.id,data.name,data.visibility,data.goalMinutes,data.capacity,randomToken().slice(0,24),now()),q(env,'INSERT INTO community_members(room_id,profile_id,joined_at) VALUES(?,?,?)',input.id,profile.id,at)]);
+    await env.DB.batch([q(env,'INSERT INTO community_rooms(id,owner_id,name,visibility,goal_minutes,capacity,invite_token,created_at,study_subject) VALUES(?,?,?,?,?,?,?,?,?)',input.id,profile.id,data.name,data.visibility,data.goalMinutes,data.capacity,randomToken().slice(0,24),now(),subject),q(env,'INSERT INTO community_members(room_id,profile_id,joined_at) VALUES(?,?,?)',input.id,profile.id,at)]);
     return result({id:input.id},201);
    }
    if(path==='/invite'&&method==='POST'){
     requireProfile();const input=await body(request),code=String(input.code||'').trim().toLowerCase();await rateLimit(env,'invite-lookup',user.id,30,3600000,at);await rateLimit(env,'invite-ip',request.headers.get('cf-connecting-ip')||'local',60,3600000,at);
     if(!/^[a-f0-9]{24}$/.test(code))fail(404,'INVITE','This invitation is invalid or closed.');const room=await q(env,'SELECT id,name,owner_id,visibility,capacity,(SELECT count(*) FROM community_members m WHERE m.room_id=community_rooms.id AND m.banned=0 AND m.left_at=0) AS members,EXISTS(SELECT 1 FROM community_members m WHERE m.room_id=community_rooms.id AND m.profile_id=? AND m.banned=0 AND m.left_at=0) AS alreadyMember FROM community_rooms WHERE invite_token=? AND invitations_open=1 AND closed_at=0',profile.id,code).first();
-    if(!room)fail(404,'INVITE','This invitation is invalid or closed.');const entitlement=await ownerEntitlements(env,room.owner_id,at),limit=Math.min(room.capacity,entitlement.memberLimit);delete room.owner_id;return result({room:{...room,joinLimit:limit,capacity:Math.max(limit,room.members)}});
+    if(!room)fail(404,'INVITE','This invitation is invalid or closed.');const entitlement=await ownerEntitlements(env,room.owner_id,at),limit=Math.min(room.capacity,entitlement.memberLimit),readOnly=!(await roomAccess(env,room.id,null,at)).roomActive;delete room.owner_id;return result({room:{...room,readOnly,joinLimit:limit,capacity:Math.max(limit,room.members)}});
    }
    const advancedMatch=path.match(/^\/rooms\/([a-f0-9-]{36})\/advanced(?:\/([a-z-]+))?$/);
    if(advancedMatch){requireProfile();const r=await roomContext(advancedMatch[1]);return await groupAdvanced({request,env,at,r,profile,user,endpoint:advancedMatch[2]||'',now,signal,reviewFetch,reviewTimeoutMs});}
