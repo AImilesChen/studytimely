@@ -1,0 +1,57 @@
+/* A continuous reading section. Illustrations are paper examples, not tool cards. */
+.sc-guide{margin:48px 0 36px;border-top:1px solid var(--line);padding-top:30px;min-width:0}
+.sc-guide-heading{display:block;margin:0 0 28px;padding:0;background:none}
+.study-center .sc-guide-heading h2{font:700 29px/1.25 Georgia,'Times New Roman',serif;letter-spacing:-.025em;margin:0 0 10px}
+.sc-guide-heading>p{font-size:15px;line-height:1.75;color:var(--muted);margin:0;max-width:68ch}
+.sc-guide-row{display:grid;grid-template-columns:minmax(240px,.9fr) minmax(0,1.8fr);gap:clamp(28px,4vw,64px);align-items:start;padding:32px 0;border-top:1px solid var(--line)}
+.sc-guide-figure{margin:0;min-width:0;max-width:380px}
+.sc-guide-paper{border:1px solid var(--line);border-radius:3px;padding:20px 22px;background:var(--sc-card);color:var(--fg)}
+.sc-guide-paper-label{display:block;font-size:12px;line-height:1.6;color:var(--muted);margin-bottom:9px}
+.sc-guide-paper>strong{display:block;font:700 17px/1.45 Georgia,'Times New Roman',serif;overflow-wrap:anywhere}
+.sc-guide-paper dl{padding:0;margin:14px 0}
+.sc-guide-paper dl>div{display:flex;justify-content:space-between;gap:16px;padding:6px 0;font-size:13px;line-height:1.5}
+.sc-guide-paper dt{font-weight:400;color:var(--muted)}
+.sc-guide-paper dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.sc-guide-action{display:inline-block;padding:8px 12px;border:1px solid var(--sc-accent);border-radius:5px;color:var(--sc-accent);font-size:12px;font-weight:600;margin-top:3px}
+.sc-guide-paper-result{margin-top:18px;border-top:1px solid var(--line);padding-top:12px;font-size:13px;line-height:1.6}
+.sc-guide-paper-result>span{display:block;color:var(--muted);font-size:12px}
+.sc-guide-paper-result>strong{display:block;margin-top:3px;font-size:15px}
+.sc-guide-figure figcaption{margin-top:8px;color:var(--muted);font-size:12px;line-height:1.6}
+.sc-guide-countdown{font-size:14px;margin:18px 0 0;color:var(--muted)}
+.sc-guide-countdown b{font-size:42px;line-height:1;color:var(--fg);font-weight:600;letter-spacing:-.04em;margin-right:4px}
+.sc-guide-meter{height:5px;margin-top:12px;background:var(--line);overflow:hidden}
+.sc-guide-meter>span{display:block;width:80%;height:100%;background:var(--sc-accent)}
+.sc-guide-paper .sc-guide-paper-note{font-size:12px;line-height:1.65;color:var(--muted);margin:10px 0 0}
+.sc-guide-checklist{list-style:none;margin:15px 0 0;padding:0}
+.sc-guide-checklist li{display:flex;align-items:baseline;gap:8px;font-size:13px;padding:8px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}
+.sc-guide-checklist li>span{color:var(--sc-accent);font-size:17px}
+.sc-guide-checklist small{margin-left:auto;color:var(--muted);font-size:11px}
+.sc-guide-copy{min-width:0;max-width:70ch}
+.study-center .sc-guide-copy h3{font:700 22px/1.4 Georgia,'Times New Roman',serif;letter-spacing:-.02em;margin:0 0 12px}
+.sc-guide-copy h3>span{font:400 13px/1.5 Arial,Helvetica,sans-serif;color:var(--sc-accent);margin-right:10px;vertical-align:middle}
+.sc-guide-copy>p{font-size:14px;line-height:1.8;color:var(--muted);margin:0 0 15px}
+.sc-guide-copy ol{padding:0 0 0 20px;margin:0;font-size:14px;line-height:1.8}
+.sc-guide-copy li{padding-left:4px;margin-bottom:9px}
+.sc-guide-copy li:last-child{margin-bottom:0}
+.sc-guide-copy strong{font-weight:600}
+.sc-guide-copy .sc-guide-result{margin:16px 0 0;padding-left:14px;border-left:2px solid var(--line);font-size:13px}
+.sc-guide-story{border-block:1px solid var(--line);padding:28px 0;margin:14px 0 0;display:grid;grid-template-columns:minmax(240px,.9fr) minmax(0,1.8fr);gap:16px clamp(28px,4vw,64px)}
+.study-center .sc-guide-story h3,.study-center .sc-guide-questions h3{font:700 23px/1.35 Georgia,'Times New Roman',serif;letter-spacing:-.02em;margin:0 0 9px}
+.sc-guide-story>div>p{font-size:14px;line-height:1.75;color:var(--muted);margin:0;max-width:28ch}
+.sc-guide-story ol{margin:0;padding-left:20px;font-size:14px;line-height:1.85}
+.sc-guide-story li{padding-left:4px;margin-bottom:6px}
+.sc-guide-story .sc-guide-story-result{grid-column:2;line-height:1.75;font-size:14px;margin:0;padding:14px 0 0;border-top:1px solid var(--line)}
+.sc-guide-story-result strong{display:block;margin-bottom:4px;font-weight:600}
+.sc-guide-story .sc-guide-note{grid-column:2;margin:0;font-size:12px;line-height:1.7;color:var(--muted)}
+.sc-guide-questions{padding-top:32px}
+.sc-guide-questions dl{margin:18px 0 0;padding:0}
+.sc-guide-questions dl>div{display:grid;grid-template-columns:minmax(240px,.9fr) minmax(0,1.8fr);gap:clamp(28px,4vw,64px);border-top:1px solid var(--line);padding:18px 0}
+.sc-guide-questions dt{font-size:14px;font-weight:600;line-height:1.8;max-width:30ch}
+.sc-guide-questions dd{font-size:14px;line-height:1.85;color:var(--muted);margin:0;max-width:70ch}
+/* Let working fields and shared alignment define the rest of the page. */
+.study-center .sc-tool-workspace{padding:0;border:0;border-radius:0;background:transparent}
+.study-center .sc-tool-workspace .field :is(input,select,textarea){background:var(--sc-card)}
+.study-center .sc-history .sc-panel{border:0;border-left:1px solid var(--line);border-radius:0;background:transparent}
+.study-center .sc-community-compact{margin:30px 0 22px;border-bottom:0}
+@media(max-width:900px){.sc-guide-row,.sc-guide-story,.sc-guide-questions dl>div{grid-template-columns:minmax(210px,.85fr) minmax(0,1.5fr);gap:24px}.sc-guide-paper{padding:18px}.study-center .sc-guide-copy h3{font-size:21px}}
+@media(max-width:650px){.sc-guide{margin-top:32px;padding-top:24px}.study-center .sc-guide-heading h2{font-size:25px}.sc-guide-heading>p{font-size:14px}.sc-guide-row{grid-template-columns:1fr;gap:20px;padding:26px 0}.sc-guide-figure{width:100%;max-width:380px}.sc-guide-paper{padding:18px}.sc-guide-copy{max-width:none}.study-center .sc-guide-copy h3{font-size:21px}.sc-guide-copy>p,.sc-guide-copy ol{font-size:14px}.sc-guide-story{grid-template-columns:1fr;padding:24px 0;gap:16px}.sc-guide-story .sc-guide-story-result,.sc-guide-story .sc-guide-note{grid-column:1}.sc-guide-story>div>p{max-width:none}.sc-guide-questions dl>div{grid-template-columns:1fr;gap:7px;padding:17px 0}.sc-guide-questions dt{max-width:none}.study-center .sc-guide-story h3,.study-center .sc-guide-questions h3{font-size:22px}.study-center .sc-history .sc-panel{border-left:0;border-top:1px solid var(--line);padding-inline:0}}

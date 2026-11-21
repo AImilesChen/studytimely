@@ -11,8 +11,9 @@ import {StudyPlanning} from './StudyPlanning.jsx';
 const studyTime=seconds=>seconds?human(seconds):'0 min';
 const EXAMPLES=[{title:'Practise 10 algebra questions',subject:'Maths',estimateMinutes:30},{title:'Recall one biology chapter',subject:'Biology',estimateMinutes:25},{title:'Draft an essay introduction',subject:'English',estimateMinutes:45}];
 export function Planner(props){return <StudyPlanning {...props} basic={BasicPlanner}/>;}
-function BasicPlanner({store,now,onStart,confirm,calculatorDraft,onDraftConsumed,navigate,embedded=false}){
+function BasicPlanner({store,now,onStart,confirm,calculatorDraft,onDraftConsumed,navigate,embedded=false,allTasks=false}){
  const currentDay=dayKey(now||Date.now()),[today,setToday]=useState(''),[view,setView]=useState('day'),[selectedDay,setSelectedDate]=useState(''),[offset,setOffset]=useState(0),[query,setQuery]=useState(''),[subject,setSubject]=useState(''),[timer,setTimer]=useState('study'),[quick,setQuick]=useState(''),[quickSubject,setQuickSubject]=useState(''),[quickMinutes,setQuickMinutes]=useState(''),[editor,setEditor]=useState(null),[reschedule,setReschedule]=useState(null),[notice,setNotice]=useState(''),[issue,setIssue]=useState(''),[saving,setSaving]=useState(false);
+ useEffect(()=>{if(allTasks)setView('all');},[allTasks]);
  const selectedDate=selectedDay||today,ready=store.ready&&!!today;
  useEffect(()=>{setToday(currentDay);},[currentDay]);
  const quickInput=useRef(null),omitted=new Set((store.data.workspace?.planning?.rules||[]).filter(r=>!r.deletedAt&&r.prep?.omitted).map(r=>r.id)),tasks=alive(store.data.workspace?.tasks).filter(t=>!omitted.has(t.id)),week=plannerWeek(today,offset),overview=useMemo(()=>plannerOverview(store.data.workspace?.tasks||[],store.data.sessions,today),[store.data.workspace?.tasks,store.data.sessions,today]);
