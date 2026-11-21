@@ -1,6 +1,6 @@
 # Study Center local redesign — 21 November 2026
 
-Status: implemented locally under the approved practical-visual-design plan. Production and package version remain V2.46.0. No commit, push or deployment performed.
+Historical local notes below. These changes and the follow-ups were published as V2.47.0 on 21 November 2026; see [the verified release record](StudyTimely-V2.47.0-Release.md). Earlier local-only statuses describe their original stage.
 
 ## Behaviour and layout
 
