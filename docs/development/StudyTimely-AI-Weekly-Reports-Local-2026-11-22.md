@@ -129,6 +129,10 @@ Further actual synthetic UI checks: initial AI entry/unchecked consent, generati
 Ignored evidence folder: `docs/development/evidence/ai-weekly-clarity-2026-11-22/` contains desktop.jpg,mobile.jpg,pdf-page-1.png,pdf-page-2.png,and output/pdf/StudyTimely-AI-Weekly-Example.pdf. This deliverable is an explicitly synthetic example, not live DeepSeek output. Real-model key/call/quality/cost, production activation, actual Google authentication and paid entitlements remain unverified as previously recorded. No commit,push or deployment performed.
 
 
+## Publication superseding local status — 22 November 2026
+
+The implemented eight-part report is now published as V2.52.0. See [the release handoff](StudyTimely-V2.52.0-Release.md) for the actual runtime, migration, encrypted provider configuration, paid-only generation rule and verification limits. Earlier local-only/unconfigured statements describe their dated stage, not current production. Stripe purchase and real production Plus generation are not claimed as accepted.
+
 ## Paid-report content standard draft — 22 November 2026
 
 The user requested useful analytical sections and a concrete report format before a richer AI report. The design is in `docs/development/ai-weekly-v2/`: report-contract.json, report-output.schema.json, deepseek-report-prompt.txt, implementation-notes.txt, fictional example-data/example-report/example-model-output JSON and reproducible build_example.py/validate_example.py. It is a proposed V2 content/data contract, not a runtime implementation or a user-approved commercial quota.
