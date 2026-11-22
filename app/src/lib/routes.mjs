@@ -25,7 +25,7 @@ export const MANAGEMENT_ROUTES=[
  {id:'app',path:'/app',title:'StudyTimely App',h1:'Opening your workspace',description:'Open the last timing tool used in your StudyTimely app.',indexable:false}
 ];
 export const WORLD_CLOCK_ROUTES=[{id:'world-clock',path:'/time',title:'World Clock',seoTitle:'World Clock — Current Local Times Around the World',h1:'World Clock',description:`Check current local times in ${CITIES.length} cities worldwide. Search by city or time zone, save favourite clocks, and understand date differences and daylight saving time.`,worldClock:true},...CITIES.map(c=>({id:'time-'+c.slug,path:'/time/'+c.slug,title:cityContent(c.slug).title,h1:'Time in '+c.name,description:cityDescription(c),worldClock:true}))];
-ROUTES.push(...MANAGEMENT_ROUTES,...WORLD_CLOCK_ROUTES);
+ROUTES.push({id:'pricing',path:'/pricing',title:'Pricing — Free and Plus',h1:'A little more room for your study.',description:'Compare StudyTimely Free and Plus: study timers, AI weekly reports, planning, music, scenes and groups. Review monthly and annual pricing and how membership works.',indexable:false,onlineOnly:true},...MANAGEMENT_ROUTES,...WORLD_CLOCK_ROUTES);
 export const routeFor=path=>ROUTES.find(r=>r.path===path);
 export const toolFor=mode=>ROUTES.find(t=>t.id===mode)||TOOLS[1];
 export const LEGAL_LINKS=[['Privacy Policy','/privacy'],['Terms of Use','/terms'],['Cookies & Local Storage','/cookies']];
