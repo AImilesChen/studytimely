@@ -3,6 +3,7 @@ import {validatePlanning,planningSettings,planningDate} from './planning-schema.
 import {generateStudySchedule,planningFingerprint} from './planning-engine.mjs';
 import {zonedDay} from './study-analysis.mjs';
 import {recordTask} from './learning-history.mjs';
+import {detailedPlanning} from './ai-weekly-detailed.mjs';
 import {createExamPreparation,preparationSignature,preparationFor} from './exam-preparation.mjs';
 const bad=m=>{throw Error(m);},live=xs=>xs.filter(x=>!x.deletedAt);
 export function planningAction(state,a,{id,now}){
@@ -67,9 +68,22 @@ export function planningAction(state,a,{id,now}){
   if(!Number.isSafeInteger(a.at)||a.at>now||now-a.at>15*60000)bad('This preview expired. Generate it again.');
   let restChange=null;if(a.restDate){if(!planningDate(a.restDate)||a.restDate<zonedDay(now,p.settings.zone))bad('Choose today or a future rest day.');const existing=live(p.exceptions).find(e=>e.date===a.restDate&&e.kind==='off');if(!existing){const exception={id:id+':rest',date:a.restDate,kind:'off',start:0,end:1440,updatedAt:time,deletedAt:0};p.exceptions.push(exception);restChange={id:exception.id,previous:null};}}
   apply(generateStudySchedule(state,a.recipe,a.at),restChange);
+ }else if(a.type==='planning-apply-weekly'){
+  const review=w.learning.reviews.find(r=>!r.deletedAt&&r.snapshot?.aiWeek?.id===a.reportId),ai=review?.snapshot?.aiWeek;
+  if(ai?.version!==2||!ai.facts.detail.planning.candidate)bad('Choose a saved detailed report with a proposed schedule.');
+  if(w.learning.events.some(e=>e.kind==='ai-plan'&&e.reportId===a.reportId))bad('This report schedule was already added. Generate a new report after reviewing your plan.');
+  const saved=ai.facts.detail.planning;
+  if(saved.basis!==planningFingerprint(state))bad('Your tasks, available time or plan changed. Generate an updated report before adding its schedule.');
+  const checked=detailedPlanning(state,{at:saved.at}),candidate=checked.facts.candidate;
+  if(!candidate||JSON.stringify(candidate)!==JSON.stringify(saved.candidate))bad('This schedule can no longer be reproduced. Generate an updated report.');
+  if(checked.schedule.blocks.some(b=>b.startAt<now))bad('A proposed time has passed. Generate an updated report.');
+  apply(checked.schedule);
+  const adoptionId=id+':ai-plan';p.undo.aiAdoptionId=adoptionId;
+  w.learning.events.push({id:adoptionId,kind:'ai-plan',at:now,order:0,reportId:a.reportId,links:[...new Set(checked.schedule.blocks.map(b=>b.taskId))].map(taskId=>({taskId}))});
  }else if(a.type==='planning-undo'){
   const u=p.undo;if(!u||u.revision!==p.revision)bad('The plan changed after this generation. Undo is no longer available.');
   const active=state.timer?.planningBlockId;if(active&&u.afterIds.includes(active))bad('Finish the linked timer before undoing its plan.');
+  if(u.aiAdoptionId)w.learning.events.push({id:id+':ai-undo',kind:'ai-plan-undone',at:now,order:0,adoptionId:u.aiAdoptionId});
   p.blocks=p.blocks.map(b=>u.afterIds.includes(b.id)?{...b,updatedAt:time,deletedAt:time}:b);for(const row of u.before){const old=p.blocks.find(x=>x.id===row.id);if(old)Object.assign(old,row,{updatedAt:time});}if(u.restChange){const e=p.exceptions.find(e=>e.id===u.restChange.id);if(e)Object.assign(e,u.restChange.previous||{deletedAt:time},{updatedAt:time});markApplied();}p.undo=null;
  }else if(a.type==='planning-block'){
   const b=live(p.blocks).find(b=>b.id===a.itemId);if(!b)bad('This session was removed.');
@@ -88,5 +102,5 @@ export function planningAction(state,a,{id,now}){
   if(block){block.status='reviewed';block.updatedAt=time;}
   p.feedback.push({id,taskId:task.id,blockId:block?.id||'',remainingMinutes:rule.remainingMinutes,done:task.done,updatedAt:time,deletedAt:0});
  }else bad('Unknown planning operation.');
- p.revision++;if(!['planning-apply','planning-undo','planning-preparation'].includes(a.type))p.undo=null;state.workspace.planning=validatePlanning(p);
+ p.revision++;if(!['planning-apply','planning-apply-weekly','planning-undo','planning-preparation'].includes(a.type))p.undo=null;state.workspace.planning=validatePlanning(p);
 }

@@ -1,0 +1,49 @@
+V2 REPORT FORMAT / DEVELOPMENT HANDOFF
+Date: 22 November 2026
+Status: Designed with a complete fictional example; not implemented in the runtime.
+
+WHY THIS IS DIFFERENT FROM THE CURRENT REPORT
+The current runtime receives one week of daily/subject totals, aggregate task/goal/estimate counts and a previous-period total. It cannot support every section of the designed report. A longer prompt would not fix those missing inputs.
+
+DATA WORK BEFORE REAL GENERATION
+1. Compute the original week-start task and target baselines from dated history. Separate midweek additions, later edits and unknown completion dates. Do not compare today's plan as if it was the original plan.
+2. Reuse the local study-analysis task/goal history. Supply bounded, anonymous estimate/effort pairs from completed tasks only, with known initial estimates and an explicit period-versus-lifetime effort scope.
+3. Reuse the existing exam-preparation/planning engines for remaining work, deadline cutoffs, breaks, locked/running work and available capacity. Have application code generate feasible candidate schedules. The model selects/explains a candidate; it does not invent a timetable.
+4. Add comparable four-week snapshots and stable anonymous subject aliases within a report. Subject 1 must not silently refer to a different subject in another week.
+5. Add stable recommendation IDs and explicit adoption-to-task links. At the next snapshot, use dated task events and user-entered remaining work to evaluate follow-through. Do not equate adoption with completion or completion with causality.
+6. Update the pre-generation consent categories for the new summary fields. Only send coarse available-minute totals and the minimum approved candidate-plan information needed for interpretation; keep private calendar events and exact private windows local when not needed. Continue excluding task titles, raw logs, chats and private reflections. Reset consent when the input scope changes.
+
+RUNTIME AND COMPATIBILITY
+Introduce a distinct version-2 facts/output contract. Do not label V2 payloads as version 1 or overwrite old report snapshots. Continue reading/exporting/deleting V1 reports and keeping their personal notes intact. Backup, merge, account export/deletion and stale-response guards must cover both versions.
+The current output ceiling of 1600 tokens and four-part schema is not this V2 content standard. Choose an explicit bounded V2 generation budget only after controlled real DeepSeek tests and cost measurement. This handoff does not change the commercial allowance, existing preview, package version or pricing.
+
+OUTPUT CHECKS
+Validate the schema, exact evidence IDs and supported quoted values, candidate ID, supported task IDs, and plan fingerprint. Recheck current task/availability/deadline state before applying a saved plan; show a refreshed draft if records changed. Do not mutate plans or run timers during report generation.
+An invalid/incomplete provider response must not consume a successful-report allowance or replace the last usable report. An insufficient-data preview must explain its limits before a full-depth purchase/allowance decision. The final commercial treatment of limited reports is a separate confirmation, not a change made by this design.
+
+USER FLOW
+Open Progress -> see AI weekly report purpose and available analysis coverage -> optionally supply a missing weekly goal/remaining-time estimate/availability in place -> explicitly consent -> generate -> read the short overview and expanded analysis in the same report -> review the candidate plan -> confirm selected changes -> track accepted actions at the next report.
+Keep the existing direct PDF/HTML download. Online and downloaded reports contain the same saved analysis and graphs, without a second AI call. Place the download beside the visible AI report identity; report history is only for old reports. Reading/exporting an already-created report remains available after access expires.
+
+ACCEPTANCE CASES
+- Rich recorded week: supported findings, verified arithmetic, feasible next plan, complete matching export.
+- First report/no previous advice: no-history message; no fabricated adoption/completion.
+- Missing goal, task estimate or remaining work: missing stays unknown, not zero.
+- One or a few sessions: limited conclusions; no personality/attention assessment.
+- Midweek target/task changes: compare the appropriate historical baseline.
+- In-progress week: equal elapsed previous period, no false full-week comparison.
+- Cross-midnight/DST/timezone changes: same scope in tables, model facts and export.
+- Stable subject aliases across weeks: no crossed comparisons.
+- Unknown exam time/date-only deadline: do not assume exam-day capacity.
+- Breaks, unavailable dates, locked blocks and running timers: candidate remains feasible and protected.
+- Stale plan/saved snapshot: preserve old report, require a rechecked draft to apply.
+- Deleted/completed task or unlinked adopted advice: no duplicate work and no invented follow-through.
+- Malformed/unsupported provider output: preserve last report and release successful-report quota.
+- PDF/HTML/online parity: all decisions, tables, limitations and provenance preserved.
+
+PREMIUM QUALITY GATE
+For a data-rich full-depth report, require at least two user-specific supported decisions and one feasible candidate plan or a clearly explained constraint preventing a plan. Every decision should have evidence, interpretation, optional action and a next check. Users should be able to say what to change after reading, not merely repeat the time total. Do not substitute a word count, page count, a test pass count or a PDF design for actual user value.
+Before commercial release, compare controlled real-provider reports against this standard, then observe whether users review/adopt an action and return to follow up. No willingness-to-pay or improved grades is claimed by the example.
+
+ARTIFACTS
+build_example.py generates the shared content model, four-page PDF and matching HTML with arithmetic/text/bounds checks. report-contract.json is a design contract; report-output.schema.json is the proposed model output schema; deepseek-report-prompt.txt is the proposed prompt. example-data.json and example-report.json are entirely fictional. None of these enables the richer feature in the app.

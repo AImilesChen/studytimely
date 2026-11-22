@@ -1,0 +1,150 @@
+{
+  "version": 2,
+  "status": "design_contract_not_runtime_implemented",
+  "language": "en",
+  "intent": "A grounded weekly decision aid, not a longer statistics paraphrase.",
+  "reader_outcomes": [
+    "Understand the week without reading a long essay",
+    "Find 1-3 supported planning decisions",
+    "Review a feasible next-week draft",
+    "Track previously accepted recommendations"
+  ],
+  "sections": [
+    {
+      "id": "executive",
+      "name": "本周最重要的结论",
+      "answers": "先保持什么、先改什么、下一周先做什么？",
+      "format": "one-screen overview, up to three evidence-linked decisions",
+      "required": true
+    },
+    {
+      "id": "goals_actual",
+      "name": "目标与实际",
+      "answers": "与事先设定的目标和上个可比周期差多少？",
+      "format": "metric strip, daily chart, short interpretation",
+      "required": true
+    },
+    {
+      "id": "allocation",
+      "name": "科目投入与近期重点",
+      "answers": "投入与已输入的目标、考试及剩余任务是否匹配？",
+      "format": "subject bars plus deadline-aware interpretation",
+      "required": false
+    },
+    {
+      "id": "execution",
+      "name": "计划执行与估时偏差",
+      "answers": "哪些任务没做完？哪些同类任务估时明显不准？",
+      "format": "matched estimate/actual table, sample coverage, tentative adjustment",
+      "required": false
+    },
+    {
+      "id": "capacity",
+      "name": "下周容量与截止日期",
+      "answers": "现有任务到底排不排得下？需要舍弃什么？",
+      "format": "availability/required-time/buffer table and explicit trade-off",
+      "required": false
+    },
+    {
+      "id": "next_plan",
+      "name": "可审阅的下周安排",
+      "answers": "具体做什么，放在哪一天，遇到超时怎么调整？",
+      "format": "validated candidate schedule, keep/defer list, fallback action",
+      "required": true
+    },
+    {
+      "id": "follow_up",
+      "name": "建议追踪与多周变化",
+      "answers": "上次采纳的建议做了没有？最近几周发生了什么变化？",
+      "format": "accepted-action status table and comparable trend",
+      "required": false
+    },
+    {
+      "id": "evidence",
+      "name": "数据依据与分析边界",
+      "answers": "这些结论可信吗？有哪些没有记录？",
+      "format": "short coverage/unknowns notes; detailed audit at the end",
+      "required": true
+    }
+  ],
+  "reasoning_unit": {
+    "observation": "What the verified record shows",
+    "evidence_refs": "Existing evidence IDs, visible sample size and time scope",
+    "interpretation": "Why this may matter to the stated goal; qualify unknown causes",
+    "action": "A concrete optional adjustment",
+    "check_next_week": "A measurable follow-up, without grading learning quality"
+  },
+  "output_contract": {
+    "version": 2,
+    "analysis_status": [
+      "full",
+      "limited",
+      "insufficient"
+    ],
+    "overview": "headline + 1-3 reasoning units",
+    "sections": "ordered section IDs with available/limited/unavailable states and evidence-linked prose",
+    "selected_plan_id": "must reference an application-validated candidate, not invented time slots",
+    "actions": "at most three priorities with stable recommendation IDs and supported task refs",
+    "unknowns": "explicit missing fields; do not replace missing values with zero"
+  },
+  "generation_pipeline": [
+    "Build bounded factual snapshots locally with an explicit cutoff/timezone",
+    "Compute metrics and generate deadline/availability-safe candidate plans with existing deterministic engines",
+    "Show eligible analysis areas and missing inputs before generation",
+    "Obtain explicit consent; preserve default subject anonymisation and exclusion of private notes/raw logs/task titles",
+    "DeepSeek receives whitelisted aggregates, stable anonymous references and approved candidate plans",
+    "Validate schema, evidence refs, quoted numbers, task IDs, candidate IDs and constraints; reject invalid output",
+    "Render an overview plus full sections and export the same saved content",
+    "Apply only after user confirmation; link accepted recommendation IDs to created or changed tasks",
+    "At the next report, evaluate linked status and comparable metrics without claiming causality"
+  ],
+  "current_data_gaps": [
+    {
+      "item": "Original weekly target",
+      "state": "history exists but weekly AI pack currently sends only daily goal counts"
+    },
+    {
+      "item": "Task-level estimate/effort pairs and week-start plan baseline",
+      "state": "local task history exists; current AI pack contains aggregate totals, not bounded task-level pairs"
+    },
+    {
+      "item": "Exam deadline, availability, remaining work and candidate schedules",
+      "state": "planning/exam engines exist; not yet wired into weekly AI contract"
+    },
+    {
+      "item": "Comparable four-week subject trends",
+      "state": "add bounded snapshots and stable anonymous subject mapping across weeks; previous-period AI facts currently contain only totals/counts/days"
+    },
+    {
+      "item": "Recommendation adoption and follow-through",
+      "state": "add persistent recommendation-to-task links and dated status snapshots; not currently part of AI weekly data"
+    }
+  ],
+  "thin_data_policy": {
+    "before_generation": "Explain which analyses are supported and what inputs are missing, without forcing a long onboarding form",
+    "limited_report": "Show a candid starting report; do not pad missing sections with generic encouragement",
+    "allowance": "Proposed: do not silently consume a full-depth report allowance for an insufficient-data summary; commercial policy still needs confirmation",
+    "first_report": "Previous-action section says no history; no invented previous advice"
+  },
+  "quality_gates": [
+    "Every priority includes evidence, a reason, an actionable adjustment and a next check",
+    "No invented attention/efficiency/mastery score, diagnosis, grades or guaranteed gains",
+    "Counts and comparisons use consistent scope; current weeks compare equal elapsed periods",
+    "No causation inferred from time or task status; subject allocation is not automatically imbalance",
+    "Matched estimates use completed, historically known tasks; state lifetime/period effort and n",
+    "Unknown task completion/goal/remaining-time history is excluded or labelled",
+    "Schedule accounts for breaks, locked/running blocks, deadlines and user availability; no automatic calendar write",
+    "Do not fabricate an optimal study method from time totals",
+    "Every exported finding and graph matches its saved online snapshot; reading/downloading uses no new AI call",
+    "Preview/mock/provider-produced labels remain distinct",
+    "Sparse input, inconsistent records, missing availability, first report, overdue exams and stale plans all need representative acceptance cases"
+  ],
+  "layout": {
+    "web": "single report, one clear download action, short overview followed by expanded analysis; no nested feature menu",
+    "print": "approximately 3-4 pages when data supports depth, reflow without truncation; do not pad to a page count",
+    "type": "serif short titles + readable sans body, figures aligned to common edges",
+    "colour": "existing warm paper, terracotta emphasis, ochre for comparisons, restrained apricot/honey annotations",
+    "prose": "detailed enough to explain decisions, concise within each section; never use word count as a substitute for value"
+  },
+  "release_limit": "This artifact does not change the current runtime, subscription pricing/allowance or public feature promises. Real DeepSeek configuration, trial output evaluation and cost measurement are still required."
+}

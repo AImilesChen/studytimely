@@ -1,3 +1,4 @@
+import {validateSavedWeekly} from './ai-weekly-contract.mjs';
 // Append-only planning evidence. Baselines describe what was observed, not past completions.
 const validDate=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&Number.isFinite(Date.parse(s+'T12:00:00Z'))&&new Date(s+'T12:00:00Z').toISOString().slice(0,10)===s;
 const bad=()=>{throw Error('Invalid learning analysis history.');};
@@ -5,6 +6,7 @@ const str=(s,max=150)=>typeof s==='string'&&s.length<=max?s:bad();
 const stamp=n=>Number.isFinite(n)&&n>=0&&n<=Date.now()+86400000?n:bad();
 export const emptyLearning=()=>({version:1,startedAt:0,events:[],reviews:[],zone:'',zoneUpdatedAt:0});
 function validateSnapshot(s){
+ if(s.aiWeek!==undefined)validateSavedWeekly(s.aiWeek);
  const positive=n=>Number.isFinite(n)&&n>=0,strings=(v,keys)=>keys.every(k=>typeof v[k]==='string'),subjects=a=>Array.isArray(a)&&a.length<=500&&a.every(v=>typeof v.name==='string'&&v.name.length<=40&&positive(v.seconds)&&positive(v.share)&&v.share<=1);
  if(!positive(s.total)||!Number.isInteger(s.count)||s.count<0||!Number.isInteger(s.activeDays)||s.activeDays<0||!(s.average===null||positive(s.average))||!subjects(s.subjects))bad();
  if(!Array.isArray(s.series)||s.series.length>366||!s.series.every(v=>validDate(v.date)&&positive(v.seconds)))bad();
@@ -18,9 +20,13 @@ export function validateLearning(value){
  if(value===undefined)return emptyLearning();
  if(!value||value.version!==1||!Array.isArray(value.events)||value.events.length>50000||!Array.isArray(value.reviews)||value.reviews.length>2000||value.reviews.filter(r=>!r?.deletedAt).length>200)bad();
  const ids=new Set(),events=value.events.map(e=>{
-  if(!e||!['task','baseline','daily-goal','weekly-goal'].includes(e.kind)||!e.id||ids.has(e.id))bad();ids.add(e.id);
+  if(!e||!['task','baseline','daily-goal','weekly-goal','ai-plan','ai-plan-undone'].includes(e.kind)||!e.id||ids.has(e.id))bad();ids.add(e.id);
   if(e.order!==undefined&&(!Number.isSafeInteger(e.order)||e.order<0))bad();const row={id:str(e.id),at:stamp(e.at),kind:e.kind,order:e.order||0};
-  if(e.kind==='task'||e.kind==='baseline'){
+  if(e.kind==='ai-plan'){
+   if(typeof e.reportId!=='string'||!/^[a-f0-9-]{36}$/.test(e.reportId)||!Array.isArray(e.links)||!e.links.length||e.links.length>40||new Set(e.links.map(x=>x.taskId)).size!==e.links.length)bad();
+   row.reportId=e.reportId;row.links=e.links.map(x=>({taskId:str(x.taskId)}));if(row.links.some(x=>!x.taskId))bad();
+  }else if(e.kind==='ai-plan-undone'){row.adoptionId=str(e.adoptionId);if(!row.adoptionId)bad();}
+  else if(e.kind==='task'||e.kind==='baseline'){
    if(!e.taskId||typeof e.done!=='boolean'||typeof e.deleted!=='boolean'||!Number.isInteger(e.estimateMinutes)||e.estimateMinutes<0||e.estimateMinutes>10080)bad();
    for(const k of ['plannedDate','dueDate'])if(e[k]!==''&&!validDate(e[k]))bad();
    Object.assign(row,{taskId:str(e.taskId),title:str(e.title,140),subject:str(e.subject,40),plannedDate:e.plannedDate,dueDate:e.dueDate,estimateMinutes:e.estimateMinutes,done:e.done,deleted:e.deleted});
@@ -53,5 +59,5 @@ export function mergeLearning(a,b){
 }
 export function losesLearningHistory(previous,next){
  const a=previous?.workspace?.learning,b=next?.workspace?.learning;if(!a)return false;if(!b)return !!(a.startedAt||a.events?.length||a.reviews?.length);
- return (a.events||[]).some(e=>!b.events?.some(n=>n.id===e.id))||(a.reviews||[]).some(r=>!b.reviews?.some(n=>n.id===r.id));
+ return (a.events||[]).some(e=>!b.events?.some(n=>n.id===e.id))||(a.reviews||[]).some(r=>{const n=b.reviews?.find(n=>n.id===r.id);return !n||!!r.snapshot?.aiWeek&&!r.deletedAt&&!n.deletedAt&&!n.snapshot?.aiWeek;});
 }

@@ -1,0 +1,223 @@
+{
+  "kind": "fictional_example",
+  "runtime_connected": false,
+  "week": {
+    "start": "2026-11-09",
+    "end": "2026-11-15",
+    "zone": "Europe/London",
+    "complete": true,
+    "snapshot_at": "2026-11-16T07:00:00Z"
+  },
+  "weekly_goal_minutes": 480,
+  "previous_minutes": 420,
+  "days": [
+    {
+      "date": "2026-11-09",
+      "minutes": 65
+    },
+    {
+      "date": "2026-11-10",
+      "minutes": 70
+    },
+    {
+      "date": "2026-11-11",
+      "minutes": 75
+    },
+    {
+      "date": "2026-11-12",
+      "minutes": 70
+    },
+    {
+      "date": "2026-11-13",
+      "minutes": 70
+    },
+    {
+      "date": "2026-11-14",
+      "minutes": 70
+    },
+    {
+      "date": "2026-11-15",
+      "minutes": 0
+    }
+  ],
+  "sessions": 12,
+  "subjects": [
+    {
+      "name": "Maths",
+      "minutes": 270
+    },
+    {
+      "name": "Biology",
+      "minutes": 150
+    }
+  ],
+  "planned_at_week_start": 8,
+  "completed_from_baseline": 6,
+  "added_midweek": 0,
+  "completion_dates_unknown": 0,
+  "matched_completed_tasks": [
+    {
+      "id": "M1",
+      "estimate_minutes": 25,
+      "recorded_minutes": 40
+    },
+    {
+      "id": "M2",
+      "estimate_minutes": 30,
+      "recorded_minutes": 45
+    },
+    {
+      "id": "M3",
+      "estimate_minutes": 35,
+      "recorded_minutes": 50
+    }
+  ],
+  "open_tasks": [
+    {
+      "id": "M4",
+      "recorded_minutes": 135,
+      "remaining_minutes": 60
+    },
+    {
+      "id": "B4",
+      "recorded_minutes": 75,
+      "remaining_minutes": 45
+    }
+  ],
+  "four_weeks_minutes": [
+    240,
+    300,
+    420,
+    420
+  ],
+  "next_week": {
+    "start": "2026-11-16",
+    "end": "2026-11-22",
+    "gross_weekday_window": "18:00-19:10",
+    "planned_break_minutes_per_day": 10,
+    "available_study_minutes_per_day": 60,
+    "available_days": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri"
+    ],
+    "weekend_available": false,
+    "exam_date": "2026-11-20",
+    "exam_subject": "Biology",
+    "exam_time": null,
+    "candidates": [
+      {
+        "id": "B4",
+        "subject": "Biology",
+        "minutes": 45,
+        "label": "Finish transport recap",
+        "priority": "exam"
+      },
+      {
+        "id": "B5",
+        "subject": "Biology",
+        "minutes": 45,
+        "label": "Review the next exam topic",
+        "priority": "exam"
+      },
+      {
+        "id": "B6",
+        "subject": "Biology",
+        "minutes": 45,
+        "label": "Complete exam-question practice",
+        "priority": "exam"
+      },
+      {
+        "id": "M4",
+        "subject": "Maths",
+        "minutes": 60,
+        "label": "Finish the current practice set",
+        "priority": "deadline"
+      },
+      {
+        "id": "M5",
+        "subject": "Maths",
+        "minutes": 60,
+        "label": "Review the recorded error list",
+        "priority": "deadline"
+      },
+      {
+        "id": "M6",
+        "subject": "Maths",
+        "minutes": 90,
+        "label": "Extra optional practice set",
+        "priority": "optional"
+      },
+      {
+        "id": "M7",
+        "subject": "Maths",
+        "minutes": 75,
+        "label": "Rewrite the course notes",
+        "priority": "optional"
+      }
+    ],
+    "candidate_plan_id": "plan-001",
+    "locked_blocks": []
+  },
+  "previous_actions": [
+    {
+      "id": "A1",
+      "task_id": "M3",
+      "label": "Complete functions practice",
+      "status": "completed",
+      "completed_date": "2026-11-11"
+    },
+    {
+      "id": "A2",
+      "task_id": "B4",
+      "label": "Finish transport recap",
+      "status": "in_progress",
+      "completed_date": null
+    }
+  ],
+  "plan": [
+    {
+      "day": "Mon 16",
+      "subject": "Biology",
+      "task": "B4",
+      "focus": 45,
+      "buffer": 15,
+      "slots": "18:00-18:45"
+    },
+    {
+      "day": "Tue 17",
+      "subject": "Biology",
+      "task": "B5",
+      "focus": 45,
+      "buffer": 15,
+      "slots": "18:00-18:45"
+    },
+    {
+      "day": "Wed 18",
+      "subject": "Biology",
+      "task": "B6",
+      "focus": 45,
+      "buffer": 15,
+      "slots": "18:00-18:45"
+    },
+    {
+      "day": "Thu 19",
+      "subject": "Maths",
+      "task": "M4",
+      "focus": 60,
+      "buffer": 0,
+      "slots": "18:00-18:30 + 18:40-19:10"
+    },
+    {
+      "day": "Fri 20",
+      "subject": "Maths",
+      "task": "M5",
+      "focus": 60,
+      "buffer": 0,
+      "slots": "18:00-18:30 + 18:40-19:10"
+    }
+  ],
+  "scope_ref": "fictional-weekly-v2-20261115-London"
+}

@@ -146,6 +146,12 @@ export function workspaceAction(state,action,{id,now,owner}){
  else if(type==='weekly-goal'){recordGoal(state,'weekly-goal',number(action.minutes,0,10080),now,id);w.weeklyGoal=action.minutes;w.goalUpdatedAt=now;}
  else if(type==='analytics-init')beginLearning(state,now,id);
  else if(type==='analytics-zone'){const zone=text(action.zone,100);try{new Intl.DateTimeFormat('en',{timeZone:zone});}catch{invalid('Choose a valid IANA time zone.');}w.learning.zone=zone;w.learning.zoneUpdatedAt=now;}
+ else if(type==='review-import-ai'){
+  const ai=action.review?.snapshot?.aiWeek;if(!ai||!/^[a-f0-9-]{36}$/.test(ai.id))invalid('A completed AI weekly report is required.');
+  const reportId='ai-week-'+ai.id;
+  // Import once, including deletion markers: refresh must not resurrect a review.
+  if(!w.learning.reviews.some(r=>r.id===reportId))w.learning.reviews.push({...action.review,id:reportId,updatedAt:now,deletedAt:0});
+ }
  else if(type==='review-save'){
   const old=w.learning.reviews.find(r=>r.id===action.itemId&&!r.deletedAt);
   if(action.itemId&&!old)invalid('This review was removed.');

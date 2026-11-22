@@ -1,0 +1,232 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 2
+    },
+    "scope_ref": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "analysis_status": {
+      "enum": [
+        "full",
+        "limited",
+        "insufficient"
+      ]
+    },
+    "overview": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "type": "string",
+          "maxLength": 180
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 1100
+        },
+        "priority_ids": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^F[0-9]+$"
+          }
+        }
+      },
+      "required": [
+        "headline",
+        "summary",
+        "priority_ids"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^F[0-9]+$"
+          },
+          "section_id": {
+            "enum": [
+              "goals_actual",
+              "allocation",
+              "execution",
+              "capacity",
+              "follow_up"
+            ]
+          },
+          "observation": {
+            "type": "string",
+            "maxLength": 1100
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^E[0-9]+$"
+            }
+          },
+          "interpretation": {
+            "type": "string",
+            "maxLength": 1100
+          },
+          "uncertainty": {
+            "type": "string",
+            "maxLength": 1100
+          },
+          "recommendation": {
+            "type": "string",
+            "maxLength": 1100
+          },
+          "check_next_week": {
+            "type": "string",
+            "maxLength": 1100
+          }
+        },
+        "required": [
+          "id",
+          "section_id",
+          "observation",
+          "evidence_refs",
+          "interpretation",
+          "uncertainty",
+          "recommendation",
+          "check_next_week"
+        ]
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "goals_actual",
+              "allocation",
+              "execution",
+              "capacity",
+              "follow_up"
+            ]
+          },
+          "status": {
+            "enum": [
+              "available",
+              "limited",
+              "unavailable"
+            ]
+          },
+          "finding_ids": {
+            "type": "array",
+            "maxItems": 5,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^F[0-9]+$"
+            }
+          },
+          "unavailable_reason": {
+            "type": "string",
+            "maxLength": 450
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "finding_ids",
+          "unavailable_reason"
+        ]
+      }
+    },
+    "next_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "candidate_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 100
+        },
+        "explanation": {
+          "type": "string",
+          "maxLength": 1100
+        },
+        "tradeoffs": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "maxLength": 1100
+          }
+        },
+        "fallbacks": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "string",
+            "maxLength": 1100
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "string",
+            "pattern": "^E[0-9]+$"
+          }
+        }
+      },
+      "required": [
+        "candidate_id",
+        "explanation",
+        "tradeoffs",
+        "fallbacks",
+        "evidence_refs"
+      ]
+    },
+    "follow_up_status": {
+      "enum": [
+        "available",
+        "no_history",
+        "missing_links"
+      ]
+    },
+    "unknowns": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "maxLength": 450
+      }
+    }
+  },
+  "required": [
+    "version",
+    "scope_ref",
+    "analysis_status",
+    "overview",
+    "findings",
+    "sections",
+    "next_plan",
+    "follow_up_status",
+    "unknowns"
+  ]
+}

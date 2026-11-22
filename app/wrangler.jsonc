@@ -41,7 +41,13 @@
     "SUPPORT_EMAIL": "support@studytimely.com",
     "COMMUNITY_REVIEW_PROVIDER": "cloudflare",
     "COMMUNITY_REVIEW_ENABLED": "false",
-    "COMMUNITY_REVIEW_DAILY_NEURONS": "5000"
+    "COMMUNITY_REVIEW_DAILY_NEURONS": "5000",
+    "AI_WEEKLY_ENABLED": "true",
+    "AI_WEEKLY_MONTHLY_LIMIT": "4",
+    "AI_WEEKLY_DAILY_TOKEN_LIMIT": "100000",
+    "AI_WEEKLY_DETAILED_ENABLED": "true",
+    "AI_WEEKLY_DETAILED_MAX_OUTPUT": "5000",
+    "AI_WEEKLY_PREVIEW": "false"
   },
   "durable_objects": {
     "bindings": [

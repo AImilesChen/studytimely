@@ -1,0 +1,481 @@
+{
+  "provenance": "AI-written illustrative content from fictional inputs; no live provider request",
+  "pages": [
+    {
+      "eyebrow": "01 / YOUR WEEK, EXPLAINED",
+      "title": "A steady week. A smaller next plan.",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "You saved seven hours across six study days. The important next move is to make your upcoming workload fit the time you actually have, while protecting preparation for Friday's Biology exam."
+        },
+        {
+          "type": "metrics",
+          "items": [
+            [
+              "Saved study",
+              "7h 00m"
+            ],
+            [
+              "Weekly goal",
+              "8h 00m"
+            ],
+            [
+              "Planned tasks done",
+              "6 / 8"
+            ],
+            [
+              "Study days",
+              "6 / 7"
+            ]
+          ]
+        },
+        {
+          "type": "heading",
+          "number": "01",
+          "title": "Three decisions worth taking away"
+        },
+        {
+          "type": "note",
+          "label": "Keep",
+          "text": "Keep the six-day rhythm if it suits you. Your recorded study days were close in length: 65-75 minutes. There is no need to make every day longer simply to make the chart look better."
+        },
+        {
+          "type": "note",
+          "label": "Adjust",
+          "text": "Allow more room for similar Maths tasks. Three completed, linked tasks took 135 minutes against 90 estimated minutes. Treat that as a planning signal for these tasks, not a judgement of your ability."
+        },
+        {
+          "type": "note",
+          "label": "Prioritise",
+          "text": "Protect 135 minutes of Biology preparation before the exam date. Your original next-week list needs 420 minutes, but your entered availability supports 300 minutes. Review what to defer before adding work."
+        },
+        {
+          "type": "heading",
+          "number": "02",
+          "title": "Goals and the study you saved"
+        },
+        {
+          "type": "daily_chart"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Measure",
+            "This week",
+            "Comparison"
+          ],
+          "rows": [
+            [
+              "Saved study",
+              "420 min",
+              "420 min previously: unchanged"
+            ],
+            [
+              "Weekly target",
+              "480 min",
+              "60 min short; 87.5% reached"
+            ],
+            [
+              "Baseline planned tasks",
+              "8",
+              "6 completed; 2 still open"
+            ],
+            [
+              "Dated completions missing",
+              "0",
+              "No unknown dates in this example"
+            ]
+          ],
+          "widths": [
+            170,
+            105,
+            240
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "The time target was set before this week and stayed unchanged. Missing an hour does not tell us why the target was missed. The records do not measure learning quality, attention or grades."
+        },
+        {
+          "type": "source",
+          "text": "Basis: E01 daily totals; E02 target history; E03 baseline task/completion snapshot. Full fictional-data scope is on page 4."
+        }
+      ]
+    },
+    {
+      "eyebrow": "02 / WHERE THE PLAN NEEDS ADJUSTMENT",
+      "title": "Give the next deadline enough room.",
+      "blocks": [
+        {
+          "type": "heading",
+          "number": "03",
+          "title": "Subject time in the context of your next goal"
+        },
+        {
+          "type": "subjects"
+        },
+        {
+          "type": "paragraph",
+          "text": "Maths received 270 minutes (64.3%) and Biology 150 minutes (35.7%). This split is not automatically a problem: equal time is not a requirement. It matters now because your next dated exam is Biology on Friday 20 November, and three selected preparation tasks still need an estimated 135 minutes."
+        },
+        {
+          "type": "paragraph",
+          "text": "The draft on page 3 reserves those three tasks first, then keeps two Maths priorities. It does not claim Biology is a weak subject or that more hours will guarantee exam readiness. Review the priorities against what your teacher or course actually requires."
+        },
+        {
+          "type": "heading",
+          "number": "04",
+          "title": "Why similar tasks may need a larger estimate"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Completed task",
+            "Initial estimate",
+            "Recorded effort",
+            "Difference"
+          ],
+          "rows": [
+            [
+              "Maths M1",
+              "25 min",
+              "40 min",
+              "+15 min"
+            ],
+            [
+              "Maths M2",
+              "30 min",
+              "45 min",
+              "+15 min"
+            ],
+            [
+              "Maths M3",
+              "35 min",
+              "50 min",
+              "+15 min"
+            ],
+            [
+              "Matched sample total",
+              "90 min",
+              "135 min",
+              "+45 min (+50%)"
+            ]
+          ],
+          "widths": [
+            155,
+            120,
+            120,
+            120
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "For these three tasks, an average 30-minute estimate corresponded to 45 recorded minutes. For the next comparable practice task, try an editable 40-50 minute estimate, or split the work into two smaller parts. Check what remains after the first part rather than automatically extending every session."
+        },
+        {
+          "type": "paragraph",
+          "text": "The sample contains only three completed tasks with both an original estimate and linked records. It excludes unfinished work and tasks with missing estimates. The recorded effort is lifetime effort through the cutoff, not a claim that all future Maths work takes 50% longer. The cause of the mismatch is unknown."
+        },
+        {
+          "type": "heading",
+          "number": "05",
+          "title": "What fits before the next deadline"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Entered next-week capacity",
+            "Minutes"
+          ],
+          "rows": [
+            [
+              "Five weekday windows: 18:00-19:10",
+              "350 gross"
+            ],
+            [
+              "Planned breaks: 10 min each day",
+              "-50"
+            ],
+            [
+              "Available study capacity",
+              "300"
+            ],
+            [
+              "Current candidate task list",
+              "420"
+            ],
+            [
+              "Minimum gap before adding buffer",
+              "120"
+            ]
+          ],
+          "widths": [
+            365,
+            150
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "The proposed plan schedules 255 study minutes and leaves 45 minutes unallocated for work that runs over. That means deferring 165 minutes, rather than only the bare 120-minute gap. The exam time was not entered, so Biology preparation is placed before the exam date; no exam-day preparation time is assumed."
+        },
+        {
+          "type": "source",
+          "text": "Basis: E04 subject totals; E05 three matched task estimates; E06 next-week availability, breaks, task remaining-time estimates and exam date. Remaining time is user-estimated, not predicted by AI."
+        }
+      ]
+    },
+    {
+      "eyebrow": "03 / A PLAN YOU CAN REVIEW",
+      "title": "Five priorities. Forty-five minutes of room.",
+      "blocks": [
+        {
+          "type": "heading",
+          "number": "06",
+          "title": "Your proposed next-week plan"
+        },
+        {
+          "type": "paragraph",
+          "text": "This draft schedules 255 study minutes plus 45 minutes of buffer. It does not automatically change the previous 480-minute weekly target: review that target against this smaller commitment. Confirm the deadline, remaining-work estimates and availability before saving."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Day",
+            "Task / purpose",
+            "Study",
+            "Buffer"
+          ],
+          "rows": [
+            [
+              "Mon 16",
+              "Biology B4: finish transport recap",
+              "45 min",
+              "15 min"
+            ],
+            [
+              "Tue 17",
+              "Biology B5: next exam topic",
+              "45 min",
+              "15 min"
+            ],
+            [
+              "Wed 18",
+              "Biology B6: exam-question practice",
+              "45 min",
+              "15 min"
+            ],
+            [
+              "Thu 19",
+              "Maths M4: finish current set",
+              "60 min",
+              "0"
+            ],
+            [
+              "Fri 20",
+              "Maths M5: review error list",
+              "60 min",
+              "0"
+            ],
+            [
+              "Total",
+              "5 selected tasks",
+              "255 min",
+              "45 min"
+            ]
+          ],
+          "widths": [
+            67,
+            275,
+            85,
+            88
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "For each 45-minute Biology block, use 18:00-18:45; the entered 10-minute break leaves 15 minutes as unscheduled room. Each 60-minute Maths allocation is split into 18:00-18:30 and 18:40-19:10, with a 10-minute break. Saturday and Sunday remain unscheduled because no availability was entered."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Defer for your review",
+            "Time released",
+            "Why"
+          ],
+          "rows": [
+            [
+              "M6: extra optional practice",
+              "90 min",
+              "Lower priority than the entered deadline work"
+            ],
+            [
+              "M7: rewrite course notes",
+              "75 min",
+              "Optional in this task list; keep original task"
+            ],
+            [
+              "Total deferred",
+              "165 min",
+              "No tasks are deleted"
+            ]
+          ],
+          "widths": [
+            205,
+            95,
+            215
+          ]
+        },
+        {
+          "type": "note",
+          "label": "If work runs over",
+          "text": "Use the available buffer first. If Biology still has unfinished preparation after Wednesday, review Thursday's Maths allocation before adding time you have not entered. The report cannot know whether your remaining-time estimate covers everything needed for the exam."
+        },
+        {
+          "type": "note",
+          "label": "When you accept",
+          "text": "Review the draft in place, then explicitly save the selected changes. The draft is not a commitment until you accept it. Keep any existing commitments you cannot move; review a fresh draft if your free time changes."
+        },
+        {
+          "type": "heading",
+          "number": "07",
+          "title": "What happened to the previous suggestions?"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Previously accepted action",
+            "Recorded status",
+            "This report's response"
+          ],
+          "rows": [
+            [
+              "A1: complete functions practice",
+              "Done 11 Nov (M3)",
+              "Do not suggest it as new work"
+            ],
+            [
+              "A2: finish transport recap",
+              "Open (B4); 45 min remaining",
+              "Carry it into Monday's draft"
+            ]
+          ],
+          "widths": [
+            200,
+            150,
+            165
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "One accepted action was completed; one is still in progress. This is follow-through on linked tasks, not proof that an AI suggestion caused better learning. The relationship exists only because these fictional tasks were explicitly linked to a previous report."
+        },
+        {
+          "type": "source",
+          "text": "Basis: E06 reviewed candidate plan; E07 accepted-action/task links and dated task status. This fictional example illustrates linked follow-through, not an actual user history."
+        }
+      ]
+    },
+    {
+      "eyebrow": "04 / WHAT TO CHECK NEXT",
+      "title": "Make the next review easier to act on.",
+      "blocks": [
+        {
+          "type": "heading",
+          "number": "07",
+          "title": "Follow-up continued: the longer view"
+        },
+        {
+          "type": "weeks"
+        },
+        {
+          "type": "paragraph",
+          "text": "Across the four recorded weeks, saved study rose from 4 to 5 to 7 hours, then stayed at 7 hours. The latest week is a plateau in recorded time, not evidence of stalled understanding. Use completion and estimate accuracy alongside the time chart rather than chasing a longer bar."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Check at the next review",
+            "What it tells you"
+          ],
+          "rows": [
+            [
+              "Were the three Biology priorities completed before the exam date?",
+              "Whether the selected deadline work was finished; not an exam-readiness score"
+            ],
+            [
+              "How close were the next comparable task estimates?",
+              "Whether the 40-50 minute trial estimate was useful for this kind of work"
+            ],
+            [
+              "Was 255 min + 45 min buffer workable?",
+              "Whether the next plan needs fewer tasks or more realistic remaining-time estimates"
+            ]
+          ],
+          "widths": [
+            260,
+            255
+          ]
+        },
+        {
+          "type": "heading",
+          "number": "08",
+          "title": "Evidence and limits"
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Evidence",
+            "What this example includes"
+          ],
+          "rows": [
+            [
+              "E01 / E02",
+              "12 saved sessions; all 7 calendar dates; 6 study days; a stable 480-minute weekly target"
+            ],
+            [
+              "E03",
+              "8 tasks at the week-start baseline; 6 dated completions; 0 midweek additions; 0 unknown completion dates"
+            ],
+            [
+              "E04 / E05",
+              "Subject totals; 3 completed tasks with initial estimates and linked recorded effort"
+            ],
+            [
+              "E06",
+              "User-entered next-week windows, breaks, remaining work, selected priorities and a date-only Biology exam"
+            ],
+            [
+              "E07 / E08",
+              "Two prior accepted-action links; four complete-week totals using consistent scope"
+            ]
+          ],
+          "widths": [
+            100,
+            415
+          ]
+        },
+        {
+          "type": "paragraph",
+          "text": "All figures, task references, task names, exam details and action history in this example are fictional. This is an AI-written format demonstration, not an analysis of your account or a live DeepSeek result. A real report should identify its saved week, cutoff and missing information just as clearly."
+        },
+        {
+          "type": "paragraph",
+          "text": "Unrecorded study is not included. The 6/8 completion figure follows the original task baseline; the timing comparison covers only the three matched completed tasks. Next-week remaining-time values are your estimates. Check them if a task still seems too large."
+        },
+        {
+          "type": "paragraph",
+          "text": "Saved time and self-marked completion do not establish grades, attention or mastery. A report can help you review a plan; it cannot tell whether the task list covers everything you need for an exam. Your private reflections remain separate from the generated analysis."
+        },
+        {
+          "type": "note",
+          "label": "Before your next review",
+          "text": "After each priority session, check what remains and confirm completion when finished. At the next review, compare the linked tasks and their estimates with the plan you actually accepted. Keep the same saved report online or download it; the copy does not contain extra analysis."
+        },
+        {
+          "type": "source",
+          "text": "Review artifact only. No live model request, actual-user analysis, entitlement change, task write, deployment or purchase was performed."
+        }
+      ]
+    }
+  ]
+}

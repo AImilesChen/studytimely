@@ -1,0 +1,155 @@
+{
+  "version": 2,
+  "scope_ref": "fictional-weekly-v2-20261115-London",
+  "analysis_status": "full",
+  "overview": {
+    "headline": "A steady week. A smaller next plan.",
+    "summary": "Protect the next dated deadline, allow room for similar tasks that took longer than estimated, and make the next plan fit the entered availability.",
+    "priority_ids": [
+      "F2",
+      "F3",
+      "F4"
+    ]
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "section_id": "goals_actual",
+      "observation": "Saved study was 420 minutes against a stable 480-minute target. The original task plan has six of eight tasks completed.",
+      "evidence_refs": [
+        "E01",
+        "E02",
+        "E03"
+      ],
+      "interpretation": "The next week has less entered availability than this week. Reusing the old target would create a commitment that does not fit the supplied windows.",
+      "uncertainty": "A time shortfall does not establish its cause or prove less learning. The next-week time commitment is a user choice, not an AI-set goal.",
+      "recommendation": "Review the old target alongside the candidate plan: it commits 255 study minutes and keeps 45 minutes unallocated. Confirm a realistic new target before saving.",
+      "check_next_week": "At the next review, compare recorded study with the target the user actually accepted, and show any changes made during the week."
+    },
+    {
+      "id": "F2",
+      "section_id": "allocation",
+      "observation": "Maths has 270 recorded minutes and Biology 150. The next dated exam is Biology on 20 November; three selected Biology tasks need an estimated 135 minutes.",
+      "evidence_refs": [
+        "E04",
+        "E06"
+      ],
+      "interpretation": "Subject time does not need to be equal. The imminent entered deadline provides a concrete reason to protect the selected Biology work first.",
+      "uncertainty": "The report cannot know whether those tasks cover the entire exam syllabus or whether Biology is a weak subject.",
+      "recommendation": "Keep B4, B5 and B6 in the candidate plan before the exam date; review the lower-priority Maths work for deferral.",
+      "check_next_week": "Check whether B4, B5 and B6 were completed before the entered exam date; do not convert that status into an exam-readiness score."
+    },
+    {
+      "id": "F3",
+      "section_id": "execution",
+      "observation": "Three completed, linked Maths tasks have 90 initial estimated minutes and 135 recorded lifetime minutes through cutoff: 45 minutes more, or 50%.",
+      "evidence_refs": [
+        "E05"
+      ],
+      "interpretation": "For this sample, an average 30-minute estimate corresponded to 45 recorded minutes. Similar next tasks may need a larger estimate or smaller scope.",
+      "uncertainty": "Only three matched tasks are represented. Missing estimates and unfinished tasks are excluded; this is not a 50% prediction for all future Maths work.",
+      "recommendation": "For the next comparable practice task, try an editable 40-50 minute estimate or two smaller parts. Check remaining work after the first part.",
+      "check_next_week": "Compare the next dated, completed task with its original estimate and recorded effort, keeping the same matching rules."
+    },
+    {
+      "id": "F4",
+      "section_id": "capacity",
+      "observation": "The candidate task list requires 420 minutes. The five entered weekday windows provide 300 study minutes after breaks.",
+      "evidence_refs": [
+        "E06"
+      ],
+      "interpretation": "The list exceeds capacity by 120 minutes even before keeping any buffer. The selected candidate keeps 255 minutes of priorities and 45 minutes unallocated.",
+      "uncertainty": "Remaining work is user-estimated. The exam has a date but no start time, so the candidate does not assume exam-day Biology preparation capacity.",
+      "recommendation": "Defer the optional M6 and M7 tasks, releasing 165 minutes while preserving them in the task list. Review the candidate rather than adding unavailable time.",
+      "check_next_week": "Check whether the accepted priorities and buffer were workable, and refresh the draft if availability or remaining work changed."
+    },
+    {
+      "id": "F5",
+      "section_id": "follow_up",
+      "observation": "Of two explicitly accepted previous actions, A1 links to completed task M3 and A2 to open task B4 with 45 estimated minutes remaining.",
+      "evidence_refs": [
+        "E07"
+      ],
+      "interpretation": "The completed action should not be proposed as new work. The unfinished linked task is a concrete candidate for the next plan.",
+      "uncertainty": "Accepted action status does not show that advice caused a learning improvement. Unlinked tasks must not be counted as followed advice.",
+      "recommendation": "Carry B4 into Monday while preserving its existing task identity and recorded work; do not recreate M3.",
+      "check_next_week": "At the next report, inspect the dated completion or updated remaining-work feedback for B4."
+    },
+    {
+      "id": "F6",
+      "section_id": "follow_up",
+      "observation": "Four complete-week saved-time totals are 240, 300, 420 and 420 minutes under the same scope.",
+      "evidence_refs": [
+        "E08"
+      ],
+      "interpretation": "Recorded time rose and then stayed level. The next decision should account for deadlines and task completion rather than aim for a longer bar by default.",
+      "uncertainty": "A flat time total is not evidence of stalled understanding. These figures do not identify a cause or an optimal study duration.",
+      "recommendation": "Keep the manageable rhythm if it suits the user; review the smaller next-week commitment against the time actually available.",
+      "check_next_week": "Review the same-scope time trend together with dated completion and estimate accuracy, not as a standalone learning-quality score."
+    }
+  ],
+  "sections": [
+    {
+      "id": "goals_actual",
+      "status": "available",
+      "finding_ids": [
+        "F1"
+      ],
+      "unavailable_reason": ""
+    },
+    {
+      "id": "allocation",
+      "status": "available",
+      "finding_ids": [
+        "F2"
+      ],
+      "unavailable_reason": ""
+    },
+    {
+      "id": "execution",
+      "status": "available",
+      "finding_ids": [
+        "F3"
+      ],
+      "unavailable_reason": ""
+    },
+    {
+      "id": "capacity",
+      "status": "available",
+      "finding_ids": [
+        "F4"
+      ],
+      "unavailable_reason": ""
+    },
+    {
+      "id": "follow_up",
+      "status": "available",
+      "finding_ids": [
+        "F5",
+        "F6"
+      ],
+      "unavailable_reason": ""
+    }
+  ],
+  "next_plan": {
+    "candidate_id": "plan-001",
+    "explanation": "Keep the three Biology preparation tasks before the exam date, then retain the two selected Maths priorities. Reserve buffer instead of filling every available study minute.",
+    "tradeoffs": [
+      "M6 optional practice and M7 note rewriting are deferred, not deleted.",
+      "The previous weekly target needs separate review; accepting a task plan does not silently change the target."
+    ],
+    "fallbacks": [
+      "If priority work remains after Wednesday, review Thursday before adding unavailable time.",
+      "Refresh the draft if the entered availability, task status or remaining-work estimates change."
+    ],
+    "evidence_refs": [
+      "E06"
+    ]
+  },
+  "follow_up_status": "available",
+  "unknowns": [
+    "Exam start time was not provided.",
+    "Remaining work is estimated, not guaranteed.",
+    "The records do not measure grades, attention or mastery."
+  ]
+}

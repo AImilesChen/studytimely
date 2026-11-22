@@ -1,4 +1,5 @@
 import {readGroupsReturn} from '../lib/group-center-draft.mjs';
+import {consumeWeeklyEntry} from '../lib/weekly-report-entry.mjs';
 import {MyGroups} from './MyGroups.jsx';
 import {StudyCenterProgress} from './StudyCenterProgress.jsx';
 import {StudyCenterGuide} from './StudyCenterGuide.jsx';
@@ -27,6 +28,7 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
   enter();window.addEventListener('studytimely:account-entry',enter);window.addEventListener('popstate',enter);return()=>{window.removeEventListener('studytimely:account-entry',enter);window.removeEventListener('popstate',enter);};
  },[]);
  useEffect(()=>{if(settingsSignal)setView('settings');},[settingsSignal]);
+ useEffect(()=>{if(!auth?.user?.syncAccountId||!consumeWeeklyEntry())return;setView('progress');const url=new URL(location.href);url.searchParams.set('view','progress');history.replaceState({},'',url.pathname+url.search+url.hash);},[auth?.user?.syncAccountId]);
  useEffect(()=>{if(loaded&&auth?.user?.googleLinked&&auth.user.syncAccountId&&['settings','signin'].includes(new URL(location.href).searchParams.get('view'))&&readGroupsReturn(auth.user.syncAccountId)){setView('community');const url=new URL(location.href);url.searchParams.set('view','community');history.replaceState({},'',url.pathname+url.search+url.hash);}},[loaded,auth?.user?.syncAccountId,auth?.user?.googleLinked]);
  const report=useMemo(()=>ready?studyCenterReport(store.data,minute*60000):null,[ready,today,minute,store.data.sessions,store.data.workspace,store.data.dailyGoal]);
  const active=store.data.timer,unfinished=hasProgress(active),timerPath=unfinished?toolFor(active.mode).path:'/';
@@ -60,7 +62,7 @@ export function StudyCenter({store,now,navigate,onStart,auth,loaded,cloud,accoun
  {!auth&&loaded&&<section className="sc-signin"><div><h2>Keep learning here, sync when you choose</h2><p>Google sign-in enables optional cloud sync and community access. Signing in alone does not upload these records.</p></div><button className="button" disabled={!signInReady||accountBusy} onClick={onSignIn}>Continue with Google</button><button className="text-button" onClick={()=>choose('settings')}>Account options</button></section>}
 
  </>}
- {view==='progress'&&<StudyCenterProgress key={(store.cloudSync?.info?.account||'local')+':'+store.data.epoch} store={store} now={now} ready={ready} onDirty={value=>{progressDirty.current=value;}} studyAction={link(timerPath,unfinished?'Return to current timer':'Open study timer')}/>}
+ {view==='progress'&&<StudyCenterProgress key={(store.cloudSync?.info?.account||'local')+':'+store.data.epoch} auth={auth} onSignIn={onSignIn} signInReady={signInReady} store={store} now={now} ready={ready} onDirty={value=>{progressDirty.current=value;}} studyAction={link(timerPath,unfinished?'Return to current timer':'Open study timer')}/>}
  {view==='community'&&<MyGroups key={auth?.user?.syncAccountId||'guest'} auth={auth} loaded={loaded} navigate={navigate} onAccount={()=>choose('settings')}/>}
  {view==='settings'&&settings}
  </div><p className="sc-source">Saved personal learning in this browser · local calendar dates. Plans and task completion do not create study time. Sync is optional and managed in Account & data.</p></main>;

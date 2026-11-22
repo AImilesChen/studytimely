@@ -1,6 +1,7 @@
 import {SCENE_VIDEOS} from '../src/lib/scene-media.mjs';
 import {automaticSyncMaintenance} from './automatic-sync.mjs';
 import {learningFeatures,libraryAccess} from './learning-features.mjs';
+import {createWeeklyApi,weeklyMaintenance} from './ai-weekly.mjs';
 import {result} from './auth-shared.mjs';
 import {PLUS_SCENES,sceneAssetPath} from '../src/lib/library-access.mjs';
 import {MUSIC_TRACKS} from '../src/lib/music-catalog.mjs';
@@ -11,6 +12,7 @@ import {createAccountsApi} from './accounts.mjs';
 import {createGoogleAuth} from './google-auth.mjs';
 import {createCommunityApi,communityMaintenance} from './community.mjs';
 const accountApi=createAccountsApi({emailRecoveryOnly:true}),googleApi=createGoogleAuth(),communityApi=createCommunityApi();
+const weeklyApi=createWeeklyApi();
 const accountPaths=new Set(['/api/auth/me','/api/auth/request-code','/api/auth/verify-code','/api/auth/logout','/api/workspace','/api/account/export','/api/account']);
 const paths=new Set(ROUTES.map(r=>r.path));
 const musicFiles=new Map([...MUSIC_TRACKS,...AMBIENT_RECORDINGS,...MUSIC_TRACKS.filter(t=>t.sampleSrc).map(t=>({src:t.sampleSrc,bytes:t.sampleBytes}))].map(t=>[t.src,t.bytes]));
@@ -29,6 +31,7 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
   catch{return result({error:{code:'LIBRARY_UNAVAILABLE',message:'Access could not be checked. Try again; free content remains available.'}},503);}
  }
  if(path==='/api/learning/features')return learningFeatures(request,env,config);
+ if(path.startsWith('/api/learning/weekly-reports'))return weeklyApi(request,env,config,ctx);
  if(path.startsWith('/api/auth/google/'))return googleApi(request,env);
  if(path.startsWith('/api/community/'))return communityApi(request,env,config.communityEnabled===true,ctx);
  if(accountPaths.has(path)||path.startsWith('/api/sync/'))return accountApi(request,env,config.accountsEnabled===true);
@@ -65,4 +68,4 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
  const analytics=config.analyticsEnabled&&path==='/analytics-frame.html'?" https://www.googletagmanager.com https://www.google-analytics.com https://region1.google-analytics.com https://analytics.ahrefs.com":'';
  out.set('Content-Security-Policy',`default-src 'self'; script-src 'self'${analytics}; style-src 'self' 'unsafe-inline'; img-src 'self' data:${analytics}; font-src 'self'; connect-src 'self'${config.communityEnabled&&path==='/study-groups'?' '+(url.protocol==='https:'?'wss://':'ws://')+url.host:''}${analytics}; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'`);
  return new Response(request.method==='HEAD'?null:response.body,{status:missing?404:response.status,headers:out});
-},async scheduled(event,env,ctx){if(config.accountsEnabled)ctx.waitUntil(automaticSyncMaintenance(env,event.scheduledTime));if(config.communityEnabled)ctx.waitUntil(communityMaintenance(env,event.scheduledTime));}};}
+},async scheduled(event,env,ctx){if(config.accountsEnabled)ctx.waitUntil(automaticSyncMaintenance(env,event.scheduledTime));if(config.accountsEnabled&&env.AI_WEEKLY_ENABLED==='true')ctx.waitUntil(weeklyMaintenance(env,event.scheduledTime));if(config.communityEnabled)ctx.waitUntil(communityMaintenance(env,event.scheduledTime));}};}
