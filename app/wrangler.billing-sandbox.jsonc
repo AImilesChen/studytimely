@@ -1,0 +1,24 @@
+{
+  "name": "studytimely-billing-sandbox",
+  "main": ".wrangler/billing-webhook/worker.mjs",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
+  "vars": {
+    "BILLING_ENABLED": "true",
+    "BILLING_ENV": "test",
+    "BILLING_TEST_ISOLATED": "true",
+    "BILLING_ORIGIN": "https://studytimely-billing-sandbox.chenminjian08.workers.dev"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "studytimely-billing-sandbox",
+      "database_id": "1122e115-6b77-43db-aef8-ee0a0cca7e69",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
