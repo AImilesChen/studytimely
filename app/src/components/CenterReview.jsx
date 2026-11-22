@@ -2,7 +2,7 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {analysisRange,studyAnalysis,newReview,analysisFingerprint,duration} from '../lib/study-analysis.mjs';
 import {dayKey} from '../lib/model.mjs';
 import {shiftPlannerDay} from '../lib/planner.mjs';
-import {WeeklyStudyReport,WeeklyReportGuide} from './WeeklyStudyReport.jsx';
+import {WeeklyStudyReport} from './WeeklyStudyReport.jsx';
 import {accountRequest} from '../lib/sync.mjs';
 
 const notes=[['good','What went well?','What helped you get started or understand a topic?'],['difficulty','What got in the way?','A difficult topic, an unrealistic estimate, or something else?'],['next','What will you change next time?','Choose one small adjustment you can act on.']];
@@ -73,7 +73,6 @@ export function CenterReview({store,source,report,now,access,demo=false,datesPen
   <p className="weekly-purpose">DeepSeek analyses your saved weekly summary. Read the full report here; download the same charts, analysis and suggestions to keep a copy. Nothing extra is generated when you download.</p>
   {demo?<p className="cp-note">Example view. Reflections and next steps are not saved in this mode.</p>:access.status==='loading'?<p role="status" className="cp-note">Checking review availability…</p>:access.status==='error'?<p className="cp-note">Review availability could not be checked. Your basic statistics and records still work. <button className="button" onClick={access.retry}>Retry availability</button></p>:!access.active?<p className="cp-note">New snapshots and review editing require eligible advanced analytics access. Available saved reviews remain readable here.</p>:!eligible&&!selected&&!draft?<p className="cp-note">Choose This week, Last week, This month or Last month above to write a review. Custom-date statistics and CSV remain available.</p>:null}
   <WeeklyStudyReport store={store} source={source} report={report} now={now} view={aiView} auth={auth} onSignIn={onSignIn} signInReady={signInReady} demo={demo} onImported={id=>{if(!dirty&&!busy){chooseAI(id);requestAnimationFrame(()=>document.querySelector('.weekly-report-paper')?.scrollIntoView({block:'start',behavior:source.settings?.reducedMotion?'auto':'smooth'}));}}} onAction={useSuggestion} onWeek={onWeek} onBusy={setGenerating} canPlan={!demo&&!busy&&!store.hasPending&&!datesPending}/>
-  {!aiView&&<WeeklyReportGuide/>}
   {view&&!view.snapshot.aiWeek&&(selected||dirty)&&<>
    <p className="cp-review-range">Review snapshot: {view.start} – {view.end} · {view.zone} · {view.subject==='none'?'Unlabelled':view.subject||'All subjects'}{view.mode?' · '+view.mode:''}</p>
    <div className="cp-review-summary"><span><strong>{duration(view.snapshot.total)}</strong> saved study</span><span><strong>{view.snapshot.activeDays}</strong> study days</span><span><strong>{view.snapshot.completed||0}</strong> known task completions</span></div>
@@ -86,6 +85,5 @@ export function CenterReview({store,source,report,now,access,demo=false,datesPen
   {notice&&<p className="cp-feedback" role="status">{notice}</p>}{issue&&<p className="field-error" role="alert">{issue}</p>}
   {savedReview?.snapshot.aiWeek&&<button className="button" type="button" disabled={busy||demo||store.hasPending} onClick={removeAI}>Delete this AI report</button>}
   <form ref={nextForm} className="cp-next-step" aria-label="Plan a next step from this review" onSubmit={addTask}><h3><span className="cp-handwritten-emoji" aria-hidden="true">✏️</span> One next step</h3><p>Add a concrete task here when you know what to do next.</p><label className="cp-field cp-next-title">Study task<input name="title" required maxLength={140} key={selected||'new'} defaultValue="" placeholder="e.g. Practise five cell-transport questions" disabled={busy||demo||store.hasPending}/></label><label className="cp-field">Study day<input name="plannedDate" type="date" required defaultValue={shiftPlannerDay(dayKey(now),1)} disabled={busy||demo||store.hasPending}/></label><label className="cp-field">Planned minutes<input name="minutes" type="number" min="0" max="10080" step="1" placeholder="25" disabled={busy||demo||store.hasPending}/></label><button className="button" disabled={busy||demo||store.hasPending}>Add next step</button><p className="cp-note">Tasks use your device’s local calendar. Estimates and task completion do not add study minutes.</p>{taskNotice&&<p className="cp-feedback" role="status">{taskNotice}</p>}{taskIssue&&<p className="field-error" role="alert">{taskIssue}</p>}</form>
-  {aiView&&<WeeklyReportGuide/>}
  </section>;
 }
