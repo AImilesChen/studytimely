@@ -1,0 +1,151 @@
+{
+  "generatedDate": "2026-11-22",
+  "tool": "built-in image_gen",
+  "description": "New AI-generated artwork; no social-media source image files were copied or supplied as edit targets. General subjects, palettes and moods informed original text prompts.",
+  "assets": [
+    {
+      "id": "cobalt-horizon",
+      "sourceSha256": "3d651f937bf5bf096304cfc2066ecc58afc73009c0d6901f7d36416fce5fbe7d",
+      "src": "/focus-scenes/cobalt-horizon-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 76848,
+      "sha256": "40d81b33147c10891e8fe47a7fb96d555a5d1d5c4510619fe4b2ee96be9e9a91",
+      "thumbnail": "/focus-scenes/previews/cobalt-horizon-v1.webp",
+      "thumbnailSha256": "9ff3ba1d220bbeea7ddfa8609a156aef8a1c17a12d7574c939a40544c1c8524e",
+      "promptKey": "blue"
+    },
+    {
+      "id": "reedwater",
+      "sourceSha256": "dd006d6a4a5f02a7e7783c21fff94f596a807f224223bba24b05f7eab96bc832",
+      "src": "/focus-scenes/reedwater-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 219762,
+      "sha256": "5b1ea05396115a5ccce2d3b7a5f186fa1ddbb5fb143c995a6cb15641300e2a84",
+      "thumbnail": "/focus-scenes/previews/reedwater-v1.webp",
+      "thumbnailSha256": "73cffaf1637b14dae70c51682f566a740bd3ed4df1757cb1b30b7031885a1e3d",
+      "promptKey": "reeds"
+    },
+    {
+      "id": "cosmos-shore",
+      "sourceSha256": "22f83f376cf954453977c78218afaeb13bd05bcff9ac0b69c0db14883ee3574b",
+      "src": "/focus-scenes/cosmos-shore-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 81168,
+      "sha256": "75a6ea6a3b00aa2af0b397465f1178d5b3406c8d1891270c399691775fdd9742",
+      "thumbnail": "/focus-scenes/previews/cosmos-shore-v1.webp",
+      "thumbnailSha256": "98d76d9c73a9573f5f3a5658a119784cf6445b92bd598f73c769109d5cdb6de5",
+      "promptKey": "flowers"
+    },
+    {
+      "id": "golden-birches",
+      "sourceSha256": "65865c622740de59c85fd17172884c9c33b3d737d2f5c22a234797bdc3dae7af",
+      "src": "/focus-scenes/golden-birches-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 354412,
+      "sha256": "857b45b8838cef12974ad881ecd1ea4726a8af88f9895147c6f4f0d063e6d8c7",
+      "thumbnail": "/focus-scenes/previews/golden-birches-v1.webp",
+      "thumbnailSha256": "c54fd15c50f2d5809eab1c3b7a54351521eecd5b00cee9b54a38cf3a844450f1",
+      "promptKey": "birch"
+    },
+    {
+      "id": "amber-canopy",
+      "sourceSha256": "4504a9d310bc3ce033c3f71636cbfd665e9277c8e10a3292dfbc665b647c15fb",
+      "src": "/focus-scenes/amber-canopy-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 243802,
+      "sha256": "bb365814908e70907be372b802fa041d199910389e86b9bb385abcffd67d3320",
+      "thumbnail": "/focus-scenes/previews/amber-canopy-v1.webp",
+      "thumbnailSha256": "374811687d2ff7a2338584135f7d9d5112475fc82e0a15c5eadb52cdd29cf68a",
+      "promptKey": "amber"
+    },
+    {
+      "id": "harbor-bookshop",
+      "sourceSha256": "a12e3d146935cb4d2c1db47d4b21d231eb27de4a41bf5d69ca51caaa69e8b451",
+      "src": "/focus-scenes/harbor-bookshop-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 317472,
+      "sha256": "d2c78d4c82c301c0b6b770753fd757d78e3344e219e4f431bacc44e09156d361",
+      "thumbnail": "/focus-scenes/previews/harbor-bookshop-v1.webp",
+      "thumbnailSha256": "e0efa2007ad2ee5bfe62b3350c357f42849fb816a44f8238597e9e589b1a1561",
+      "promptKey": "street"
+    },
+    {
+      "id": "daisy-nap",
+      "sourceSha256": "7fcd8a4b2f41b40571aca2cf88fb778e932b49b0e680a15786bed0b7f8402921",
+      "src": "/focus-scenes/daisy-nap-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 101062,
+      "sha256": "6897754414c54640019bfacf98a83d730b8b25ec66bc3fff49eafdb988240fd4",
+      "thumbnail": "/focus-scenes/previews/daisy-nap-v1.webp",
+      "thumbnailSha256": "c74a74a48c368915c0e60f8071ed014f24fc9892d5f5551b1e282d6ccecf6219",
+      "promptKey": "kitten"
+    },
+    {
+      "id": "curious-calves",
+      "sourceSha256": "8ca7ec2be8b270ace3cd21dfc32f3ee78d9804fb6aae26c98e24bfbb5fb8ea43",
+      "src": "/focus-scenes/curious-calves-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 169576,
+      "sha256": "1ff9413cfeeac1819345c3cbc661c7ee7f446cd97f27c2ff37b974db4d9bada9",
+      "thumbnail": "/focus-scenes/previews/curious-calves-v1.webp",
+      "thumbnailSha256": "f66ba955c0299b7e4f15493666e31160f44cc813cac46661300f02691822650c",
+      "promptKey": "calves"
+    },
+    {
+      "id": "blanket-capybara",
+      "sourceSha256": "78bbfcb3fbf779ea0566aa2f460161a77bddae83238380f48885d58f99ff758c",
+      "src": "/focus-scenes/blanket-capybara-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 126548,
+      "sha256": "71b21ac32899c0af60fd5e06aa80cedab76ed3e5a4d354f9f8c2bfef4a038451",
+      "thumbnail": "/focus-scenes/previews/blanket-capybara-v1.webp",
+      "thumbnailSha256": "7c77219a642defffa4f0a6c78bb6effe2272866e863a71c672db966a2a5d68ab",
+      "promptKey": "capybara"
+    },
+    {
+      "id": "professor-duck",
+      "sourceSha256": "e70a3e8c6eb1115eb0dd91775808ec87368e9dfbd94eb3e64a83f777171ab691",
+      "src": "/focus-scenes/professor-duck-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 122534,
+      "sha256": "ed79cbca68610037f6e43a5cd5b0c82e7941669b2b56ff3bbd2fc5ef9ab452a2",
+      "thumbnail": "/focus-scenes/previews/professor-duck-v1.webp",
+      "thumbnailSha256": "d383b57ac6257f97181a5da9e84e636b3ebac8bdba382e9ef58c9298b909d981",
+      "promptKey": "duck"
+    },
+    {
+      "id": "coastal-carriage",
+      "sourceSha256": "4cfd7abc9c4da18a8acb7f44956a2e0565321307081cb24924d811fd2459e23a",
+      "src": "/focus-scenes/coastal-carriage-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 230788,
+      "sha256": "53f561370f215869bd674b76773a87f436c0494e6f3f4a0847789cdb29454318",
+      "thumbnail": "/focus-scenes/previews/coastal-carriage-v1.webp",
+      "thumbnailSha256": "0cb8d34fcd31623205f7c3608d69239fdbe299d936167ec598d09506418ccc6a",
+      "promptKey": "window"
+    },
+    {
+      "id": "golden-koi",
+      "sourceSha256": "d2511a2f844abfc747ad0ac3c7293e4fa2204acbe849e4dd0da9e7dd8d4e9b2e",
+      "src": "/focus-scenes/golden-koi-generated-v1.webp",
+      "width": 1664,
+      "height": 936,
+      "bytes": 182410,
+      "sha256": "84f578bb4dc8dae91312136db978f41c6fa452e639b7fdbb24f1aee21d0ee752",
+      "thumbnail": "/focus-scenes/previews/golden-koi-v1.webp",
+      "thumbnailSha256": "9675d6d6025bf191f31ed8e6182b6b4977ef8bbbb9991d122bd362e14bbbd161",
+      "promptKey": "koi"
+    }
+  ]
+}

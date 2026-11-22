@@ -4,9 +4,14 @@ import {MusicControls} from './MusicControls.jsx';
 import {THEMES,themePatch} from '../lib/ambient.mjs';
 import {SOUND_SCAPES} from '../lib/sound-settings.mjs';
 import {ambientRecording,AMBIENT_RECORDINGS} from '../lib/ambient-catalog.mjs';
+import {useLibraryAccess} from '../lib/useLibraryAccess.jsx';
+import {LibraryAccessNote,LibraryRules} from './LibraryAccess.jsx';
 const SOUND_ICONS={rain:CloudRain,cafe:Coffee,forest:Tree,waves:Waves,white:WaveSine,brown:WaveSine,pink:WaveSine,fire:Fire,fan:Fan,stream:Drop,keyboard:Keyboard,nature:Wind};
 
-export function ThemePicker({settings,command,ready}){const selected=settings.spaceTheme==='default'?settings.theme:settings.spaceTheme;return <div className="space-themes">{THEMES.map(([id,label,color])=><button key={id} disabled={!ready} className={selected===id?'chosen':''} aria-pressed={selected===id} onClick={()=>command('settings',{patch:themePatch(id)})}><span className="theme-swatch" style={{background:color}}/><span>{label}</span></button>)}</div>;}
+export function ThemePicker({settings,command,ready}){
+ const access=useLibraryAccess(),[notice,setNotice]=useState('');const saved=settings.spaceTheme==='default'?settings.theme:settings.spaceTheme,selected=access.item('theme',saved).allowed?saved:settings.theme;
+ return <><LibraryAccessNote/><div className="space-themes">{THEMES.map(([id,label,color])=>{const item=access.item('theme',id);return <button key={id} disabled={!ready} data-locked={!item.allowed} className={selected===id?'chosen':''} aria-pressed={selected===id} onClick={()=>{if(!item.allowed){setNotice(`${label} is a Plus colour theme. Your current theme is unchanged. ${access.status==='loading'?'Checking access…':access.status==='error'?'Use Check again above to retry.':'Paid subscriptions are not available yet.'}`);return;}setNotice('');command('settings',{patch:themePatch(id)});}}><span className="theme-swatch" style={{background:color}}/><span>{label}</span><small className="library-badge" data-tier={item.tier}>{item.label}</small></button>;})}</div>{notice&&<p role="status" className="library-locked-note">{notice}</p>}{saved!==selected&&<p className="library-locked-note">Your saved Plus colour is kept. A free theme is displayed until access is available.</p>}<LibraryRules/></>;
+}
 export function TimerSizePicker({settings,command,ready}) {
  return <fieldset className="timer-size-picker"><legend>Timer size</legend><div>{['small','medium','large'].map(size=><button key={size} type="button" aria-pressed={settings.timerSize===size} disabled={!ready} onClick={()=>command('settings',{patch:{timerSize:size}})}><span aria-hidden="true" className={`size-sample ${size}`}>25</span><span>{size[0].toUpperCase()+size.slice(1)}</span>{settings.timerSize===size&&<Check size={14} aria-hidden="true"/>}</button>)}</div><p className="help">Fits your screen automatically. Choose a smaller or larger view.</p></fieldset>;
 }

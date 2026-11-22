@@ -19,5 +19,7 @@
   "advancedAnalyticsPreview": true,
   "advancedAnalyticsPreviewEndsAt": 0,
   "advancedPlanningPreview": true,
-  "advancedPlanningPreviewEndsAt": 0
+  "advancedPlanningPreviewEndsAt": 0,
+  "advancedLibraryPreview": true,
+  "advancedLibraryPreviewEndsAt": 0
 }

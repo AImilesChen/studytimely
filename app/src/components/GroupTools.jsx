@@ -1,3 +1,4 @@
+import {useLibraryAccess} from '../lib/useLibraryAccess.jsx';
 import {createContext,useCallback,useContext,useEffect,useRef,useState} from 'react';
 import {Plus,ArrowRight,CheckCircle,ShieldCheck} from '@phosphor-icons/react';
 import {Dialog} from './Dialog.jsx';
@@ -6,7 +7,7 @@ import {accountRequest} from '../lib/sync.mjs';
 import {GROUP_TASK_TEMPLATES,WEEKDAYS,seriesDraft,seriesDates,dayPlus,ACTIVITY_SUBJECTS,ACTIVITY_KINDS} from '../lib/group-advanced.mjs';
 import {activityWall,activityWhen} from '../lib/group-activities.mjs';
 import {utcDay} from '../lib/community-model.mjs';
-import {FOCUS_SCENES,sceneFor,sceneImage} from '../lib/focus-space.mjs';
+import {FOCUS_SCENES,sceneFor,sceneImage,sceneThumbnail} from '../lib/focus-space.mjs';
 import {MUSIC_TRACKS,musicTrack} from '../lib/music-catalog.mjs';
 import './group-advanced.css';
 const subjects=Object.entries(ACTIVITY_SUBJECTS),kinds=Object.entries(ACTIVITY_KINDS);
@@ -477,6 +478,7 @@ export function ChallengeForm({challenge,busy,now,save,canSave=true,access}) {
 }
 
 export function RoomAtmosphere({data,manage,canUse,canPrepare,busy,write,music,scene,onScene,workspace}) {
+  const library=useLibraryAccess();
   const environment = data.environment;
   const [draft,setDraft] = useState(() => ({scene:environment.scene,music:environment.music,
     quietChat:Boolean(environment.quiet_chat),version:environment.version}));
@@ -499,25 +501,25 @@ export function RoomAtmosphere({data,manage,canUse,canPrepare,busy,write,music,s
   }
   return <section className="group-room-atmosphere" aria-label="Scene and music controls">
     <figure className="tools-scene-preview">
-      <img src={sceneImage(draft.scene)} alt={preview.name + ' study background'}/>
+      <img src={sceneThumbnail(draft.scene)} alt={preview.name + ' study background'}/>
       <figcaption>{draft.scene === environment.scene ? 'Suggested room scene' : 'Your scene preview'}</figcaption>
     </figure>
     <div className="tools-atmosphere-copy">
       <div className="group-field-pair tools-atmosphere-selectors">
         <label className="field">Background<select value={draft.scene} disabled={!canUse || busy} onChange={event => change({scene:event.target.value})}>
-          {FOCUS_SCENES.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+          {FOCUS_SCENES.map(item => <option key={item.id} value={item.id}>{item.name} · {library.item('scene',item.id).label}</option>)}
         </select></label>
         <label className="field">Music<select value={draft.music} disabled={!canUse || busy} onChange={event => change({music:event.target.value})}>
-          {MUSIC_TRACKS.map(item => <option key={item.id} value={item.id}>{item.title}</option>)}
+          {MUSIC_TRACKS.map(item => <option key={item.id} value={item.id}>{item.title} · {library.item('music',item.id).label}</option>)}
         </select></label>
       </div>
       <div className="tools-atmosphere-actions">
-        <button type="button" className="button primary" disabled={!canUse || !onScene || sceneApplied} onClick={() => {
+        <button type="button" className="button primary" disabled={!canUse || !onScene || sceneApplied || !library.item('scene',draft.scene).allowed} onClick={() => {
           onScene(draft.scene); setFeedback('Scene applied on this device.');
-        }}>{sceneApplied ? 'Scene applied' : 'Use scene'}</button>
+        }}>{!library.item('scene',draft.scene).allowed?'Plus scene · preview only':sceneApplied ? 'Scene applied' : 'Use scene'}</button>
         <button type="button" className="button" disabled={!canUse || !music?.ready}
           onClick={() => playing ? music.onPause() : music.onPlay(draft.music,[draft.music])}>
-          {playing ? 'Pause music' : 'Play music'}
+          {playing ? 'Pause music' : library.item('music',draft.music).allowed?'Play music':'Play 8s sample'}
         </button>
       </div>
       <div className="group-room-volume">
@@ -528,6 +530,8 @@ export function RoomAtmosphere({data,manage,canUse,canPrepare,busy,write,music,s
       </div>
       {music && ['playing','loading'].includes(music.status) && <p className="help">Now playing · {musicTrack(music.trackId)?.title || 'Instrumental music'}</p>}
       <p className="help">Your background, playback and volume apply on this device. Choosing a scene does not start audio.</p>
+      {!library.item('scene',draft.scene).allowed&&<p className="help">This Plus scene is a thumbnail preview. Choose a Free scene to apply a background; your current setup is kept.</p>}
+      {!library.item('music',draft.music).allowed&&<p className="help">The Plus track plays an 8-second sample. Library access belongs to each member; a room recommendation does not grant membership.</p>}
       {!canUse && <p className="help">An active room place is needed to use these controls.</p>}
       {feedback && <p className="help" role="status">{feedback}</p>}
       {music?.error && <p className="field-error" role="alert">{music.error}</p>}

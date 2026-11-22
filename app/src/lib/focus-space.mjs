@@ -1,4 +1,6 @@
 import {SCENE_VIDEOS} from './scene-media.mjs';
+import {ORIGINAL_SCENES,SCENE_CATEGORIES} from './original-scenes.mjs';
+import {libraryMediaURL,libraryTier,sceneAssetPath} from './library-access.mjs';
 import {validateMix} from './sound-settings.mjs';
 import {musicTrack,validateMusicList,MUSIC_REPEAT} from './music-catalog.mjs';
 export const FOCUS_SCENES=[
@@ -15,7 +17,8 @@ export const FOCUS_SCENES=[
  {id:'lavender-lake',name:'Warm lake',group:'Evening reading',caption:'Warm evening light reflected on still water.',mix:{stream:15},accent:'#e3cfe3'},
  {id:'dusk-cloud-sea',name:'Dusk cloud sea',group:'Evening reading',caption:'Soft peach light above a sea of clouds.',mix:{stream:10},accent:'#e5d5e4'},
  {id:'coast',name:'Ocean waves',group:'Live',caption:'Real waves washing onto the shore.',mix:{waves:45,nature:10},accent:'#afe0ed'},
- {id:'rain',name:'Rain on glass',group:'Live',caption:'Real rain, softly moving across the window.',mix:{rain:48},accent:'#c5d9fd'}
+ {id:'rain',name:'Rain on glass',group:'Live',caption:'Real rain, softly moving across the window.',mix:{rain:48},accent:'#c5d9fd'},
+ ...ORIGINAL_SCENES
 ];
 export const FOCUS_ATMOSPHERES={
  'Morning reading':{sound:'Light piano + gentle water',music:'meditation-01'},
@@ -23,12 +26,13 @@ export const FOCUS_ATMOSPHERES={
  'Rainy focus':{sound:'Gentle rain · optional piano',music:'evening-piano'},
  'Evening reading':{sound:'Ambient music + gentle water',music:'water-prelude'}
 };
-export const SCENE_GROUPS=['All',...Object.keys(FOCUS_ATMOSPHERES),'Live'];
+export const SCENE_GROUPS=['All',...SCENE_CATEGORIES,'Live'];
 const legacyScene=id=>({minimal:'coast',cabin:'coast',library:'coast',cafe:'coast','soft-dunes':'blue-plains','after-rain':'rain-cleared-meadow','rain-coast':'valley-drizzle','golden-grassland':'dusk-cloud-sea'}[id]||id);
 export const sceneFor=id=>FOCUS_SCENES.find(s=>s.id===legacyScene(id))||FOCUS_SCENES[0];
-export const sceneImage=id=>'/focus-scenes/'+sceneFor(id).id+(sceneFor(id).group==='Live'?'-nature-v1.webp':'-generated-v1.webp');
-export const sceneVideo=id=>SCENE_VIDEOS.find(s=>s.id===legacyScene(id))?.src||null;
-export const sceneKind=id=>sceneVideo(id)?'Live video':'Still scene';
+export const sceneImage=id=>{const scene=sceneFor(id),src=sceneAssetPath(scene.id);return libraryTier('scene',scene.id)==='plus'?libraryMediaURL(src):src;};
+export const sceneThumbnail=id=>'/focus-scenes/previews/'+sceneFor(id).id+'-v1.webp';
+export const sceneVideo=id=>{const src=SCENE_VIDEOS.find(s=>s.id===legacyScene(id))?.src;return src?libraryMediaURL(src):null;};
+export const sceneKind=id=>sceneVideo(id)?'Live video':sceneFor(id).kind||'Still scene';
 export const DEFAULT_FOCUS_CONFIG={scene:'mist-lake',appearance:'day',motion:true,mode:'focus',minutes:25,breakMinutes:5,mix:{stream:20},volume:45,sound:false,endSound:'fade',musicTrack:'',musicVolume:25,musicRepeat:'one',musicQueue:[]};
 export function focusConfig(value={}){
  const c={...DEFAULT_FOCUS_CONFIG,...value};c.scene=legacyScene(c.scene);

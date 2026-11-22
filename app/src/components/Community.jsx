@@ -1,6 +1,7 @@
 import {roomHeartbeat,beginRoomTimer,pauseRoomTimer} from '../lib/room-timer-client.mjs';
 import {GroupPreview} from './GroupTools.jsx';
 import {sceneImage,sceneFor} from '../lib/focus-space.mjs';
+import {useLibraryAccess} from '../lib/useLibraryAccess.jsx';
 import {RoomAccessNotice,RoomAdvancedArea,RoomStudyGuide,RoomProgress} from './RoomStudyAdditions.jsx';
 import {RoomManage} from './RoomManage.jsx';
 import {GroupStudyHero,GroupStudyGuide} from './GroupStudyContent.jsx';
@@ -38,7 +39,9 @@ function SharedStatus({messages,memberId,now}){const m=messages.findLast(m=>m.au
 const Rules=()=> <details className="community-rules"><summary>Scoring, privacy and community rules</summary><p>{communityRules()}</p><p>Use a nickname, not your full name, school or contact details. {STUDY_CHAT_RULES} Automatic checks can miss violations or block legitimate discussion; report a message if needed. Room chat is text only and visible to members; chat is kept for up to 30 days, reports for up to 90 days. Report a message or hide its author’s messages from the room. Reports about an owner go to platform moderators.</p><a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a></details>;
 
 export function Community({navigate,confirm,site,onAccount,ambient,music}){
+ const library=useLibraryAccess();
  const [roomTab,setRoomTab]=useState('study'),[roomScene,setRoomScene]=useState(''),[conversationOpen,setConversationOpen]=useState(false),[guideFeedback,setGuideFeedback]=useState('');
+ const shownRoomScene=roomScene&&library.item('scene',roomScene).allowed?roomScene:'';
  const [createGoal,setCreateGoal]=useState(120);
  const [roomOverview,setRoomOverview]=useState(null);
  const [activityNavigation,setActivityNavigation]=useState(null);
@@ -177,7 +180,7 @@ export function Community({navigate,confirm,site,onAccount,ambient,music}){
 {selected.member&&profile&&<section className="room-activity-section"><RoomActivities key={roomId} room={{...selected.room,readOnly:selected.access?.canParticipate===false}} auth={auth} profile={profile} canOrganize={selected.canManage} members={selected.members} revision={selected.serverNow} now={now} chatReviewAvailable={selected.chatReviewAvailable} timer={timer} live={live} studying={studying} onStart={startTimer} onPause={pauseTimer} refresh={refresh} confirm={confirm} view={roomTab==='tasks'?'full':'summary'} onOpen={openActivities} onStudyTogether={()=>focusRoomArea('study')} onOverview={setRoomOverview} navigationRequest={activityNavigation}/></section>}
  </section>
  <div hidden={roomTab!=='study'}>
- {roomScene&&<div className="room-study-scene" style={{backgroundImage:`url(${sceneImage(roomScene)})`}}><span>{sceneFor(roomScene).name} · Your device</span><button onClick={()=>setRoomScene('')}>Hide scene</button></div>}
+ {shownRoomScene&&<div className="room-study-scene" style={{backgroundImage:`url(${sceneImage(shownRoomScene)})`}}><span>{sceneFor(shownRoomScene).name} · Your device</span><button onClick={()=>setRoomScene('')}>Hide scene</button></div>}
  {selected.members.length>0&&<StudyCompanions key={roomId+'-companions'} selected={selected} profile={profile} me={me} timer={timer} now={now} connection={connection} busy={busy} studying={studying} live={live} onStart={startTimer} onPause={pauseTimer} onPresence={changePresence} onInteract={interactWith} onQuick={sendStudyMessage} feedback={chatFeedback} onManageMember={openMembers}>
 {selected.member&&profile&&!selected.room.closed&&<><button className="room-conversation-open" aria-haspopup="dialog" onClick={()=>setConversationOpen(true)}><ChatCircle size={18}/>All messages &amp; safety<ArrowRight size={16}/></button><Dialog open={conversationOpen} title="Room conversation" close={()=>setConversationOpen(false)} className="room-conversation-dialog" preserveScroll><div id="room-chat-content" className="settings-body">
 <div className="community-messages" role="log" aria-live={chatQuiet?'off':'polite'} aria-label="Room messages">{selected.messages.length?selected.messages.map(m=><article key={m.id}><header><strong>{m.nickname}</strong><time dateTime={new Date(m.created_at).toISOString()}>{new Date(m.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</time></header><StudyMessageBody message={m} interactive={!chatQuiet}/>{(m.author_id===profile.id||selected.canManage)&&<button className="text-button" disabled={busy} onClick={()=>confirm({title:m.author_id===profile.id?'Delete this message?':'Hide this message?',body:'It will no longer appear in room chat. A reported excerpt may remain for moderation for up to 90 days.',action:m.author_id===profile.id?'Delete message':'Hide message',run:()=>action(async()=>{await api('/rooms/'+roomId+'/messages',auth,'DELETE',{id:m.id});await loadRoom();return true;})})}>{m.author_id===profile.id?'Delete message':'Hide message'}</button>}{m.author_id!==profile.id&&<button className="text-button" onClick={()=>setReport(m)}>Report message</button>}</article>):<p className="help">No messages yet. Keep it kind and focused.</p>}</div>
@@ -201,7 +204,7 @@ export function Community({navigate,confirm,site,onAccount,ambient,music}){
     activityOverview={roomOverview?.roomId===roomId ? roomOverview : null}
     onActivity={openProgressActivity} onPlan={()=>focusRoomArea('activity')}
     auth={auth} revision={selected.serverNow} refresh={refresh} confirm={confirm}
-    music={music} scene={roomScene} onScene={setRoomScene}/>}
+    music={music} scene={shownRoomScene} onScene={id=>{if(library.item('scene',id).allowed)setRoomScene(id);}}/>}
  </div>
  <div role="tabpanel" id="room-panel-manage" aria-labelledby="room-tab-manage" hidden={roomTab!=='manage'}>
   {selected.member&&profile&&<RoomManage key={roomId+'-manage'} selected={selected} me={me} profile={profile} auth={auth}

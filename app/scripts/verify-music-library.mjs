@@ -12,6 +12,9 @@ export async function verifyMusicLibrary(root){
   seen.add(t.id);const audio=await fs.readFile(path.join(root,'public',t.src));
   const sha=createHash('sha256').update(audio).digest('hex');
   if(audio.byteLength!==t.bytes||sha!==t.sha256||!t.src.includes(sha.slice(0,12))||t.bytes>25*1024*1024)throw Error('Music bytes do not match the source manifest: '+t.id);
+  if(!/^\/music\/samples\/[a-z0-9-]+-8s\.[a-f0-9]{12}\.mp3$/.test(t.sampleSrc||''))throw Error('Missing public eight-second sample: '+t.id);
+  const sample=await fs.readFile(path.join(root,'public',t.sampleSrc));
+  if(sample.length!==t.sampleBytes||sample.length>150000||createHash('sha256').update(sample).digest('hex')!==t.sampleSha256||!t.sampleSrc.includes(t.sampleSha256.slice(0,12)))throw Error('Sample does not match its manifest: '+t.id);
   if(!credits.includes(t.title)||!credits.includes(t.isrc)||!credits.includes(t.source))throw Error('Incomplete music attribution: '+t.id);
  }
  const natural=JSON.parse(await fs.readFile(path.join(root,'public/ambient/catalog.json'),'utf8')).sounds;

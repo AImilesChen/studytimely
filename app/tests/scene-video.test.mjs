@@ -17,16 +17,16 @@ function fixture(){
 test('the four agreed study atmospheres have three still scenes and a playable catalogue pairing each',()=>{
  assert.equal(Object.keys(FOCUS_ATMOSPHERES).length,4);
  for(const [group,pairing] of Object.entries(FOCUS_ATMOSPHERES)){
-  const scenes=FOCUS_SCENES.filter(s=>s.group===group);assert.equal(scenes.length,3);
+  const scenes=FOCUS_SCENES.filter(s=>s.group===group&&!s.collection);assert.equal(scenes.length,3);
   assert.ok(musicTrack(pairing.music));
-  for(const s of scenes){assert.equal(sceneKind(s.id),'Still scene');assert.doesNotThrow(()=>focusConfig({scene:s.id,mix:s.mix}));}
+  for(const s of scenes){assert.equal(sceneKind(s.id),s.kind||'Still scene');assert.doesNotThrow(()=>focusConfig({scene:s.id,mix:s.mix}));}
  }
  for(const [before,after] of [['soft-dunes','blue-plains'],['after-rain','rain-cleared-meadow'],['rain-coast','valley-drizzle'],['golden-grassland','dusk-cloud-sea']]){
   const c=focusConfig({scene:before,minutes:40,mix:{pink:25}});assert.equal(c.scene,after);assert.equal(c.minutes,40);assert.deepEqual(c.mix,{pink:25});
  }
 });
 test('only the two real video scenes advertise live footage and share matching posters',()=>{
- for(const id of ['rain','coast']){assert.equal(sceneVideo(id),`/focus-scenes/${id}-nature-v1.mp4`);assert.equal(sceneImage(id),`/focus-scenes/${id}-nature-v1.webp`);assert.equal(sceneKind(id),'Live video');}
+ for(const id of ['rain','coast']){assert.equal(sceneVideo(id),`/library/full/focus-scenes/${id}-nature-v1.mp4`);assert.equal(sceneImage(id),`/library/full/focus-scenes/${id}-nature-v1.webp`);assert.equal(sceneKind(id),'Live video');}
  assert.equal(sceneVideo('unknown'),null);assert.equal(sceneKind('coast'),'Live video');
 });
 test('retired desk scenes migrate without losing preset timing or sound preferences',()=>{

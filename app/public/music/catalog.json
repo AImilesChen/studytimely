@@ -22,7 +22,10 @@
       "src": "/music/meditation-01.060099cf12d1.mp3",
       "bytes": 4256958,
       "sha256": "060099cf12d14364fd28b19584a83fa4e325df9b5301386dac59cc4faf754c3b",
-      "durationSeconds": 212.82
+      "durationSeconds": 212.82,
+      "sampleSrc": "/music/samples/meditation-01-8s.65643c61f221.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "65643c61f221f9d26ac171ed19a60b7195e47c468f5b17619d6c8e5e1b19836e"
     },
     {
       "id": "dream-culture",
@@ -44,7 +47,10 @@
       "src": "/music/dream-culture.0cc72b7fa8da.mp3",
       "bytes": 4288305,
       "sha256": "0cc72b7fa8da6ca696ed2c3fab2d179a7770aba13c25a8d60b9323509aaa14b6",
-      "durationSeconds": 214.39
+      "durationSeconds": 214.39,
+      "sampleSrc": "/music/samples/dream-culture-8s.c84eb7c59df9.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "c84eb7c59df91e04016ad489ae50ee8f9a87367520282d52f2f08b8d1a2de77c"
     },
     {
       "id": "evening-harp",
@@ -66,7 +72,10 @@
       "src": "/music/evening-harp.9ae4dcd40217.mp3",
       "bytes": 2905382,
       "sha256": "9ae4dcd40217d6b111a279e2b479d5b6c81db6a34a773182dcce18469f7d26e3",
-      "durationSeconds": 145.24
+      "durationSeconds": 145.24,
+      "sampleSrc": "/music/samples/evening-harp-8s.bd277ec3755a.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "bd277ec3755ad815fe611c11084a7e3b72d5485eaaacfee5559fa176276855ef"
     },
     {
       "id": "evening-piano",
@@ -88,7 +97,10 @@
       "src": "/music/evening-piano.8aa2e20f2040.mp3",
       "bytes": 3302444,
       "sha256": "8aa2e20f2040bfb6f8032fab13c014ed12429e6de299553496e35aec31b9720c",
-      "durationSeconds": 165.09
+      "durationSeconds": 165.09,
+      "sampleSrc": "/music/samples/evening-piano-8s.dd66348c06e8.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "dd66348c06e853d1c0822a5e7c9aeba1bd95bd1a4cf94cc308be202a922da777"
     },
     {
       "id": "water-prelude",
@@ -110,7 +122,10 @@
       "src": "/music/water-prelude.c340c74add08.mp3",
       "bytes": 6499309,
       "sha256": "c340c74add087f89270c791a18d581141c4d00ebf21f0283022ab2b0b999aa59",
-      "durationSeconds": 324.94
+      "durationSeconds": 324.94,
+      "sampleSrc": "/music/samples/water-prelude-8s.ca1b5d9e88bb.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "ca1b5d9e88bb2ae729c1b59d6517b2bb8cda28988627e122e2f6fb2fcd752a0d"
     },
     {
       "id": "meditation-02",
@@ -132,7 +147,10 @@
       "src": "/music/meditation-02.c4478dc24d5e.mp3",
       "bytes": 4982640,
       "sha256": "c4478dc24d5ef8676b97e8c658a497685fdfffa47612a050faf8aab52de4291f",
-      "durationSeconds": 249.1
+      "durationSeconds": 249.1,
+      "sampleSrc": "/music/samples/meditation-02-8s.5b2b900f4b4a.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "5b2b900f4b4a7fbbc9dc6b11984a53cb36d61a7dbf828fbe3d996b34f6e83308"
     },
     {
       "id": "meditation-03",
@@ -154,7 +172,10 @@
       "src": "/music/meditation-03.0aaf34657785.mp3",
       "bytes": 5105415,
       "sha256": "0aaf34657785c54cc03eea69831406dd047c17b2e0693694906907d058205134",
-      "durationSeconds": 255.24
+      "durationSeconds": 255.24,
+      "sampleSrc": "/music/samples/meditation-03-8s.91fefb90c3e4.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "91fefb90c3e4a1b128c9eb1be69d2837fd202f0f51302e8f976e158db0745499"
     },
     {
       "id": "fresh-air",
@@ -176,7 +197,10 @@
       "src": "/music/fresh-air.fd3c03e08004.mp3",
       "bytes": 5882297,
       "sha256": "fd3c03e08004711961c4668bfce8a479b0d0226851f635003bdd1637b2c79e0a",
-      "durationSeconds": 294.09
+      "durationSeconds": 294.09,
+      "sampleSrc": "/music/samples/fresh-air-8s.4faabdf0bbf4.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "4faabdf0bbf4191ca8ed0ef0e9f5d05667112c9f46d4dd37e1fa16039e47150e"
     },
     {
       "id": "gymnopedie-1",
@@ -198,7 +222,10 @@
       "src": "/music/gymnopedie-1.8775d255198d.mp3",
       "bytes": 3742868,
       "sha256": "8775d255198dec4520e6fbfd8da1d878574d5c07bb42bf15b569bf11109db1bc",
-      "durationSeconds": 187.12
+      "durationSeconds": 187.12,
+      "sampleSrc": "/music/samples/gymnopedie-1-8s.44151ed2ad4f.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "44151ed2ad4ff9c97413e9d9559472b89055110f9cc25333f99500884036622b"
     },
     {
       "id": "gymnopedie-2",
@@ -220,7 +247,10 @@
       "src": "/music/gymnopedie-2.db503877c1ba.mp3",
       "bytes": 3181758,
       "sha256": "db503877c1ba3db0e52cc8d2692d6e2581763235cd2cd359c1585eadc12b541f",
-      "durationSeconds": 159.06
+      "durationSeconds": 159.06,
+      "sampleSrc": "/music/samples/gymnopedie-2-8s.f87416c5ee94.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "f87416c5ee944664be77711250f123dc11388d68980d5a9e56fa970ef9552034"
     },
     {
       "id": "clear-waters",
@@ -242,7 +272,10 @@
       "src": "/music/clear-waters.cd71f763d434.mp3",
       "bytes": 2563178,
       "sha256": "cd71f763d434f9befed868618902c025776e31ed8facc4fad5dac5baa3f4c99d",
-      "durationSeconds": 128.13
+      "durationSeconds": 128.13,
+      "sampleSrc": "/music/samples/clear-waters-8s.4160f5754c3c.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "4160f5754c3ca9c230e770c9a52692d774a0172929a91a6313e930217b9537d7"
     },
     {
       "id": "moonstone",
@@ -264,7 +297,10 @@
       "src": "/music/moonstone.8f5293e2b606.mp3",
       "bytes": 5103848,
       "sha256": "8f5293e2b606638f08fe9caafaf505ee753076555f85ce557613ae5ef67e70f7",
-      "durationSeconds": 255.16
+      "durationSeconds": 255.16,
+      "sampleSrc": "/music/samples/moonstone-8s.5a9a5975c6da.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "5a9a5975c6daac94e001f4096fd20812b152bbe1e171d4c9eb4d650e3f668af2"
     },
     {
       "id": "starry",
@@ -286,7 +322,10 @@
       "src": "/music/starry.0b6d4bca01be.mp3",
       "bytes": 3971178,
       "sha256": "0b6d4bca01be4b27bb5bd3d1ce9d9eb72cd227a2f21404f47dc0e4a706f2f9d2",
-      "durationSeconds": 198.53
+      "durationSeconds": 198.53,
+      "sampleSrc": "/music/samples/starry-8s.47fd8542d641.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "47fd8542d641a8741af0de730bd8660001a5e27e4db5561f6103c39beed6a591"
     },
     {
       "id": "manatees",
@@ -308,7 +347,10 @@
       "src": "/music/manatees.0a5f2d968cf3.mp3",
       "bytes": 21122133,
       "sha256": "0a5f2d968cf34569da2a842c102a35bdf07c2bbdfd5e120b7e93961324bf8e06",
-      "durationSeconds": 1056.08
+      "durationSeconds": 1056.08,
+      "sampleSrc": "/music/samples/manatees-8s.ada8db95070b.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "ada8db95070b50cb902c6ec5417c0f3c234d62597597c8f0e45ee65a3a12e118"
     },
     {
       "id": "organic-one",
@@ -330,7 +372,10 @@
       "src": "/music/organic-one.108405966abe.mp3",
       "bytes": 19762199,
       "sha256": "108405966abea1d19c0b510e59df8c12bfbbc1f94b2df1438b13286b64b04189",
-      "durationSeconds": 988.08
+      "durationSeconds": 988.08,
+      "sampleSrc": "/music/samples/organic-one-8s.df05c2f10b0e.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "df05c2f10b0e2f657f66f38891dbaa11f951a5978dec57a31bb8c41a8f70d3b6"
     },
     {
       "id": "organic-three",
@@ -352,7 +397,10 @@
       "src": "/music/organic-three.500d0ca5c164.mp3",
       "bytes": 19346852,
       "sha256": "500d0ca5c164d9ac3550242e81ab39b366a780d3b3dca56837ff40bce06a9011",
-      "durationSeconds": 967.31
+      "durationSeconds": 967.31,
+      "sampleSrc": "/music/samples/organic-three-8s.3e63bc243816.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "3e63bc2438161647c4926e047c2bd968737e1162a85f981ea2000c71b4fc654d"
     },
     {
       "id": "tranquility",
@@ -374,7 +422,10 @@
       "src": "/music/tranquility.d06be13c41ca.mp3",
       "bytes": 19742346,
       "sha256": "d06be13c41cac2e01886d57702996814ab4ff9db4c53ad55a972b96473e16308",
-      "durationSeconds": 987.09
+      "durationSeconds": 987.09,
+      "sampleSrc": "/music/samples/tranquility-8s.38351df25883.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "38351df2588328b773dccbb5fe6113a85ea189a6c036fa25cf079c431a0d50c9"
     },
     {
       "id": "soaring",
@@ -396,7 +447,10 @@
       "src": "/music/soaring.1b1ae2542bf8.mp3",
       "bytes": 7602199,
       "sha256": "1b1ae2542bf87175e4856707dba74b045bd1fcfbcd3c2a942b9861fda0b98282",
-      "durationSeconds": 380.08
+      "durationSeconds": 380.08,
+      "sampleSrc": "/music/samples/soaring-8s.824a20a0b5d7.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "824a20a0b5d7121efa67795805d1cc937a6fa526aae759964c79c113011f389f"
     },
     {
       "id": "northern-glade",
@@ -418,7 +472,10 @@
       "src": "/music/northern-glade.4cc19f9b89db.mp3",
       "bytes": 6301823,
       "sha256": "4cc19f9b89db6f4abe7fd8a83eba692d5346320e06087e508a7cf9f339b33828",
-      "durationSeconds": 315.06
+      "durationSeconds": 315.06,
+      "sampleSrc": "/music/samples/northern-glade-8s.9dae5f034ee4.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "9dae5f034ee4a453cfd574a2d7678ec643c1f7964b95d704ad2162b4ee276fbc"
     },
     {
       "id": "dreamer",
@@ -440,7 +497,10 @@
       "src": "/music/dreamer.67aed7ec69b6.mp3",
       "bytes": 4082460,
       "sha256": "67aed7ec69b67d58fe138e95765411a865b3c65691fef11d6c59d006cca0885d",
-      "durationSeconds": 204.09
+      "durationSeconds": 204.09,
+      "sampleSrc": "/music/samples/dreamer-8s.6a3b2263bf25.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "6a3b2263bf25669ddd6ac2f54ac33196cdfba44a3807b1b8b341d9a70c779d86"
     },
     {
       "id": "late-night-radio",
@@ -462,7 +522,10 @@
       "src": "/music/late-night-radio.6e7f3d0482ea.mp3",
       "bytes": 5273121,
       "sha256": "6e7f3d0482eae234d18f90a769d8ab395dca10d79e864e514fce54d593eeb839",
-      "durationSeconds": 263.63
+      "durationSeconds": 263.63,
+      "sampleSrc": "/music/samples/late-night-radio-8s.7380417ce082.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "7380417ce0826bc0f85ac76f26b1afc28aa75f4c287066b69752dbbbccf039cc"
     },
     {
       "id": "study-relax",
@@ -484,7 +547,10 @@
       "src": "/music/study-relax.ca18ec19838d.mp3",
       "bytes": 4469072,
       "sha256": "ca18ec19838d0a36e558f5d48856cdec4de4abe8b22587359ac596a0828e9789",
-      "durationSeconds": 223.43
+      "durationSeconds": 223.43,
+      "sampleSrc": "/music/samples/study-relax-8s.13c3bbad386e.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "13c3bbad386e16be8197c8fb1c7119f76ada7ee456af81ad99f22b752249285c"
     },
     {
       "id": "clean-soul",
@@ -506,7 +572,10 @@
       "src": "/music/clean-soul.5bfa8ba0bc5c.mp3",
       "bytes": 6135684,
       "sha256": "5bfa8ba0bc5c0eb440caf703f8d8ff6796be5d9c6b2b2fe8e1dce751c5444e18",
-      "durationSeconds": 306.76
+      "durationSeconds": 306.76,
+      "sampleSrc": "/music/samples/clean-soul-8s.2bd0d8ceebed.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "2bd0d8ceebedd8183d815dc90db914fd5b548ca8e31e3983892dbafbd283650f"
     },
     {
       "id": "light-thought",
@@ -528,7 +597,10 @@
       "src": "/music/light-thought.2e255c059dd8.mp3",
       "bytes": 3250721,
       "sha256": "2e255c059dd8d36dfd40f6d9739dfd24d3396f07107b4f3d9acb577624d4ae02",
-      "durationSeconds": 162.51
+      "durationSeconds": 162.51,
+      "sampleSrc": "/music/samples/light-thought-8s.c46d8ba1fb28.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "c46d8ba1fb28c4f3865b8bf6ca445d2f9bf9be9daa8676e51cedb844ddc5687f"
     },
     {
       "id": "easy-lemon",
@@ -550,7 +622,10 @@
       "src": "/music/easy-lemon.866194e7be36.mp3",
       "bytes": 2528697,
       "sha256": "866194e7be365a04c3e6f9a0e7cd0943488f6de393e48191e8e24669276956ee",
-      "durationSeconds": 126.41
+      "durationSeconds": 126.41,
+      "sampleSrc": "/music/samples/easy-lemon-8s.2a3cb7fd3a20.mp3",
+      "sampleBytes": 96906,
+      "sampleSha256": "2a3cb7fd3a20d8a3ea78d19d7048eed12c0d3b22f4939a27a54f8821e65ce6b1"
     }
   ],
   "licenseDocument": {

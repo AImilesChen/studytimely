@@ -1,6 +1,6 @@
 # Terms of Use
 
-Effective date: 2026-11-13. Last updated: 2026-11-17.
+Effective date: 2026-11-13. Last updated: 2026-11-22.
 
 ## 1. The service and operator
 
@@ -19,6 +19,12 @@ You do not need an account for the free tools. The absence of registration is no
 The free release provides the timer, clock, stopwatch and local study-record functions available on the site. Basic study-timing functions are provided free of charge, consistent with our commitment to keep those core functions free. No payment card or subscription is required for them.
 
 Optional Google sign-in, manual cloud sync and a free advanced preview of automatic sync and recovery are available; email codes recover existing unlinked accounts. Anonymous tools remain available. Manual cloud snapshots support up to 1 MiB; automatic sync supports a 4 MiB workspace with bounded batches. Recovery is limited to 30 days and the count/storage limits shown in the recovery center. Use JSON backup for larger histories. Optional study rooms, member chat and opted-in public leaderboards are available under the community section below. Paid subscriptions and AI study tools are not included. A roadmap is not a promise that a feature will be released on a particular date. Any later paid feature must be clearly described and separately chosen; it will not silently enrol you in a subscription or turn the promised free core timing tools into paid features.
+
+### Music, scenes and colour themes
+
+The eight original colour themes, five original music tracks, all nature sounds and mixes, and the Morning mist, Sunlit slopes, Rainy lake and Pastel sea scenes remain free. The expanded Plus library includes twenty additional music tracks, twenty-two additional scenes (including two moving scenes), and the Terracotta, Paper and Rose colour themes. This release makes the expanded library available through a free preview, not a paid subscription. Its availability may change. Where access is unavailable, public scene thumbnails and eight-second music samples can still be viewed or played. Full expanded music, full-size expanded scenes and moving-scene requests require current server-verified access.
+
+When expanded access ends, expanded music pauses and free scene/colour alternatives are used without stopping study timers. Saved favourites, setups and learning records are kept. Renewed access never starts audio automatically. Library access belongs to the individual account; a room owner's access does not grant library membership to every room member. Downloaded or previously cached copies cannot be recalled. Music remains licensed under CC BY 4.0 with attribution; an eventual membership concerns the curated StudyTimely service, not exclusive rights in those recordings. No price or paid subscription is offered in this release.
 
 ## 4. Your records and device
 

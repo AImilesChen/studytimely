@@ -78,7 +78,7 @@ export function validateSettings(input){
  if(!MODES.includes(s.lastTool)||s.lastTool==='alarm')fail('INVALID','Choose a supported last tool.');
  if(typeof s.lastPage!=='string'||s.lastPage.length>100)fail('INVALID','Invalid last page.');
  if(!['dark','light'].includes(s.theme))fail('INVALID','Choose a supported theme.');
- if(!['default','midnight','sand','rain','forest','coffee','desk'].includes(s.spaceTheme))fail('INVALID','Choose a supported study space.');
+ if(!['default','midnight','sand','rain','forest','coffee','desk','terracotta','paper','rose'].includes(s.spaceTheme))fail('INVALID','Choose a supported study space.');
  try{s.ambient=validateMix(s.ambient);s.ambientPresets=validateMixes(s.ambientPresets);}catch(e){fail('INVALID',e.message);}
  integer(s.ambientVolume,0,100,'Ambient volume');
  integer(s.musicVolume,0,100,'Music volume');

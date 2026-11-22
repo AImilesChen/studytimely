@@ -2,7 +2,7 @@ import {MUSIC_TRACKS,MUSIC_REPEAT,musicTrack,nextMusicId,validateMusicList} from
 
 // One lazy, same-origin audio element lives beyond individual panels and timer routes.
 // Playback position and playback intent are never saved or restored.
-export function createMusicPlayer({createAudio=()=>new globalThis.Audio(),onChange=()=>{},onAdvance=()=>{},schedule=setTimeout,unschedule=clearTimeout,fadeMs=0,now=()=>Date.now()}={}) {
+export function createMusicPlayer({createAudio=()=>new globalThis.Audio(),onChange=()=>{},onAdvance=()=>{},resolveSource=track=>track.src,schedule=setTimeout,unschedule=clearTimeout,fadeMs=0,now=()=>Date.now()}={}) {
  let audio=null,token=0,wantsPlay=false,closed=false,previewTimer=null,fadeTimer=null,envelope=1,playQueue=[];
  const cancelPreview=()=>{if(previewTimer!==null)unschedule(previewTimer);previewTimer=null;};
  const cancelFade=()=>{if(fadeTimer!==null)unschedule(fadeTimer);fadeTimer=null;};
@@ -40,13 +40,16 @@ export function createMusicPlayer({createAudio=()=>new globalThis.Audio(),onChan
  async function play(id=state.trackId,{previewSeconds=0}={}){
   if(closed)return false;
   const track=musicTrack(id);if(!track)throw Error('Choose a music track from the library.');
+  const source=resolveSource(track,{previewSeconds});
+  if(!source){pause();emit({status:'error',error:'This full track needs Plus access. Its 8-second sample and the free playlist remain available.'});return false;}
   cancelPreview();cancelFade();
   const request=++token,changed=state.trackId!==id;
   wantsPlay=true;
-  const a=ensure(),newSource=changed||!a.getAttribute('src')||state.status==='error';
+  const a=ensure(),newSource=changed||a.getAttribute('src')!==source||state.status==='error';
   const replay=state.status==='ended'||a.ended;
   emit({status:'loading',preview:previewSeconds>0,error:'',...(newSource?{trackId:id,position:0,duration:0}:{})});
-  if(newSource){a.pause();a.src=track.src;a.load();}
+  a.loop=state.repeat==='one'&&previewSeconds===0;
+  if(newSource){a.pause();a.src=source;a.load();}
   else if(replay){a.currentTime=0;}
   if(previewSeconds>0)a.currentTime=0;
   envelope=fadeMs?0:1;applyVolume();
@@ -69,7 +72,7 @@ export function createMusicPlayer({createAudio=()=>new globalThis.Audio(),onChan
    playQueue=validateMusicList(queue);
    if(!musicTrack(trackId)||!Number.isInteger(volume)||volume<0||volume>100||!MUSIC_REPEAT.includes(repeat))throw Error('Invalid music preference.');
    if(trackId!==state.trackId){token++;wantsPlay=false;cancelPreview();cancelFade();unload();emit({trackId,position:0,duration:0,status:'idle',preview:false,error:''});}
-   if(audio)audio.loop=repeat==='one';
+   if(audio)audio.loop=repeat==='one'&&!state.preview;
    emit({volume,repeat});
    applyVolume();
   },

@@ -12,7 +12,7 @@ test('local video encodes match reviewed sizes, use MP4 and stay out of mandator
  }
 });
 test('Worker serves real video byte ranges and keeps HEAD, invalid ranges and music types correct',async()=>{
- const worker=createWorker(),body=Uint8Array.from({length:128},(_,i)=>i);
+ const worker=createWorker({advancedLibraryPreview:true}),body=Uint8Array.from({length:128},(_,i)=>i);
  const env={ASSETS:{fetch:async request=>new Response(request.method==='HEAD'?null:body,{headers:{'Content-Length':'128','ETag':'"media"'}})}};
  const url='https://example.test'+SCENE_VIDEOS[0].src;
  for(const [range,start,end] of [['bytes=10-19',10,19],['bytes=-8',120,127],['bytes=120-',120,127]]){

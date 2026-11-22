@@ -24,7 +24,7 @@ function fixture(options={}){
   pause(){this.paused=true;this.dispatchEvent(new Event('pause'));}
  }
  const changes=[],advanced=[];
- const engine=createMusicPlayer({schedule:options.schedule,unschedule:options.unschedule,fadeMs:options.fadeMs,now:options.now,createAudio:()=>new Audio(),onChange:s=>changes.push(s),onAdvance:id=>advanced.push(id)});
+ const engine=createMusicPlayer({resolveSource:options.resolveSource,schedule:options.schedule,unschedule:options.unschedule,fadeMs:options.fadeMs,now:options.now,createAudio:()=>new Audio(),onChange:s=>changes.push(s),onAdvance:id=>advanced.push(id)});
  return {engine,instances,pending,changes,advanced};
 }
 test('music stays lazy and paused when preferences are loaded; playback needs an explicit action',async()=>{
@@ -103,4 +103,14 @@ test('a chosen category playlist advances within that selection',async()=>{
 test('favorites and playlist preferences survive explicit backup without creating study records',()=>{
  const s=emptyState('favorites');const next=transition(s,{type:'settings',epoch:s.epoch,patch:{musicFavorites:[first.id],musicQueue:[second.id,first.id]}},{owner:'test',id:'save',now:1000}).state;
  assert.deepEqual(backupOf(next,1000,{includePreferences:true}).preferences.values.musicFavorites,[first.id]);assert.deepEqual(next.sessions,[]);assert.deepEqual(persistedState({...next,settings:{...next.settings,rememberPreferences:false}}).settings.musicFavorites,[]);assert.throws(()=>validateSettings({musicFavorites:['missing']}));assert.throws(()=>validateSettings({musicQueue:[first.id,first.id]}));
+});
+
+// Public samples are separate files; a locked track never requests its full source.
+test('sample source is bounded, cannot loop, and a later full play changes the source',async()=>{
+ const f=fixture({resolveSource:(track,{previewSeconds})=>previewSeconds?track.sampleSrc:track.src});f.engine.configure({repeat:'one'});
+ await f.engine.play(first.id,{previewSeconds:8});assert.equal(f.instances[0].src,first.sampleSrc);assert.equal(f.instances[0].loop,false);
+ f.engine.pause();await f.engine.play(first.id);assert.equal(f.instances[0].src,first.src);assert.equal(f.instances[0].loop,true);f.engine.close();
+});
+test('a rejected full source cannot allocate an audio element or start a timer',async()=>{
+ const f=fixture({resolveSource:()=>null});assert.equal(await f.engine.play(last.id),false);assert.equal(f.instances.length,0);assert.equal(f.engine.snapshot().status,'error');f.engine.close();
 });
