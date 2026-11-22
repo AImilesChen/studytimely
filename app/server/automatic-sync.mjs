@@ -1,11 +1,13 @@
 import {ApiError,fail,body,result,digest} from './auth-shared.mjs';
 import {packDocument,unpackRecords,checkRecords,applyRecords,SYNC_MAX_BYTES,SYNC_BATCH_BYTES,SYNC_RECORD_BYTES,canonical,validSyncKey,recoverySelection,recordLabel} from '../src/lib/cloud-sync.mjs';
 import {emptyState} from '../src/lib/model.mjs';
+import {requireSyncWrite} from './sync-access.mjs';
 import {backupOf} from '../src/lib/storage.mjs';
 const DAY=86400000,encoder=new TextEncoder(),size=v=>encoder.encode(JSON.stringify(v)).length;
 const idOK=v=>typeof v==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(v);
 export async function handleAutomaticSync({request,env,identity,sessionHash,at,limit}){
  const path=new URL(request.url).pathname.slice('/api/sync'.length),method=request.method,q=(sql,...args)=>env.DB.prepare(sql).bind(...args),account=identity.id;
+ if(method==='POST'&&['/enable','/mutations','/backups'].includes(path))await requireSyncWrite(env,account,at);
  const head=()=>q('SELECT generation,version,bytes,updated_at FROM sync_heads WHERE account_id=?',account).first();
  const records=async()=>Object.fromEntries((await q('SELECT record_key,document FROM sync_records WHERE account_id=?',account).all()).results.filter(r=>r.document!=='null').map(r=>[r.record_key,JSON.parse(r.document)]));
  async function device(){
@@ -79,6 +81,7 @@ const chunks=(await q('SELECT document FROM sync_backup_chunks WHERE account_id=
  if(path==='/restore'&&method==='POST'){
   await limit('sync-restore',account,8,3600000);const input=await body(request,6*1024*1024),current=await head();
   if(input.confirm!=='RESTORE'||!current||input.version!==current.version||input.generation!==current.generation)fail(409,'CONFLICT','Cloud data changed. Review the restore preview again.');
+  if(!input.clear)await requireSyncWrite(env,account,at);
   let target;try{target=input.clear?packDocument(backupOf(emptyState('clear'))):input.records;checkRecords(target);}catch(e){fail(400,'INVALID',e.message);}
   const before=await records(),generation=crypto.randomUUID(),id=crypto.randomUUID(),old=JSON.stringify(before),guard='EXISTS(SELECT 1 FROM sync_heads WHERE account_id=? AND generation=?)';
   const statements=[q('UPDATE sync_heads SET generation=?,version=version+1,bytes=?,updated_at=? WHERE account_id=? AND generation=? AND version=?',generation,size(target),at,account,current.generation,current.version),...await backupStatements(before,input.clear?'Before cloud clear':'Before restore',id,guard,[account,generation]),q('DELETE FROM sync_records WHERE account_id=? AND '+guard,account,account,generation)];

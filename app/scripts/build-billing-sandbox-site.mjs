@@ -1,0 +1,24 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {build} from 'esbuild';
+const root=path.resolve(import.meta.dirname,'..'),repo=path.dirname(root),out=path.join(root,'.wrangler/billing-site');
+await fs.mkdir(out,{recursive:true});const source=path.join(out,'source');await fs.mkdir(source,{recursive:true});
+execFileSync('git',['archive','--format=tar','--output',path.join(out,'base.tar'),'HEAD'],{cwd:repo});
+execFileSync('tar',['-xf',path.join(out,'base.tar'),'-C',source]);
+const files=['vite.config.mjs','server/accounts.mjs','server/automatic-sync.mjs','server/cloudflare.mjs','server/community-entitlements.mjs','server/community.mjs','server/google-auth.mjs','server/learning-features.mjs','server/registration.mjs','server/auth-return.mjs','server/sync-access.mjs','server/billing-sandbox-access.mjs','server/billing-sandbox-site-worker.mjs','src/App.jsx','src/components/Account.jsx','src/components/SyncCenter.jsx','src/components/PlusMembership.jsx','src/components/plus-membership.css','src/components/PricingPage.jsx','src/components/pricing-page.css','src/lib/billing-return.mjs'];
+const app=path.join(source,'app');for(const file of files)await fs.copyFile(path.join(root,file),path.join(app,file));
+const origin='https://studytimely-billing-sandbox.chenminjian08.workers.dev';
+const config=JSON.parse(await fs.readFile(path.join(app,'site.config.json'),'utf8'));
+Object.assign(config,{origin,indexable:false,billingSandbox:true,localAccountsTest:false,communityEnabled:false,advancedPlanningPreview:false,advancedAnalyticsPreview:false,advancedLibraryPreview:false,ga4Id:'',ahrefsKey:'',analyticsSourceContainer:'',analyticsPolicyReviewed:false});
+await fs.writeFile(path.join(app,'site.config.json'),JSON.stringify(config,null,2));
+try{await fs.symlink(path.join(root,'node_modules'),path.join(app,'node_modules'),'junction');}catch(e){if(e.code!=='EEXIST')throw e;}
+execFileSync(process.execPath,['scripts/build-site.mjs'],{cwd:app,stdio:'inherit'});
+await build({absWorkingDir:app,entryPoints:['server/billing-sandbox-site-worker.mjs'],bundle:true,format:'esm',platform:'browser',target:'es2022',minify:true,outfile:'dist/cloudflare/billing-site-worker.mjs'});
+const base=JSON.parse(await fs.readFile(path.join(root,'wrangler.billing-sandbox.jsonc'),'utf8'));
+base.main='./source/app/dist/cloudflare/billing-site-worker.mjs';base.vars={...base.vars,SANDBOX_SITE_ENABLED:'true',AI_WEEKLY_ENABLED:'false',SYNC_REQUIRE_PLUS:'true'};
+base.assets={directory:'./source/app/dist/client',binding:'ASSETS',run_worker_first:true,html_handling:'none',not_found_handling:'none'};
+base.d1_databases[0].migrations_dir='../../migrations';
+await fs.writeFile(path.join(out,'wrangler.json'),JSON.stringify(base,null,2));
+await fs.writeFile(path.join(out,'source-selection.json'),JSON.stringify({base:execFileSync('git',['rev-parse','HEAD'],{cwd:repo,encoding:'utf8'}).trim(),files,origin,excluded:['src/components/FocusGuide.jsx','scripts/stripe-local-preview.mjs','scripts/stripe-local-listen.mjs'],config},null,2));
+console.log('Built isolated payment acceptance site. Production config and unrelated edits excluded.');

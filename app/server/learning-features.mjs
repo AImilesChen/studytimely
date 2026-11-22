@@ -4,7 +4,7 @@ import {LIBRARY_POLICY_VERSION} from '../src/lib/library-access.mjs';
 export async function subscriptionExpiry(request,env,config,at){
  const token=readCookie(request);
  if(config.accountsEnabled!==true||!env.DB||!token||!/^[a-f0-9]{64}$/.test(token))return 0;
- const row=await env.DB.prepare('SELECT e.expires_at,s.expires_at AS session_expires_at FROM sessions s JOIN community_entitlements e ON e.account_id=s.account_id WHERE s.token_hash=? AND s.expires_at>? AND e.expires_at>?').bind(await digest(token),at,at).first();
+ const row=await env.DB.prepare('SELECT MAX(e.expires_at) AS expires_at,s.expires_at AS session_expires_at FROM sessions s JOIN account_entitlement_sources e ON e.account_id=s.account_id WHERE s.token_hash=? AND s.expires_at>? AND e.expires_at>? GROUP BY s.token_hash').bind(await digest(token),at,at).first();
  return row?Math.min(row.expires_at,row.session_expires_at??row.expires_at):0;
 }
 export async function libraryAccess(request,env,config,at=Date.now()){

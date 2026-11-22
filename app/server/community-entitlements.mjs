@@ -2,11 +2,11 @@ import {fail} from './auth-shared.mjs';
 export const FREE_ROOM_MEMBERS=4;
 export const FREE_OWNED_ROOMS=1,SUBSCRIBER_OWNED_ROOMS=10;
 export const previewSQL=(owner,at)=>`EXISTS(SELECT 1 FROM community_group_previews gp JOIN community_profiles p ON p.account_id=gp.account_id JOIN community_group_policy pol ON pol.id=1 WHERE p.id=${owner} AND gp.enabled=1 AND pol.enabled=1 AND (pol.ends_at=0 OR pol.ends_at>${at}))`;
-export const paidSQL=(owner,at)=>`EXISTS(SELECT 1 FROM community_entitlements e JOIN community_profiles p ON p.account_id=e.account_id WHERE p.id=${owner} AND e.expires_at>${at})`;
+export const paidSQL=(owner,at)=>`EXISTS(SELECT 1 FROM account_entitlement_sources e JOIN community_profiles p ON p.account_id=e.account_id WHERE p.id=${owner} AND e.expires_at>${at})`;
 export const groupGrantSQL=(owner,at)=>`(${paidSQL(owner,at)} OR ${previewSQL(owner,at)})`;
-export const groupLimitSQL=(owner,at)=>`COALESCE((SELECT e.member_limit FROM community_entitlements e JOIN community_profiles p ON p.account_id=e.account_id WHERE p.id=${owner} AND e.expires_at>${at}),CASE WHEN ${previewSQL(owner,at)} THEN 24 ELSE 4 END)`;
+export const groupLimitSQL=(owner,at)=>`COALESCE((SELECT MAX(e.member_limit) FROM account_entitlement_sources e JOIN community_profiles p ON p.account_id=e.account_id WHERE p.id=${owner} AND e.expires_at>${at}),CASE WHEN ${previewSQL(owner,at)} THEN 24 ELSE 4 END)`;
 export async function communityEntitlements(env,accountId,at){
- const row=accountId?await env.DB.prepare('SELECT member_limit,free_text,expires_at FROM community_entitlements WHERE account_id=?').bind(accountId).first():null;
+ const row=accountId?await env.DB.prepare('SELECT MAX(CASE WHEN expires_at>? THEN member_limit END) AS member_limit,MAX(CASE WHEN expires_at>? THEN free_text END) AS free_text,MAX(expires_at) AS expires_at FROM account_entitlement_sources WHERE account_id=?').bind(at,at,accountId).first():null;
  const policy=await env.DB.prepare('SELECT enabled,ends_at FROM community_group_policy WHERE id=1').bind().first(),available=!!policy?.enabled&&(!policy.ends_at||policy.ends_at>at);
  const preview=accountId?await env.DB.prepare('SELECT enabled FROM community_group_previews WHERE account_id=?').bind(accountId).first():null;
  const paid=row&&row.expires_at>at,source=paid?'subscription':available&&preview?.enabled?'preview':'free',advanced=source!=='free';

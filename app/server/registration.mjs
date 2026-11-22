@@ -1,3 +1,4 @@
+import {authReturnPath} from './auth-return.mjs';
 import {body,cookie,digest,equal,fail,hmac,randomToken,readCookie,result,sameOrigin,rateLimit} from './auth-shared.mjs';
 import {ACCOUNT_POLICY_VERSION,ACCOUNT_MINIMUM_AGE} from '../src/lib/account-policy.mjs';
 export const registrationCookieName=request=>new URL(request.url).protocol==='https:'?'__Host-studytimely-registration':'studytimely-local-registration';
@@ -5,7 +6,7 @@ export async function pendingRegistration(request,env,claims,returnPath,at){
  const token=randomToken(),old=readCookie(request,registrationCookieName(request));
  await env.DB.batch([
   env.DB.prepare('DELETE FROM pending_google_registrations WHERE expires_at<=? OR token_hash=?').bind(at,await digest(old)),
-  env.DB.prepare('INSERT INTO pending_google_registrations(token_hash,google_sub,email,return_path,expires_at) VALUES(?,?,?,?,?)').bind(await digest(token),claims.sub,claims.email,returnPath==='/study-groups'?returnPath:'/account',at+600000)
+  env.DB.prepare('INSERT INTO pending_google_registrations(token_hash,google_sub,email,return_path,expires_at) VALUES(?,?,?,?,?)').bind(await digest(token),claims.sub,claims.email,authReturnPath(returnPath),at+600000)
  ]);
  return cookie(request,token,600,registrationCookieName(request));
 }
@@ -38,6 +39,6 @@ export async function registration(request,env,at){
   env.DB.prepare('DELETE FROM pending_google_registrations WHERE token_hash=?').bind(hash)
  ]);
  if(Number(saved[1]?.meta?.changes)!==1)return result({error:{code:'REGISTRATION_EXPIRED',message:'Account setup has already been completed. Continue with Google to sign in.'}},410,clear);
- const response=result({redirect:pending.return_path==='/study-groups'?'/study-groups':'/account?signin=success'},200,clear);
+ const response=result({redirect:authReturnPath(pending.return_path)!=='/account'?authReturnPath(pending.return_path):'/account?signin=success'},200,clear);
  response.headers.append('Set-Cookie',cookie(request,session,30*86400));return response;
 }

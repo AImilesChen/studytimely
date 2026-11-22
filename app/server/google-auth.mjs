@@ -1,3 +1,4 @@
+import {authReturnPath} from './auth-return.mjs';
 import {pendingRegistration,registration} from './registration.mjs';
 import {ApiError,fail,result,body,randomToken,digest,equal,readCookie,cookie,sameOrigin,identity,issueSession,rateLimit} from './auth-shared.mjs';
 const AUTH='https://accounts.google.com/o/oauth2/v2/auth',TOKEN='https://oauth2.googleapis.com/token',CERTS='https://www.googleapis.com/oauth2/v3/certs';
@@ -24,7 +25,7 @@ export function createGoogleAuth({now=Date.now,fetcher=runtimeFetch,keys}={}){
  return async(request,env)=>{
   const url=new URL(request.url),at=now(),callback=url.origin+'/api/auth/google/callback';
   let returnPath='/account',failure='failed';
-  const redirect=(code,session,registrationCookie)=>{const headers=new Headers({'Location':url.origin+(code==='success'&&returnPath==='/study-groups'?returnPath:'/account?signin='+code),'Cache-Control':'no-store, private','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'});headers.append('Set-Cookie',cookie(request,'',0,binderName(request)));if(session)headers.append('Set-Cookie',session.cookie);if(registrationCookie)headers.append('Set-Cookie',registrationCookie);return new Response(null,{status:303,headers});};
+  const redirect=(code,session,registrationCookie)=>{const headers=new Headers({'Location':url.origin+(code==='success'&&authReturnPath(returnPath)!=='/account'?authReturnPath(returnPath):returnPath==='/pricing'&&!['register','link_required','link_failed'].includes(code)?'/pricing?signin='+code:'/account?signin='+code),'Cache-Control':'no-store, private','Referrer-Policy':'no-referrer','X-Robots-Tag':'noindex, nofollow'});headers.append('Set-Cookie',cookie(request,'',0,binderName(request)));if(session)headers.append('Set-Cookie',session.cookie);if(registrationCookie)headers.append('Set-Cookie',registrationCookie);return new Response(null,{status:303,headers});};
   try{
    if(!env.DB||!env.AUTH_HMAC||env.AUTH_HMAC.length<32)fail(503,'NOT_CONFIGURED','The account service is not configured.');
    if(url.pathname==='/api/auth/google/registration')return await registration(request,env,at);
@@ -34,7 +35,7 @@ export function createGoogleAuth({now=Date.now,fetcher=runtimeFetch,keys}={}){
     await rateLimit(env,'google-start',request.headers.get('cf-connecting-ip')||'local',30,3600000,at);
     const linked=input.link===true?await identity(request,env,at):null;
     const state=randomToken(),binder=randomToken(),verifier=randomToken(),nonce=randomToken();
-    await env.DB.batch([env.DB.prepare('DELETE FROM oauth_states WHERE expires_at<?').bind(at),env.DB.prepare('INSERT INTO oauth_states(state_hash,binder_hash,verifier,nonce,expires_at,link_account,link_session_hash,return_path) VALUES(?,?,?,?,?,?,?,?)').bind(await digest(state),await digest(binder),verifier,nonce,at+600000,linked?.id||null,linked?.sessionHash||null,input.returnTo==='/study-groups'?'/study-groups':'/account')]);
+    await env.DB.batch([env.DB.prepare('DELETE FROM oauth_states WHERE expires_at<?').bind(at),env.DB.prepare('INSERT INTO oauth_states(state_hash,binder_hash,verifier,nonce,expires_at,link_account,link_session_hash,return_path) VALUES(?,?,?,?,?,?,?,?)').bind(await digest(state),await digest(binder),verifier,nonce,at+600000,linked?.id||null,linked?.sessionHash||null,authReturnPath(input.returnTo))]);
     const auth=new URL(AUTH);auth.search=new URLSearchParams({client_id:env.GOOGLE_CLIENT_ID,redirect_uri:callback,response_type:'code',scope:'openid email',state,nonce,code_challenge:b64(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)))),code_challenge_method:'S256',prompt:'select_account'}).toString();
     return result({url:auth.href},200,{'Set-Cookie':cookie(request,binder,600,binderName(request))});
    }

@@ -10,10 +10,12 @@ import {AMBIENT_RECORDINGS} from '../src/lib/ambient-catalog.mjs';
 import {musicAssetResponse} from './music-assets.mjs';
 import {ROUTES} from '../src/lib/routes.mjs';
 import {createAccountsApi} from './accounts.mjs';
+import {createBillingApi} from './billing.mjs';
 import {createGoogleAuth} from './google-auth.mjs';
 import {createCommunityApi,communityMaintenance} from './community.mjs';
 const accountApi=createAccountsApi({emailRecoveryOnly:true}),googleApi=createGoogleAuth(),communityApi=createCommunityApi();
 const weeklyApi=createWeeklyApi();
+const billingApi=createBillingApi();
 const accountPaths=new Set(['/api/auth/me','/api/auth/request-code','/api/auth/verify-code','/api/auth/logout','/api/workspace','/api/account/export','/api/account']);
 const paths=new Set(ROUTES.map(r=>r.path));
 const musicFiles=new Map([...MUSIC_TRACKS,...AMBIENT_RECORDINGS,...MUSIC_TRACKS.filter(t=>t.sampleSrc).map(t=>({src:t.sampleSrc,bytes:t.sampleBytes}))].map(t=>[t.src,t.bytes]));
@@ -31,8 +33,9 @@ export function createWorker(config={indexable:false}){return{async fetch(reques
   try{const access=await libraryAccess(request,env,config);if(!access.allowed)return result({error:{code:'LIBRARY_ACCESS',message:'Plus access is needed for this full recording or moving scene. Free content and music samples remain available.'}},403);}
   catch{return result({error:{code:'LIBRARY_UNAVAILABLE',message:'Access could not be checked. Try again; free content remains available.'}},503);}
  }
- if(path==='/api/billing/options')return pricingOptions(request,env,config);
  if(path==='/api/learning/features')return learningFeatures(request,env,config);
+ if(path==='/api/billing/options'&&['studytimely.com','www.studytimely.com'].includes(url.hostname))return pricingOptions(request,env,config);
+ if(path.startsWith('/api/billing/'))return billingApi(request,env,config);
  if(path.startsWith('/api/learning/weekly-reports'))return weeklyApi(request,env,config,ctx);
  if(path.startsWith('/api/auth/google/'))return googleApi(request,env);
  if(path.startsWith('/api/community/'))return communityApi(request,env,config.communityEnabled===true,ctx);

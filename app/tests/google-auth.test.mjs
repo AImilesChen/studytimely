@@ -42,6 +42,26 @@ test('expired, cancelled and wrong-nonce flows never create an account; arbitrar
 });
 
 async function newSignup(s){const response=await s.callback(await s.start()),cookie=response.headers.getSetCookie().find(c=>c.startsWith('__Host-studytimely-registration=')).split(';')[0],read=await s.call('/api/auth/google/registration','GET',undefined,cookie);assert.equal(read.status,200);return{cookie,...await read.json()};}
+
+test('pricing sign-in returns an existing account to the offer without triggering checkout',async()=>{
+ const s=await setup();try{
+  s.db.prepare('INSERT INTO accounts(id,email,google_sub,created_at) VALUES(?,?,?,?)').run('pricing-existing','google@example.invalid','synthetic-subject',at);
+  const response=await s.callback(await s.start({returnTo:'/pricing'}));assert.equal(response.headers.get('location'),'https://study.test/pricing');
+  assert.equal(s.db.prepare('SELECT count(*) n FROM billing_checkouts').get().n,0);
+  const flow=await s.start({returnTo:'/pricing'}),cancelled=await s.call('/api/auth/google/callback?state='+flow.url.searchParams.get('state')+'&error=access_denied','GET',undefined,flow.binder);
+  assert.equal(cancelled.headers.get('location'),'https://study.test/pricing?signin=cancelled');
+ }finally{s.close();}
+});
+test('new pricing visitors still accept the account policy before returning to pricing',async()=>{
+ const s=await setup();try{
+  const response=await s.callback(await s.start({returnTo:'/pricing'}));assert.equal(response.headers.get('location'),'https://study.test/account?signin=register');
+  const cookie=response.headers.getSetCookie().find(c=>c.startsWith('__Host-studytimely-registration=')).split(';')[0];
+  assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,0);
+  const form=await(await s.call('/api/auth/google/registration','GET',undefined,cookie)).json();
+  const done=await s.call('/api/auth/google/registration','POST',{accepted:true,policyVersion:form.pending.policyVersion},cookie,form.csrf);
+  assert.equal(done.status,200);assert.equal((await done.json()).redirect,'/pricing');assert.equal(s.db.prepare('SELECT count(*) n FROM billing_checkouts').get().n,0);
+ }finally{s.close();}
+});
 test('new accounts require one-time confirmation; existing Google accounts sign in without repeating it',async()=>{
  const s=await setup();try{const form=await newSignup(s);assert.equal(form.pending.minimumAge,16);assert.equal(s.db.prepare('SELECT count(*) n FROM accounts').get().n,0);assert.equal(s.db.prepare('SELECT count(*) n FROM sessions').get().n,0);
  const stored=s.db.prepare('SELECT token_hash FROM pending_google_registrations').get();assert.notEqual(stored.token_hash,form.cookie.split('=')[1]);
