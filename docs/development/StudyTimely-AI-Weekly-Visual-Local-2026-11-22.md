@@ -1,5 +1,7 @@
 # AI weekly report entry — visual follow-up, 22 November 2026
 
+**Publication update:** this reviewed visual change is now published as V2.52.1. See [the release handoff](StudyTimely-V2.52.1-Release.md) for actual version/deployment evidence, production screenshot and verification limits. The local-only statements below describe the pre-publication handoff.
+
 Local implementation only; production remains V2.52.0. The user reported that the newly published generation area had become a wall of text despite the previous chart/text design. Applied practical-visual-design to the entry and preflight, without changing provider configuration, access, allowances, report content contracts or exports.
 
 The initial entry now places a labelled fictional report specimen next to the real generation controls. It uses the existing shared HTML/CSS chart renderer: seven daily bars summing to 7 hours, two subject shares summing to the same total, summary figures, one illustrative interpretation and a two-row next-step table. Sample figures never enter the planner, store, AI request or quota. The specimen explicitly says fictional/not the user's records/not a live AI result and offers no fake download/action buttons. The actual selected-week figures and generation checks remain separate on the right. Apricot/gold/paper roles follow the existing warm account design; no new outline-icon tile system or image asset is added.
