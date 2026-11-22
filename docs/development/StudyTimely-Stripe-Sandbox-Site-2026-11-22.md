@@ -2,6 +2,8 @@
 
 The user authorized deploying the existing checkout and membership code to a separate test site and proving payment → automatic Plus activation. Both monthly and annual hosted Checkout payments passed using Stripe's public test card; no real payment was made.
 
+Source runtime commit: `2200979540954a313fe1120b8e6b67ae5d5a52a6`, saved locally. GitHub push was rejected by automatic approval review because this request authorized the isolated deployment, not source-code egress to the remote. No alternate push mechanism was attempted; obtain explicit user authorization before pushing this commit. This does not affect the already deployed sandbox.
+
 ## Deployed site
 
 - Entry: https://studytimely-billing-sandbox.chenminjian08.workers.dev/pricing
